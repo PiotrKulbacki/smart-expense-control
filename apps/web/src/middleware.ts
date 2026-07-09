@@ -11,6 +11,10 @@ function isPublicPath(pathname: string): boolean {
     return true;
   }
 
+  if (pathname.startsWith('/api/')) {
+    return true;
+  }
+
   return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 

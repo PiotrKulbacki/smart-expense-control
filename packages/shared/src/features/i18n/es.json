@@ -36,11 +36,78 @@
     }
   },
   "transactions": {
+    "labels": {
+      "confirmExpense": "Confirmar gasto",
+      "saveTransaction": "Guardar transacción",
+      "editTransaction": "Editar transacción",
+      "deleteTransaction": "Eliminar transacción"
+    },
+    "success": {
+      "created": "Transacción guardada correctamente",
+      "updated": "Transacción actualizada",
+      "deleted": "Transacción eliminada"
+    },
     "errors": {
       "invalidAmount": "Introduce un importe positivo válido",
       "invalidCategory": "Introduce una categoría",
       "invalidDate": "Introduce una fecha válida",
-      "invalidDescription": "La descripción es demasiado larga"
+      "invalidDescription": "La descripción es demasiado larga",
+      "notFound": "Transacción no encontrada",
+      "forbidden": "No tienes permiso para modificar esta transacción"
+    }
+  },
+  "recurring": {
+    "labels": {
+      "create": "Añadir gasto recurrente",
+      "edit": "Editar gasto recurrente"
+    },
+    "success": {
+      "created": "Gasto recurrente creado",
+      "updated": "Gasto recurrente actualizado",
+      "deleted": "Gasto recurrente eliminado"
+    },
+    "errors": {
+      "invalidAmount": "Introduce un importe positivo válido",
+      "invalidCategory": "Introduce una categoría",
+      "invalidFrequency": "Selecciona una frecuencia válida",
+      "invalidNextDueDate": "Introduce una fecha de vencimiento válida",
+      "notFound": "Gasto recurrente no encontrado",
+      "forbidden": "No tienes permiso para modificar este gasto recurrente"
+    }
+  },
+  "scanner": {
+    "labels": {
+      "scanReceipt": "Escanear recibo",
+      "confirmExpense": "Confirmar gasto",
+      "uploadReceipt": "Subir foto del recibo",
+      "upgradeToPro": "Actualizar a Pro",
+      "scanBlocked": "Límite de escaneos alcanzado"
+    },
+    "status": {
+      "analyzing": "Analizando recibo...",
+      "readyToConfirm": "Revisa y confirma los datos extraídos",
+      "scansRemaining": "{{count}} escaneos restantes este mes"
+    },
+    "success": {
+      "readyToConfirm": "Recibo analizado — revisa los datos antes de guardar"
+    },
+    "warnings": {
+      "needsReview": "Algunos datos pueden ser incorrectos — revísalos antes de guardar"
+    },
+    "errors": {
+      "invalidFile": "Sube un archivo de imagen válido (JPEG, PNG o WebP)",
+      "fileTooLarge": "La imagen es demasiado grande. Tamaño máximo: 10 MB",
+      "unreadable": "No se pudo leer el importe de este recibo",
+      "quotaExceeded": "Has usado los 3 escaneos gratuitos. Actualiza a Pro para seguir escaneando recibos",
+      "monthlyLimitReached": "Límite mensual de escaneos alcanzado. Inténtalo de nuevo el próximo mes",
+      "aiFailed": "El análisis del recibo falló. Inténtalo de nuevo",
+      "parseFailed": "No se pudieron procesar los datos del recibo. Introdúcelos manualmente"
+    }
+  },
+  "currency": {
+    "errors": {
+      "fetchFailed": "No se pudieron obtener los tipos de cambio. Usando tipos guardados",
+      "rateUnavailable": "Tipo de cambio no disponible para este par de divisas"
     }
   }
 }

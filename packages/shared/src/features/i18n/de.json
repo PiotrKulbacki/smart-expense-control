@@ -36,11 +36,78 @@
     }
   },
   "transactions": {
+    "labels": {
+      "confirmExpense": "Ausgabe bestätigen",
+      "saveTransaction": "Transaktion speichern",
+      "editTransaction": "Transaktion bearbeiten",
+      "deleteTransaction": "Transaktion löschen"
+    },
+    "success": {
+      "created": "Transaktion erfolgreich gespeichert",
+      "updated": "Transaktion aktualisiert",
+      "deleted": "Transaktion gelöscht"
+    },
     "errors": {
       "invalidAmount": "Bitte geben Sie einen gültigen positiven Betrag ein",
       "invalidCategory": "Bitte geben Sie eine Kategorie ein",
       "invalidDate": "Bitte geben Sie ein gültiges Datum ein",
-      "invalidDescription": "Die Beschreibung ist zu lang"
+      "invalidDescription": "Die Beschreibung ist zu lang",
+      "notFound": "Transaktion nicht gefunden",
+      "forbidden": "Sie haben keine Berechtigung, diese Transaktion zu ändern"
+    }
+  },
+  "recurring": {
+    "labels": {
+      "create": "Wiederkehrende Ausgabe hinzufügen",
+      "edit": "Wiederkehrende Ausgabe bearbeiten"
+    },
+    "success": {
+      "created": "Wiederkehrende Ausgabe erstellt",
+      "updated": "Wiederkehrende Ausgabe aktualisiert",
+      "deleted": "Wiederkehrende Ausgabe gelöscht"
+    },
+    "errors": {
+      "invalidAmount": "Bitte geben Sie einen gültigen positiven Betrag ein",
+      "invalidCategory": "Bitte geben Sie eine Kategorie ein",
+      "invalidFrequency": "Bitte wählen Sie eine gültige Frequenz",
+      "invalidNextDueDate": "Bitte geben Sie ein gültiges Fälligkeitsdatum ein",
+      "notFound": "Wiederkehrende Ausgabe nicht gefunden",
+      "forbidden": "Sie haben keine Berechtigung, diese wiederkehrende Ausgabe zu ändern"
+    }
+  },
+  "scanner": {
+    "labels": {
+      "scanReceipt": "Beleg scannen",
+      "confirmExpense": "Ausgabe bestätigen",
+      "uploadReceipt": "Belegfoto hochladen",
+      "upgradeToPro": "Auf Pro upgraden",
+      "scanBlocked": "Scan-Limit erreicht"
+    },
+    "status": {
+      "analyzing": "Beleg wird analysiert...",
+      "readyToConfirm": "Extrahierte Daten prüfen und bestätigen",
+      "scansRemaining": "{{count}} Scans verbleiben diesen Monat"
+    },
+    "success": {
+      "readyToConfirm": "Beleg analysiert — bitte vor dem Speichern prüfen"
+    },
+    "warnings": {
+      "needsReview": "Einige Angaben könnten falsch sein — bitte vor dem Speichern prüfen"
+    },
+    "errors": {
+      "invalidFile": "Bitte laden Sie eine gültige Bilddatei hoch (JPEG, PNG oder WebP)",
+      "fileTooLarge": "Das Bild ist zu groß. Maximale Größe: 10 MB",
+      "unreadable": "Der Betrag auf diesem Beleg konnte nicht gelesen werden",
+      "quotaExceeded": "Sie haben alle 3 kostenlosen Scans verbraucht. Upgraden Sie auf Pro, um weiter zu scannen",
+      "monthlyLimitReached": "Monatliches Scan-Limit erreicht. Versuchen Sie es nächsten Monat erneut",
+      "aiFailed": "Beleganalyse fehlgeschlagen. Bitte versuchen Sie es erneut",
+      "parseFailed": "Belegdaten konnten nicht verarbeitet werden. Bitte manuell eingeben"
+    }
+  },
+  "currency": {
+    "errors": {
+      "fetchFailed": "Wechselkurse konnten nicht abgerufen werden. Gespeicherte Kurse werden verwendet",
+      "rateUnavailable": "Wechselkurs für dieses Währungspaar nicht verfügbar"
     }
   }
 }

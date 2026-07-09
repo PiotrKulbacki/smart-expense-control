@@ -4,84 +4,115 @@
 
 1. **Inicjalizacja Monorepo i CI/CD** — [✅ Zrobione]
 2. **Baza Danych (Prisma/Drizzle), Auth i i18n** — [✅ Zrobione]
-3. **Wielowalutowość i Skaner AI (In-Memory Buffer)**
+3. **Wielowalutowość i Skaner AI (In-Memory Buffer)** — [✅ Zrobione]
 4. **Predykcyjny Czat AI i PDF**
 5. **PostHog (Flags & Analytics) i Stripe**
 6. **UI Dashboard, i18n UI i Sentry**
 
 ## Latest Handoff Log
 
-**2026-07-09 — Faza 2.1 (utwardzenie fundamentu przed Fazą 3)**
+**2026-07-09 — Faza 3 uzupełniona (limity planów skanera AI). Gotowość do Fazy 4.**
 
-### Auth guard
+### Limity skanera AI (decyzja produktowa)
 
-- **Web:** `apps/web/src/middleware.ts` — przekierowanie niezalogowanych na `/login`, zalogowanych z `/login`/`/register` na `/`
-- Publiczne ścieżki: `/login`, `/register`, `/api/auth/*`, `/api/health`
-- **Mobile:** `apps/mobile/src/features/auth/components/AuthGuard.tsx` — redirect + loader w `app/_layout.tsx`
+| Plan     | Limit skanów/mies. | Po wyczerpaniu                                                           |
+| -------- | ------------------ | ------------------------------------------------------------------------ |
+| **FREE** | **3** (trial)      | Przycisk **widoczny, zablokowany** + CTA „Przejdź na Pro” (UI w Fazie 6) |
+| **PRO**  | **150**            | Komunikat `scanner.errors.monthlyLimitReached`                           |
 
-### Supabase — dual connection strings
+- **Shared:** `packages/shared/src/features/billing/plan-limits.ts` — `PLAN_LIMITS`, `getAiScanQuotaStatus()`, `getAiScanLimit()`.
+- **Backend:** `checkAiScanQuota()` używa wspólnych limitów; FREE → `quotaExceeded`, PRO → `monthlyLimitReached`.
+- **API quota (dla UI):** `GET /api/ai/scan-quota` → `{ plan, quota: { limit, used, remaining, canScan, isBlocked } }`.
+- **Licznik:** inkrementowany tylko po **udanym** skanie (po walidacji Zod).
 
-- `DATABASE_URL` — Transaction Pooler (port **6543**, `?pgbouncer=true`) — runtime aplikacji
-- `DIRECT_DATABASE_URL` — Direct connection (port **5432**) — migracje Prisma
-- Schemat: `packages/database/prisma/schema.prisma` (`directUrl`)
-- Dokumentacja w `.env.example`
+### Wielowalutowość
 
-### Seed danych deweloperskich
+- **Shared:** `packages/shared/src/features/currency/` — `convertAmount()`, `fetchRatesFromFrankfurter()`, stałe fallback (`STABLE_FALLBACK_RATES`), TTL cache 24h.
+- **Web service:** `apps/web/src/features/currency/services/currency.service.ts` — `syncExchangeRates()` zapisuje kursy do `exchange_rates`, fallback: API → DB → stałe kursy.
+- **API:** `GET /api/currency/rates` — zwraca mapę kursów (wymaga auth).
+- **Przeliczanie:** `convertToPrimaryCurrency(amount, from, primaryCurrency='PLN')` — domyślna waluta główna PLN (brak pola `primaryCurrency` na `User` — do dodania w Fazie 6 UI).
 
-- `packages/database/prisma/seed.ts`
-- Skrypt: `npm run db:seed`
-- Dev user: `dev@smart-expense.local` / `Secure1!`
-- Przykładowe transakcje (PLN/EUR/GBP), recurring expense, kursy walut
+### Skaner AI (In-Memory Buffer)
 
-### Health check
+- **Route:** `POST /api/ai/scan-receipt` — `multipart/form-data`, pole `receipt` (plik graficzny).
+- **Serwis:** `apps/web/src/features/ai/services/receipt-scanner.service.ts`
+  - Model: `gpt-4o-mini` (vision via base64, bez zapisu pliku na dysk/S3).
+  - Walidacja Zod: `receiptScanResultSchema` w `@shared/features/transactions/schemas`.
+  - Zwraca `{ draft, message }` — **nie zapisuje** transakcji; użytkownik potwierdza przez `POST /api/transactions`.
+  - Flaga `needsManualReview: true` gdy AI niepewne — klient pokazuje ostrzeżenie (toast), draft i tak jest zwracany.
+- **Env:** `OPENAI_API_KEY` (opcjonalne w t3-env, wymagane runtime do skanowania).
 
-- `GET /api/health` — status `ok` + ping bazy (`SELECT 1`), publiczny endpoint
+### CRUD Transakcji
 
-**Następny agent:** Rozpocznij Fazę 3 — moduł wielowalutowości (ExchangeRate API + fallback) i skaner AI z In-Memory Buffer.
+- **Serwisy:**
+  - `apps/web/src/features/transactions/services/transaction.service.ts`
+  - `apps/web/src/features/transactions/services/recurring-expense.service.ts`
+- **API:**
+  - `GET/POST /api/transactions`
+  - `GET/PATCH/DELETE /api/transactions/[id]`
+  - `GET/POST /api/recurring-expenses`
+  - `GET/PATCH/DELETE /api/recurring-expenses/[id]`
+- **Auth:** `getAuthenticatedUser()` — cookie (web) lub Bearer JWT (mobile).
+- **Middleware:** wszystkie `/api/*` omijają redirect do loginu (auth w route handlerach).
+
+### i18n (Faza 3)
+
+Klucze `scanner.*`, `currency.*`, `recurring.*`, rozszerzone `transactions.*` w `en`, `pl`, `de`, `es`.
 
 ---
 
-**2026-07-09 — Faza 2 zakończona (Baza, Auth, i18n)**
+## Plan na przyszłe fazy
 
-### ORM & Baza danych
+### Faza 4 — Predykcyjny Czat AI i PDF
 
-- Wybrano **Prisma** w pakiecie `packages/database/`.
-- Schemat: `packages/database/prisma/schema.prisma`
-- Migracja inicjalizacyjna: `packages/database/prisma/migrations/20260709120000_init/migration.sql`
-- Tabele: `users`, `accounts`, `sessions`, `refresh_tokens`, `transactions`, `recurring_expenses`, `exchange_rates`
-- Indeksy: `transactions(userId, date)`, `recurring_expenses(userId, nextDueDate)`
-- Klient Prisma: `packages/database/src/index.ts` → import `@smart-expense-control/database`
-- Skrypty root: `db:generate`, `db:migrate`, `db:migrate:deploy`, `db:status`, `db:seed`
-- Build web: `migrate deploy && next build` (Vercel-ready)
+- Czat asystenta finansowego z kontekstem transakcji użytkownika (OpenAI/Anthropic).
+- Import i analiza PDF wyciągów bankowych.
+- Wspólne limity planów dla operacji AI (analogicznie do `plan-limits.ts`).
 
-### Walidacja Zod (shared)
+### Faza 5 — PostHog i Stripe
 
-- Auth: `packages/shared/src/features/auth/schemas.ts` (`loginSchema`, `registerSchema`, silne hasło)
-- Transakcje: `packages/shared/src/features/transactions/schemas.ts` (`createTransactionSchema`, `updateTransactionSchema`)
-- Re-export: `packages/shared/src/schemas/index.ts`
+- Stripe webhooki → aktualizacja `currentPlan` (FREE ↔ PRO).
+- Reset `monthlyAiScansCount` przy zmianie miesiąca (Vercel Cron lub Stripe billing cycle).
+- PostHog: eventy skanowania, konwersja FREE → PRO, feature flags.
+- **Rate limiting** na `POST /api/ai/scan-receipt` (Upstash Redis, np. max 10 skanów/godzinę) — ochrona przed botami oprócz limitu 150/mies.
 
-### i18n
+### Faza 6 — UI Dashboard, i18n UI i Sentry
 
-- Klucze auth + transactions w `packages/shared/src/features/i18n/{en,de,pl,es}.json`
-- Helper `t()` i `translateError()` w `packages/shared/src/features/i18n/index.ts`
+- Dashboard wydatków z wielowalutowością.
+- **Skaner paragonów w UI:**
+  - Przycisk „Skanuj paragon” **zawsze widoczny**.
+  - Gdy `quota.isBlocked === true`: przycisk `disabled`, styl zablokowany, badge „Pro” (FREE) lub komunikat limitu (PRO).
+  - `GET /api/ai/scan-quota` do stanu UI przed kliknięciem.
+  - Formularz potwierdzenia draftu ze skanera.
+  - Błędy wyłącznie przez **toast** (sonner).
+- Pole `primaryCurrency` na `User` + wybór w ustawieniach.
+- Sentry: monitoring błędów AI i API.
 
-### Auth Web (`apps/web`)
-
-- t3-env: `apps/web/src/env.ts`
-- Route Handlers: `/api/auth/{register,login,logout,me,refresh,google,google/callback}`
-- Serwisy: `apps/web/src/features/auth/services/auth.service.ts`
-- UI: `/login`, `/register` z toast (sonner) — zero statycznych błędów pod inputami
-- Web sesje: httpOnly cookie `sec_session`; Mobile: JWT + refresh token (header `x-client-platform: mobile`)
-
-### Auth Mobile (`apps/mobile`)
-
-- Env: `apps/mobile/src/env.ts` (Zod)
-- SecureStore: `apps/mobile/src/features/auth/lib/token-storage.ts`
-- Serwis API: `apps/mobile/src/features/auth/services/auth.service.ts`
-- Ekrany: `app/login.tsx`, `app/register.tsx` z toast (`react-native-toast-message`)
-- Context: `AuthProvider` w `app/_layout.tsx`
+---
 
 ## Ostatnie zmiany
+
+**2026-07-09 — Limity planów skanera AI (FREE 3 / PRO 150)**
+
+- Wspólne limity w `@shared/features/billing/plan-limits.ts`.
+- Rozdzielone komunikaty i18n: `quotaExceeded` (FREE) vs `monthlyLimitReached` (PRO).
+- Endpoint `GET /api/ai/scan-quota` dla przyszłego UI (widoczny, zablokowany przycisk).
+- Testy jednostkowe limitów planów.
+
+**2026-07-09 — Faza 3 zakończona**
+
+- Moduł walut: frankfurter.app + cache w `exchange_rates` + fallback.
+- Skaner paragonów AI: in-memory buffer, Zod, quota, draft bez auto-zapisu.
+- CRUD `Transaction` i `RecurringExpense` z pełnym API.
+- i18n dla skanera, walut, transakcji cyklicznych (4 języki).
+- Middleware: `/api/*` z własną autoryzacją (wsparcie mobile Bearer).
+
+**2026-07-09 — Faza 2 zamknięta (weryfikacja E2E)**
+
+- Zastosowano migrację na Supabase i seed danych deweloperskich.
+- Naprawiono ładowanie `.env` w dev (błąd 500 „Invalid environment variables” przy logowaniu).
+- Potwierdzono działanie auth: `POST /api/auth/login` → **200 OK**.
+- Zaktualizowano `.env.example` (dual Supabase URLs, uwagi o haśle).
 
 **2026-07-09 — Faza 2.1 (utwardzenie fundamentu)**
 
@@ -89,6 +120,7 @@
 - Skonfigurowano dual Supabase connection strings (`DATABASE_URL` pooler + `DIRECT_DATABASE_URL`).
 - Dodano seed deweloperski (`npm run db:seed`) z przykładowym użytkownikiem i danymi.
 - Dodano endpoint `GET /api/health` do monitoringu deployu.
+- Naprawiono CI: Turbo `globalPassThroughEnv`, job-level env, Prettier formatting.
 
 **2026-07-09 — Faza 2 zakończona**
 

@@ -36,11 +36,78 @@
     }
   },
   "transactions": {
+    "labels": {
+      "confirmExpense": "Confirm expense",
+      "saveTransaction": "Save transaction",
+      "editTransaction": "Edit transaction",
+      "deleteTransaction": "Delete transaction"
+    },
+    "success": {
+      "created": "Transaction saved successfully",
+      "updated": "Transaction updated successfully",
+      "deleted": "Transaction deleted successfully"
+    },
     "errors": {
       "invalidAmount": "Please enter a valid positive amount",
       "invalidCategory": "Please enter a category",
       "invalidDate": "Please enter a valid date",
-      "invalidDescription": "Description is too long"
+      "invalidDescription": "Description is too long",
+      "notFound": "Transaction not found",
+      "forbidden": "You do not have permission to modify this transaction"
+    }
+  },
+  "recurring": {
+    "labels": {
+      "create": "Add recurring expense",
+      "edit": "Edit recurring expense"
+    },
+    "success": {
+      "created": "Recurring expense created",
+      "updated": "Recurring expense updated",
+      "deleted": "Recurring expense deleted"
+    },
+    "errors": {
+      "invalidAmount": "Please enter a valid positive amount",
+      "invalidCategory": "Please enter a category",
+      "invalidFrequency": "Please select a valid frequency",
+      "invalidNextDueDate": "Please enter a valid next due date",
+      "notFound": "Recurring expense not found",
+      "forbidden": "You do not have permission to modify this recurring expense"
+    }
+  },
+  "scanner": {
+    "labels": {
+      "scanReceipt": "Scan receipt",
+      "confirmExpense": "Confirm expense",
+      "uploadReceipt": "Upload receipt photo",
+      "upgradeToPro": "Upgrade to Pro",
+      "scanBlocked": "Scan limit reached"
+    },
+    "status": {
+      "analyzing": "Analyzing receipt...",
+      "readyToConfirm": "Review and confirm the extracted details",
+      "scansRemaining": "{{count}} scans remaining this month"
+    },
+    "success": {
+      "readyToConfirm": "Receipt analyzed — please review before saving"
+    },
+    "warnings": {
+      "needsReview": "Some details may be incorrect — please review before saving"
+    },
+    "errors": {
+      "invalidFile": "Please upload a valid image file (JPEG, PNG, or WebP)",
+      "fileTooLarge": "Image is too large. Maximum size is 10 MB",
+      "unreadable": "Could not read the amount from this receipt",
+      "quotaExceeded": "You've used all 3 free scans. Upgrade to Pro to keep scanning receipts",
+      "monthlyLimitReached": "Monthly scan limit reached. Try again next month",
+      "aiFailed": "Receipt analysis failed. Please try again",
+      "parseFailed": "Could not parse receipt data. Please enter details manually"
+    }
+  },
+  "currency": {
+    "errors": {
+      "fetchFailed": "Could not fetch exchange rates. Using cached rates",
+      "rateUnavailable": "Exchange rate unavailable for this currency pair"
     }
   }
 }

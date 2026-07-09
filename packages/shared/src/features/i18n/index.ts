@@ -58,7 +58,13 @@ export type AuthErrorCode =
   | 'auth.errors.networkError';
 
 export function translateError(code: string, locale: Locale = DEFAULT_LOCALE): string {
-  if (code.startsWith('auth.') || code.startsWith('transactions.')) {
+  if (
+    code.startsWith('auth.') ||
+    code.startsWith('transactions.') ||
+    code.startsWith('recurring.') ||
+    code.startsWith('scanner.') ||
+    code.startsWith('currency.')
+  ) {
     return t(code, locale);
   }
   return t('auth.errors.generic', locale);

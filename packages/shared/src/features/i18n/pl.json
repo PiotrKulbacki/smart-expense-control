@@ -36,11 +36,78 @@
     }
   },
   "transactions": {
+    "labels": {
+      "confirmExpense": "Zatwierdź wydatek",
+      "saveTransaction": "Zapisz transakcję",
+      "editTransaction": "Edytuj transakcję",
+      "deleteTransaction": "Usuń transakcję"
+    },
+    "success": {
+      "created": "Transakcja zapisana pomyślnie",
+      "updated": "Transakcja zaktualizowana",
+      "deleted": "Transakcja usunięta"
+    },
     "errors": {
       "invalidAmount": "Podaj prawidłową dodatnią kwotę",
       "invalidCategory": "Podaj kategorię",
       "invalidDate": "Podaj prawidłową datę",
-      "invalidDescription": "Opis jest zbyt długi"
+      "invalidDescription": "Opis jest zbyt długi",
+      "notFound": "Nie znaleziono transakcji",
+      "forbidden": "Nie masz uprawnień do modyfikacji tej transakcji"
+    }
+  },
+  "recurring": {
+    "labels": {
+      "create": "Dodaj wydatek cykliczny",
+      "edit": "Edytuj wydatek cykliczny"
+    },
+    "success": {
+      "created": "Wydatek cykliczny utworzony",
+      "updated": "Wydatek cykliczny zaktualizowany",
+      "deleted": "Wydatek cykliczny usunięty"
+    },
+    "errors": {
+      "invalidAmount": "Podaj prawidłową dodatnią kwotę",
+      "invalidCategory": "Podaj kategorię",
+      "invalidFrequency": "Wybierz prawidłową częstotliwość",
+      "invalidNextDueDate": "Podaj prawidłową datę następnej płatności",
+      "notFound": "Nie znaleziono wydatku cyklicznego",
+      "forbidden": "Nie masz uprawnień do modyfikacji tego wydatku cyklicznego"
+    }
+  },
+  "scanner": {
+    "labels": {
+      "scanReceipt": "Skanuj paragon",
+      "confirmExpense": "Zatwierdź wydatek",
+      "uploadReceipt": "Prześlij zdjęcie paragonu",
+      "upgradeToPro": "Przejdź na Pro",
+      "scanBlocked": "Limit skanów wyczerpany"
+    },
+    "status": {
+      "analyzing": "Trwa analizowanie paragonu...",
+      "readyToConfirm": "Sprawdź i zatwierdź odczytane dane",
+      "scansRemaining": "Pozostało {{count}} skanów w tym miesiącu"
+    },
+    "success": {
+      "readyToConfirm": "Paragon przeanalizowany — sprawdź dane przed zapisem"
+    },
+    "warnings": {
+      "needsReview": "Niektóre dane mogą być niepoprawne — sprawdź je przed zapisem"
+    },
+    "errors": {
+      "invalidFile": "Prześlij prawidłowy plik graficzny (JPEG, PNG lub WebP)",
+      "fileTooLarge": "Obraz jest zbyt duży. Maksymalny rozmiar to 10 MB",
+      "unreadable": "Nie udało się odczytać kwoty z tego paragonu",
+      "quotaExceeded": "Wykorzystałeś 3 darmowe skany. Przejdź na Pro, aby dalej skanować paragony",
+      "monthlyLimitReached": "Osiągnięto miesięczny limit skanów. Spróbuj ponownie w przyszłym miesiącu",
+      "aiFailed": "Analiza paragonu nie powiodła się. Spróbuj ponownie",
+      "parseFailed": "Nie udało się przetworzyć danych z paragonu. Wprowadź je ręcznie"
+    }
+  },
+  "currency": {
+    "errors": {
+      "fetchFailed": "Nie udało się pobrać kursów walut. Używam zapisanych kursów",
+      "rateUnavailable": "Kurs wymiany niedostępny dla tej pary walut"
     }
   }
 }
