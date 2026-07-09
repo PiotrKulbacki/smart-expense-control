@@ -4,21 +4,21 @@ Aplikacja webowa (Next.js) + mobilna (Expo) do zarządzania finansami osobistymi
 
 ## Stack technologiczny
 
-| Warstwa | Technologia |
-|---------|-------------|
-| Monorepo | Turborepo + npm workspaces |
-| Web | Next.js 15, React 19, TypeScript (strict), Tailwind CSS |
-| Mobile | Expo 53, Expo Router, React Native |
-| Współdzielony kod | `@shared` — schematy Zod, i18n, typy, logika domenowa |
-| Baza danych | Prisma lub Drizzle (migracje plikowe, IaC) |
-| Auth | OAuth (dostawca TBD) |
-| Walidacja env | t3-env |
-| AI | OpenAI / Anthropic (skaner OCR, czat predykcyjny) |
-| Płatności | Stripe (webhooki z idempotency) |
-| Analityka & Flagi | PostHog |
-| Monitoring | Sentry / Axiom |
-| Rate Limiting | Upstash Redis na Route Handlers |
-| Hosting Web | Vercel (`migrate deploy && next build`) |
+| Warstwa           | Technologia                                             |
+| ----------------- | ------------------------------------------------------- |
+| Monorepo          | Turborepo + npm workspaces                              |
+| Web               | Next.js 15, React 19, TypeScript (strict), Tailwind CSS |
+| Mobile            | Expo 53, Expo Router, React Native                      |
+| Współdzielony kod | `@shared` — schematy Zod, i18n, typy, logika domenowa   |
+| Baza danych       | Prisma lub Drizzle (migracje plikowe, IaC)              |
+| Auth              | OAuth (dostawca TBD)                                    |
+| Walidacja env     | t3-env                                                  |
+| AI                | OpenAI / Anthropic (skaner OCR, czat predykcyjny)       |
+| Płatności         | Stripe (webhooki z idempotency)                         |
+| Analityka & Flagi | PostHog                                                 |
+| Monitoring        | Sentry / Axiom                                          |
+| Rate Limiting     | Upstash Redis na Route Handlers                         |
+| Hosting Web       | Vercel (`migrate deploy && next build`)                 |
 
 ## Struktura Monorepo
 
@@ -39,11 +39,11 @@ Aplikacja webowa (Next.js) + mobilna (Expo) do zarządzania finansami osobistymi
 
 ## Path Aliases
 
-| Alias | Ścieżka |
-|-------|---------|
+| Alias       | Ścieżka                 |
+| ----------- | ----------------------- |
 | `@shared/*` | `packages/shared/src/*` |
-| `@web/*` | `apps/web/src/*` |
-| `@mobile/*` | `apps/mobile/src/*` |
+| `@web/*`    | `apps/web/src/*`        |
+| `@mobile/*` | `apps/mobile/src/*`     |
 
 ## Architektura modułowa (Feature-Driven)
 
@@ -103,7 +103,7 @@ Zakaz hardkodowania tekstów w komponentach.
 
 ## Gałęzie Git
 
-| Gałąź | Cel |
-|-------|-----|
-| `main` | Produkcja |
-| `dev` | Aktywny development (domyślna) |
+| Gałąź  | Cel                            |
+| ------ | ------------------------------ |
+| `main` | Produkcja                      |
+| `dev`  | Aktywny development (domyślna) |
