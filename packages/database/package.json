@@ -1,0 +1,28 @@
+{
+  "name": "@smart-expense-control/database",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "dotenv -e ../../.env -- prisma generate",
+    "migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
+    "migrate:status": "dotenv -e ../../.env -- prisma migrate status",
+    "db:push": "dotenv -e ../../.env -- prisma db push",
+    "build": "dotenv -e ../../.env -- prisma generate",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.30.1",
+    "prisma": "^6.12.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.1"
+  }
+}

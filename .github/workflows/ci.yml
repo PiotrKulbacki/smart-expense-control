@@ -11,6 +11,20 @@ on:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,6 +37,25 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Prepare environment file
+        run: |
+          cat > .env <<EOF
+          DATABASE_URL=${{ env.DATABASE_URL }}
+          AUTH_SECRET=${{ env.AUTH_SECRET }}
+          GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }}
+          NEXT_PUBLIC_APP_URL=${{ env.NEXT_PUBLIC_APP_URL }}
+          EXPO_PUBLIC_API_URL=${{ env.EXPO_PUBLIC_API_URL }}
+          SKIP_ENV_VALIDATION=true
+          EOF
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          AUTH_SECRET: ci-build-secret-key-minimum-32-chars
+          GOOGLE_CLIENT_ID: ci-google-client-id
+          GOOGLE_CLIENT_SECRET: ci-google-client-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          EXPO_PUBLIC_API_URL: http://localhost:3000
 
       - name: Format check
         run: npm run format
@@ -38,3 +71,5 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: 'true'

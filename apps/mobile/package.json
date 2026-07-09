@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "expo start",
     "build": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src",
+    "lint": "eslint src app",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -14,11 +14,14 @@
     "@smart-expense-control/shared": "*",
     "expo": "^53.0.20",
     "expo-router": "^5.1.4",
+    "expo-secure-store": "~14.2.3",
     "expo-status-bar": "^2.2.3",
     "react": "^19.1.0",
     "react-native": "^0.79.5",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "4.11.1"
+    "react-native-screens": "4.11.1",
+    "react-native-toast-message": "^2.3.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

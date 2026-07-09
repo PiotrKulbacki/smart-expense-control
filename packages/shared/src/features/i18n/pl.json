@@ -1,1 +1,46 @@
-{}
+{
+  "auth": {
+    "labels": {
+      "email": "E-mail",
+      "password": "Hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "name": "Imię",
+      "login": "Zaloguj się",
+      "register": "Utwórz konto",
+      "logout": "Wyloguj się",
+      "continueWithGoogle": "Kontynuuj z Google",
+      "noAccount": "Nie masz konta?",
+      "hasAccount": "Masz już konto?",
+      "signUp": "Zarejestruj się",
+      "signIn": "Zaloguj się"
+    },
+    "success": {
+      "login": "Zalogowano pomyślnie",
+      "register": "Konto utworzone pomyślnie",
+      "logout": "Wylogowano pomyślnie"
+    },
+    "errors": {
+      "invalidEmail": "Podaj prawidłowy adres e-mail",
+      "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
+      "passwordNeedsDigit": "Hasło musi zawierać co najmniej jedną cyfrę",
+      "passwordNeedsSpecial": "Hasło musi zawierać co najmniej jeden znak specjalny",
+      "passwordsMismatch": "Hasła nie są identyczne",
+      "nameTooShort": "Imię musi mieć co najmniej 2 znaki",
+      "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
+      "userExists": "Konto z tym adresem e-mail już istnieje",
+      "unauthorized": "Musisz być zalogowany, aby kontynuować",
+      "sessionExpired": "Twoja sesja wygasła. Zaloguj się ponownie",
+      "oauthFailed": "Logowanie przez Google nie powiodło się. Spróbuj ponownie",
+      "generic": "Coś poszło nie tak. Spróbuj ponownie",
+      "networkError": "Błąd sieci. Sprawdź połączenie i spróbuj ponownie"
+    }
+  },
+  "transactions": {
+    "errors": {
+      "invalidAmount": "Podaj prawidłową dodatnią kwotę",
+      "invalidCategory": "Podaj kategorię",
+      "invalidDate": "Podaj prawidłową datę",
+      "invalidDescription": "Opis jest zbyt długi"
+    }
+  }
+}

@@ -1,1 +1,46 @@
-{}
+{
+  "auth": {
+    "labels": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "name": "Name",
+      "login": "Log in",
+      "register": "Create account",
+      "logout": "Log out",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "signUp": "Sign up",
+      "signIn": "Sign in"
+    },
+    "success": {
+      "login": "Successfully logged in",
+      "register": "Account created successfully",
+      "logout": "Successfully logged out"
+    },
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordNeedsDigit": "Password must contain at least one digit",
+      "passwordNeedsSpecial": "Password must contain at least one special character",
+      "passwordsMismatch": "Passwords do not match",
+      "nameTooShort": "Name must be at least 2 characters",
+      "invalidCredentials": "Invalid email or password",
+      "userExists": "An account with this email already exists",
+      "unauthorized": "You must be logged in to continue",
+      "sessionExpired": "Your session has expired. Please log in again",
+      "oauthFailed": "Google sign-in failed. Please try again",
+      "generic": "Something went wrong. Please try again",
+      "networkError": "Network error. Check your connection and try again"
+    }
+  },
+  "transactions": {
+    "errors": {
+      "invalidAmount": "Please enter a valid positive amount",
+      "invalidCategory": "Please enter a category",
+      "invalidDate": "Please enter a valid date",
+      "invalidDescription": "Description is too long"
+    }
+  }
+}

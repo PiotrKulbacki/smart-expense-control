@@ -1,1 +1,46 @@
-{}
+{
+  "auth": {
+    "labels": {
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "name": "Nombre",
+      "login": "Iniciar sesión",
+      "register": "Crear cuenta",
+      "logout": "Cerrar sesión",
+      "continueWithGoogle": "Continuar con Google",
+      "noAccount": "¿No tienes cuenta?",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "signUp": "Registrarse",
+      "signIn": "Iniciar sesión"
+    },
+    "success": {
+      "login": "Sesión iniciada correctamente",
+      "register": "Cuenta creada correctamente",
+      "logout": "Sesión cerrada correctamente"
+    },
+    "errors": {
+      "invalidEmail": "Introduce un correo electrónico válido",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordNeedsDigit": "La contraseña debe contener al menos un dígito",
+      "passwordNeedsSpecial": "La contraseña debe contener al menos un carácter especial",
+      "passwordsMismatch": "Las contraseñas no coinciden",
+      "nameTooShort": "El nombre debe tener al menos 2 caracteres",
+      "invalidCredentials": "Correo o contraseña incorrectos",
+      "userExists": "Ya existe una cuenta con este correo electrónico",
+      "unauthorized": "Debes iniciar sesión para continuar",
+      "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo",
+      "oauthFailed": "Error al iniciar sesión con Google. Inténtalo de nuevo",
+      "generic": "Algo salió mal. Inténtalo de nuevo",
+      "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo"
+    }
+  },
+  "transactions": {
+    "errors": {
+      "invalidAmount": "Introduce un importe positivo válido",
+      "invalidCategory": "Introduce una categoría",
+      "invalidDate": "Introduce una fecha válida",
+      "invalidDescription": "La descripción es demasiado larga"
+    }
+  }
+}
