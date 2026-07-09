@@ -2,7 +2,12 @@ import { createHash, randomBytes } from 'node:crypto';
 import { SignJWT, jwtVerify } from 'jose';
 import { env } from '@web/env';
 
-const secretKey = new TextEncoder().encode(env.AUTH_SECRET);
+let secretKey: Uint8Array | undefined;
+
+function getSecretKey(): Uint8Array {
+  secretKey ??= new TextEncoder().encode(env.AUTH_SECRET);
+  return secretKey;
+}
 
 export function generateToken(): string {
   return randomBytes(32).toString('hex');
@@ -17,12 +22,12 @@ export async function signAccessToken(userId: string): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('15m')
-    .sign(secretKey);
+    .sign(getSecretKey());
 }
 
 export async function verifyAccessToken(token: string): Promise<string | null> {
   try {
-    const { payload } = await jwtVerify(token, secretKey);
+    const { payload } = await jwtVerify(token, getSecretKey());
     if (payload.type !== 'access' || typeof payload.sub !== 'string') {
       return null;
     }
