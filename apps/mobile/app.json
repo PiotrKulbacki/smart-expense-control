@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Smart Expense Control",
+    "slug": "smart-expense-control",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "smart-expense-control",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smartexpensecontrol.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.smartexpensecontrol.app"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,65 @@
+# Reguły dla Agentów AI — Smart Expense Control
+
+## Żelazne reguły (nienaruszalne)
+
+1. **TypeScript strict + architektura modułowa:** Używaj TypeScript w trybie strict i architektury modułowej (katalogi `features/`). Zamiast relatywnych importów, używaj Path Aliases (`@shared/*`, `@web/*`, `@mobile/*`).
+2. **Nie cofaj kodu:** Nigdy nie cofaj kodu do wcześniejszego stanu (nie usuwaj działających implementacji) bez wyraźnego polecenia od użytkownika.
+3. **Błędy UI przez toast:** Błędy dla użytkownika (np. błędy autoryzacji czy logowania) muszą być zawsze obsługiwane za pomocą wyskakujących powiadomień typu `toast`. Nigdy nie renderuj błędów jako statycznego tekstu pod przyciskami lub inputami.
+4. **i18n bez hardkodu:** Zakaz hardkodowania tekstów w komponentach. Zawsze używaj funkcji tłumaczeń i plików JSON z pakietu `@shared/features/i18n`.
+
+## Architektura Monorepo
+
+- **Struktura:** Turborepo z `/apps/web` (Next.js), `/apps/mobile` (Expo), `/packages/shared` (wspólny kod).
+- **Walidacja Zod:** Schematy formularzy w `/packages/shared/schemas` — współdzielone między web, mobile i backend.
+- **Path Aliases:** `@shared/*`, `@web/*`, `@mobile/*` — nigdy `../../../../`.
+- **Zmienne środowiskowe:** Rozdziel publiczne (Expo/Next Frontend) od tajnych (Next Backend). Waliduj przez `t3-env`.
+- **Feature-Driven:** Kod domenowy w `features/` (auth, billing, ai). Każdy moduł ma własne routing, serwisy, walidację, typy i komponenty.
+- **i18n od Dnia 1:** Tłumaczenia (en, de, pl, es) w `packages/shared/src/features/i18n/`.
+
+## Baza Danych & Migracje
+
+- **IaC:** Zakaz ręcznych zmian w bazie przez panel. Każda zmiana przez ORM (Prisma/Drizzle).
+- **Migracje plikowe:** Generuj `.sql` lokalnie, commituj do Git.
+- **Pipeline Vercel:** `npx [orm] migrate deploy && next build`.
+- **Indeksy:** Od dnia 1 dla kolumn `user_id`, `date`, `status`.
+- **Cache agregacji:** Tabela podręczna dla analityki, aktualizowana asynchronicznie (Cron).
+
+## Środowisko IDE & Code Style
+
+- **Formatowanie:** Prettier, 2 spacje, `printWidth: 100`, średniki, `prettier-plugin-tailwindcss`.
+- **Format on save:** Włączone w `.vscode/settings.json`.
+
+## Bezpieczeństwo & Monitoring
+
+- **Rate Limiting:** Na dedykowanych Route Handlers (Upstash Redis), nie globalne Middleware.
+- **Fallback walutowy:** Przy awarii API kursów — ostatnie znane dane z bazy.
+- **Sentry/Axiom:** Monitoring błędów od dnia 1 (webhooki Stripe, API AI).
+- **OAuth:** Ustal dostawców tożsamości przed implementacją auth.
+- **Feature Flags:** PostHog lub `.env` (`ENABLE_AI=true`).
+- **Analityka:** PostHog z silnym typowaniem TypeScript.
+
+## Optymalizacja Kosztów
+
+- **In-Memory Buffers:** OCR paragonów bez permanentnego storage S3.
+- **Quota Limits:** Liczniki operacji AI w bazie (`monthly_ai_scans_count`).
+
+## UX/UI & Asynchroniczność
+
+- **Form Submissions:** Blokuj inputy i przycisk po kliknięciu (stan `loading`/`disabled`).
+- **Loadery & Optimistic UI:** Szkielety stron, Optimistic UI gdzie możliwe.
+- **Webhooks:** Stripe i długie procesy przez webhooki z idempotency.
+
+## Prawne & Prywatność
+
+- **RODO/GDPR:** Kaskadowe usuwanie danych przy „Usuń konto".
+- **AI Disclaimers:** Widoczny zapis wyłączający odpowiedzialność prawną za porady LLM.
+
+## Gałęzie Git
+
+- `main` — produkcja
+- `dev` — aktywny development (domyślna gałąź robocza)
+
+## Dokumentacja żywego kontekstu
+
+- `ARCHITECTURE.md` — stack technologiczny i decyzje architektoniczne
+- `PROGRESS.md` — status faz projektu i ostatnie zmiany
