@@ -15,10 +15,10 @@
 
 ### Limity skanera AI (decyzja produktowa)
 
-| Plan | Limit skanów/mies. | Po wyczerpaniu |
-|------|-------------------|----------------|
-| **FREE** | **3** (trial) | Przycisk **widoczny, zablokowany** + CTA „Przejdź na Pro” (UI w Fazie 6) |
-| **PRO** | **150** | Komunikat `scanner.errors.monthlyLimitReached` |
+| Plan     | Limit skanów/mies. | Po wyczerpaniu                                                           |
+| -------- | ------------------ | ------------------------------------------------------------------------ |
+| **FREE** | **3** (trial)      | Przycisk **widoczny, zablokowany** + CTA „Przejdź na Pro” (UI w Fazie 6) |
+| **PRO**  | **150**            | Komunikat `scanner.errors.monthlyLimitReached`                           |
 
 - **Shared:** `packages/shared/src/features/billing/plan-limits.ts` — `PLAN_LIMITS`, `getAiScanQuotaStatus()`, `getAiScanLimit()`.
 - **Backend:** `checkAiScanQuota()` używa wspólnych limitów; FREE → `quotaExceeded`, PRO → `monthlyLimitReached`.

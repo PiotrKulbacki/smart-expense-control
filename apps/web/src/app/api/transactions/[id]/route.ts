@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { updateTransactionSchema, TRANSACTION_ERROR_CODES } from '@shared/features/transactions/schemas';
+import {
+  updateTransactionSchema,
+  TRANSACTION_ERROR_CODES,
+} from '@shared/features/transactions/schemas';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
 import {
