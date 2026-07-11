@@ -20,7 +20,7 @@
     "format:write": "prettier --write .",
     "db:generate": "npm run generate -w @smart-expense-control/database",
     "db:migrate": "npm run migrate:dev -w @smart-expense-control/database",
-    "db:migrate:deploy": "npm run migrate:deploy -w @smart-expense-control/database",
+    "db:migrate:deploy": "dotenv -e .env -- npm run migrate:deploy -w @smart-expense-control/database",
     "db:status": "npm run migrate:status -w @smart-expense-control/database",
     "db:seed": "npm run db:seed -w @smart-expense-control/database"
   },

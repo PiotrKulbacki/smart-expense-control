@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e ../../.env -- next dev --port 3000",
-    "build": "npm run migrate:deploy -w @smart-expense-control/database && dotenv -e ../../.env -- next build",
+    "build": "npm run migrate:deploy -w @smart-expense-control/database && next build",
     "start": "dotenv -e ../../.env -- next start",
     "lint": "next lint",
     "test": "vitest run",
