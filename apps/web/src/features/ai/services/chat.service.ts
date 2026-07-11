@@ -141,9 +141,7 @@ async function callOpenAiChat(
   return content;
 }
 
-export type AiChatQuotaCheckResult =
-  | { ok: true; plan: PlanType }
-  | { ok: false; error: string };
+export type AiChatQuotaCheckResult = { ok: true; plan: PlanType } | { ok: false; error: string };
 
 export async function checkAiChatQuota(userId: string): Promise<AiChatQuotaCheckResult> {
   const user = await prisma.user.findUnique({
@@ -162,9 +160,7 @@ export async function checkAiChatQuota(userId: string): Promise<AiChatQuotaCheck
     return {
       ok: false,
       error:
-        plan === 'FREE'
-          ? CHAT_ERROR_CODES.QUOTA_EXCEEDED
-          : CHAT_ERROR_CODES.MONTHLY_LIMIT_REACHED,
+        plan === 'FREE' ? CHAT_ERROR_CODES.QUOTA_EXCEEDED : CHAT_ERROR_CODES.MONTHLY_LIMIT_REACHED,
     };
   }
 

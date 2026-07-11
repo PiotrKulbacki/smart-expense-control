@@ -213,9 +213,7 @@ export async function handleCheckoutSessionCompleted(
 
 export async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
   const customerId =
-    typeof subscription.customer === 'string'
-      ? subscription.customer
-      : subscription.customer?.id;
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
 
   if (!customerId) {
     return;
@@ -244,9 +242,7 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
 
 export async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Promise<void> {
   const customerId =
-    typeof subscription.customer === 'string'
-      ? subscription.customer
-      : subscription.customer?.id;
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id;
 
   if (!customerId) {
     return;

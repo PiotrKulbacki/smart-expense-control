@@ -117,9 +117,7 @@ async function callOpenAiVision(base64: string, mimeType: string): Promise<strin
   return content;
 }
 
-export type AiScanQuotaCheckResult =
-  | { ok: true; plan: PlanType }
-  | { ok: false; error: string };
+export type AiScanQuotaCheckResult = { ok: true; plan: PlanType } | { ok: false; error: string };
 
 export async function checkAiScanQuota(userId: string): Promise<AiScanQuotaCheckResult> {
   const user = await prisma.user.findUnique({
