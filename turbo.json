@@ -32,23 +32,25 @@
         "GOOGLE_CLIENT_ID",
         "GOOGLE_CLIENT_SECRET",
         "OPENAI_API_KEY",
-        "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET",
-        "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
-        "UPSTASH_REDIS_REST_URL",
-        "UPSTASH_REDIS_REST_TOKEN",
+        "STRIPE_*",
+        "NEXT_PUBLIC_STRIPE_*",
+        "UPSTASH_*",
         "CRON_SECRET",
-        "POSTHOG_API_KEY",
-        "NEXT_PUBLIC_POSTHOG_KEY",
-        "NEXT_PUBLIC_POSTHOG_HOST",
+        "POSTHOG_*",
+        "NEXT_PUBLIC_POSTHOG_*",
         "NEXT_PUBLIC_APP_URL",
-        "EXPO_PUBLIC_API_URL",
+        "EXPO_PUBLIC_*",
         "SKIP_ENV_VALIDATION",
-        "NODE_ENV"
-      ]
+        "NODE_ENV",
+        "VERCEL",
+        "VERCEL_*",
+        "CI"
+      ],
+      "passThroughEnv": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
     },
     "@smart-expense-control/database#build": {
-      "cache": false
+      "cache": false,
+      "outputs": []
     },
     "dev": {
       "cache": false,

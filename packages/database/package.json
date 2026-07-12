@@ -7,7 +7,7 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate:dev": "dotenv -e ../../.env -- prisma migrate dev",
-    "migrate:deploy": "prisma migrate deploy",
+    "migrate:deploy": "node scripts/check-migrate-env.mjs && prisma migrate deploy",
     "migrate:status": "dotenv -e ../../.env -- prisma migrate status",
     "db:push": "dotenv -e ../../.env -- prisma db push",
     "db:seed": "dotenv -e ../../.env -- prisma db seed",
