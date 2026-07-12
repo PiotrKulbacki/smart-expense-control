@@ -1,4 +1,4 @@
-import { prisma, type Currency } from '@smart-expense-control/database';
+import { prisma } from '@smart-expense-control/database';
 import {
   buildRateMapFromPairs,
   convertAmount,
@@ -8,18 +8,6 @@ import {
   type ExchangeRateMap,
 } from '@shared/features/currency';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
-
-function mapDbRates(
-  rows: Array<{ fromCurrency: Currency; toCurrency: Currency; rate: { toNumber(): number } }>
-): ExchangeRateMap {
-  return buildRateMapFromPairs(
-    rows.map((row) => ({
-      from: row.fromCurrency as CurrencyCode,
-      to: row.toCurrency as CurrencyCode,
-      rate: row.rate.toNumber(),
-    }))
-  );
-}
 
 async function getLatestDbRates(): Promise<ExchangeRateMap> {
   const currencies: CurrencyCode[] = ['PLN', 'EUR', 'GBP'];

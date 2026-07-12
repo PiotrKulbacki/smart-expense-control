@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { initPostHog, getPostHogClient } from '@web/features/analytics/posthog-client';
 
 type FeatureFlagsContextValue = {
@@ -40,17 +40,19 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timeout);
   }, []);
 
-  const isFeatureEnabled = useCallback(
-    (flagKey: string): boolean => {
-      const client = getPostHogClient();
-      return client?.isFeatureEnabled(flagKey) ?? false;
-    },
-    [flagsVersion]
+  const contextValue = useMemo(
+    (): FeatureFlagsContextValue => ({
+      isReady,
+      isFeatureEnabled: (flagKey: string): boolean => {
+        void flagsVersion;
+        const client = getPostHogClient();
+        return client?.isFeatureEnabled(flagKey) ?? false;
+      },
+    }),
+    [isReady, flagsVersion]
   );
 
   return (
-    <FeatureFlagsContext.Provider value={{ isReady, isFeatureEnabled }}>
-      {children}
-    </FeatureFlagsContext.Provider>
+    <FeatureFlagsContext.Provider value={contextValue}>{children}</FeatureFlagsContext.Provider>
   );
 }
