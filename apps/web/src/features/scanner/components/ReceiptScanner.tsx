@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import { TRANSACTION_CATEGORIES } from '@shared/features/transactions/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { getCategoryLabelKey } from '@web/features/transactions/lib/category-config';
 
 type ScanQuota = {
   limit: number;
@@ -231,7 +232,7 @@ export function ReceiptScanner() {
               >
                 {TRANSACTION_CATEGORIES.map((category) => (
                   <option key={category} value={category}>
-                    {category}
+                    {t(getCategoryLabelKey(category))}
                   </option>
                 ))}
               </select>

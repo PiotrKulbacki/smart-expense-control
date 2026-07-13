@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Confirmar gasto",
       "saveTransaction": "Guardar transacción",
-      "editTransaction": "Editar transacción",
-      "deleteTransaction": "Eliminar transacción"
+      "editTransaction": "Editar gasto",
+      "editTransactionHint": "Actualiza el importe, la categoría o la fecha de este gasto.",
+      "deleteTransaction": "Eliminar",
+      "addManualExpense": "Añadir gasto manualmente",
+      "addManualExpenseHint": "Introduce importe, categoría y fecha de una nueva transacción."
+    },
+    "categories": {
+      "groceries": "Comestibles",
+      "transport": "Transporte",
+      "coffee": "Café",
+      "restaurants": "Restaurantes",
+      "entertainment": "Ocio",
+      "shopping": "Compras",
+      "utilities": "Servicios",
+      "health": "Salud",
+      "other": "Otros"
     },
     "success": {
       "created": "Transacción guardada correctamente",
@@ -219,9 +233,28 @@
     "categories": {
       "title": "Gastos por categoría"
     },
+    "chartFilter": {
+      "period": "Periodo actual",
+      "last7Days": "Últimos 7 días",
+      "today": "Hoy",
+      "empty": "Sin gastos en este rango de fechas."
+    },
+    "budget": {
+      "label": "Presupuesto mensual",
+      "preview": "Vista previa",
+      "spent": "{{amount}} gastado",
+      "remaining": "{{amount}} restante"
+    },
     "recent": {
       "title": "Transacciones recientes",
-      "empty": "Sin transacciones aún. Escanea un recibo o añade un gasto para empezar."
+      "emptyTitle": "Sin gastos en este periodo",
+      "empty": "Escanea un recibo o añade un gasto para empezar a controlar tus finanzas.",
+      "emptyCta": "Añadir primer gasto",
+      "actions": "Acciones de transacción"
+    },
+    "delete": {
+      "title": "¿Eliminar este gasto?",
+      "description": "Esta acción no se puede deshacer. La transacción se eliminará permanentemente de tus registros."
     },
     "form": {
       "amount": "Importe",
@@ -229,7 +262,15 @@
       "category": "Categoría",
       "date": "Fecha",
       "description": "Descripción",
+      "descriptionOptional": "Descripción (opcional)",
+      "descriptionPlaceholder": "p. ej. compra semanal, taxi al aeropuerto…",
       "cancel": "Cancelar"
+    },
+    "cta": {
+      "addManual": "Añadir gasto manualmente",
+      "addManualHint": "Introduce importe, categoría y fecha",
+      "scanReceipt": "Escanear recibo",
+      "scanReceiptHint": "La IA extrae los datos de una foto"
     }
   },
   "settings": {

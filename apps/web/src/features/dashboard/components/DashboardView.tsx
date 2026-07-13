@@ -1,25 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { BudgetProgress } from '@web/features/transactions/components/BudgetProgress';
+import { CategoryDonutChart } from '@web/features/transactions/components/CategoryDonutChart';
+import { DashboardCtas } from '@web/features/transactions/components/DashboardCtas';
+import { DeleteTransactionDialog } from '@web/features/transactions/components/DeleteTransactionDialog';
+import {
+  RecentTransactionsList,
+  type RecentTransaction,
+} from '@web/features/transactions/components/RecentTransactionsList';
+import { TransactionFormModal } from '@web/features/transactions/components/TransactionFormModal';
+import type { TransactionFormInitialValues } from '@web/features/transactions/components/TransactionForm';
+import type { ChartTransaction } from '@web/features/transactions/lib/chart-date-filter';
 
 type DashboardSummary = {
-  primaryCurrency: string;
+  primaryCurrency: CurrencyCode;
+  periodStart: string;
   totalSpent: number;
   transactionCount: number;
   categoryTotals: Array<{ category: string; amount: number }>;
 };
 
-type DashboardTransaction = {
-  id: string;
-  amount: number;
-  currency: string;
-  convertedAmount: number;
-  category: string;
-  description: string | null;
-  date: string;
+type ScanQuota = {
+  remaining: number;
 };
 
 function formatMoney(amount: number, currency: string, locale: string): string {
@@ -30,45 +37,130 @@ function formatMoney(amount: number, currency: string, locale: string): string {
   }).format(amount);
 }
 
+function toDateInputValue(isoDate: string): string {
+  const date = new Date(isoDate);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toFormInitialValues(transaction: RecentTransaction): TransactionFormInitialValues {
+  return {
+    amount: transaction.amount,
+    currency: transaction.currency as CurrencyCode,
+    category: transaction.category as TransactionFormInitialValues['category'],
+    description: transaction.description ?? '',
+    date: toDateInputValue(transaction.date),
+  };
+}
+
 export function DashboardView() {
   const t = useT();
   const { locale } = useLocale();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [transactions, setTransactions] = useState<DashboardTransaction[]>([]);
+  const [transactions, setTransactions] = useState<RecentTransaction[]>([]);
+  const [chartTransactions, setChartTransactions] = useState<ChartTransaction[]>([]);
+  const [scanQuota, setScanQuota] = useState<ScanQuota | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<RecentTransaction | null>(null);
+  const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  useEffect(() => {
-    async function loadDashboard() {
+  const loadDashboard = useCallback(
+    async (options?: { silent?: boolean }) => {
+      const silent = options?.silent ?? false;
+
+      if (!silent) {
+        setIsLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
       try {
-        const response = await fetch('/api/dashboard');
-        const data = (await response.json()) as {
+        const [dashboardResponse, quotaResponse] = await Promise.all([
+          fetch('/api/dashboard'),
+          fetch('/api/ai/scan-quota'),
+        ]);
+
+        const dashboardData = (await dashboardResponse.json()) as {
           summary?: DashboardSummary;
-          recentTransactions?: DashboardTransaction[];
+          recentTransactions?: RecentTransaction[];
+          chartTransactions?: ChartTransaction[];
           error?: string;
         };
 
-        if (!response.ok) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
+        if (!dashboardResponse.ok) {
+          toast.error(translateError(dashboardData.error ?? 'auth.errors.generic', locale));
           return;
         }
 
-        setSummary(data.summary ?? null);
-        setTransactions(data.recentTransactions ?? []);
+        setSummary(dashboardData.summary ?? null);
+        setTransactions(dashboardData.recentTransactions ?? []);
+        setChartTransactions(dashboardData.chartTransactions ?? []);
+
+        if (quotaResponse.ok) {
+          const quotaData = (await quotaResponse.json()) as {
+            quota?: { remaining: number };
+          };
+          setScanQuota(quotaData.quota ? { remaining: quotaData.quota.remaining } : null);
+        }
       } catch {
         toast.error(t('auth.errors.networkError'));
       } finally {
         setIsLoading(false);
+        setIsRefreshing(false);
       }
-    }
+    },
+    [locale, t]
+  );
 
+  useEffect(() => {
     void loadDashboard();
-  }, [locale, t]);
+  }, [loadDashboard]);
+
+  function openCreateForm() {
+    setEditingTransaction(null);
+    setIsFormOpen(true);
+  }
+
+  function openEditForm(transaction: RecentTransaction) {
+    setEditingTransaction(transaction);
+    setIsFormOpen(true);
+  }
+
+  function handleFormOpenChange(open: boolean) {
+    setIsFormOpen(open);
+    if (!open) {
+      setEditingTransaction(null);
+    }
+  }
+
+  function openDeleteDialog(transactionId: string) {
+    setDeletingTransactionId(transactionId);
+    setIsDeleteDialogOpen(true);
+  }
+
+  function handleDeleteDialogOpenChange(open: boolean) {
+    setIsDeleteDialogOpen(open);
+    if (!open) {
+      setDeletingTransactionId(null);
+    }
+  }
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-32 animate-pulse rounded-2xl bg-gray-200" />
+        <div className="h-10 w-48 animate-pulse rounded-lg bg-gray-200" />
+        <div className="h-10 w-72 animate-pulse rounded-lg bg-gray-200" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="h-32 animate-pulse rounded-2xl bg-gray-200" />
+          <div className="h-32 animate-pulse rounded-2xl bg-gray-200" />
+        </div>
         <div className="h-64 animate-pulse rounded-2xl bg-gray-200" />
+        <div className="h-72 animate-pulse rounded-2xl bg-gray-200" />
       </div>
     );
   }
@@ -79,9 +171,14 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
-        <p className="mt-1 text-sm text-gray-600">{t('dashboard.subtitle')}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            {t('dashboard.title')}
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">{t('dashboard.subtitle')}</p>
+        </div>
+        <DashboardCtas onAddManual={openCreateForm} scanQuota={scanQuota} />
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2">
@@ -90,6 +187,11 @@ export function DashboardView() {
           <p className="mt-2 text-3xl font-bold text-gray-900">
             {formatMoney(summary.totalSpent, summary.primaryCurrency, locale)}
           </p>
+          <BudgetProgress
+            totalSpent={summary.totalSpent}
+            primaryCurrency={summary.primaryCurrency}
+            locale={locale}
+          />
         </article>
         <article className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-gray-500">{t('dashboard.summary.transactions')}</p>
@@ -97,53 +199,40 @@ export function DashboardView() {
         </article>
       </section>
 
-      {summary.categoryTotals.length > 0 && (
-        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.categories.title')}</h2>
-          <div className="mt-4 space-y-3">
-            {summary.categoryTotals.map((item) => (
-              <div key={item.category} className="flex items-center justify-between text-sm">
-                <span className="text-gray-700">{item.category}</span>
-                <span className="font-medium text-gray-900">
-                  {formatMoney(item.amount, summary.primaryCurrency, locale)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <CategoryDonutChart
+        chartTransactions={chartTransactions}
+        periodStart={summary.periodStart}
+        primaryCurrency={summary.primaryCurrency}
+        locale={locale}
+      />
 
-      <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">{t('dashboard.recent.title')}</h2>
-        {transactions.length === 0 ? (
-          <p className="mt-4 text-sm text-gray-500">{t('dashboard.recent.empty')}</p>
-        ) : (
-          <div className="mt-4 divide-y divide-gray-100">
-            {transactions.map((transaction) => (
-              <article key={transaction.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {transaction.description ?? transaction.category}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {transaction.category} · {new Date(transaction.date).toLocaleDateString(locale)}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">
-                    {formatMoney(transaction.convertedAmount, summary.primaryCurrency, locale)}
-                  </p>
-                  {transaction.currency !== summary.primaryCurrency && (
-                    <p className="text-xs text-gray-500">
-                      {formatMoney(transaction.amount, transaction.currency, locale)}
-                    </p>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
+      <RecentTransactionsList
+        transactions={transactions}
+        primaryCurrency={summary.primaryCurrency}
+        locale={locale}
+        isRefreshing={isRefreshing}
+        onEdit={openEditForm}
+        onDelete={openDeleteDialog}
+        onAddFirst={openCreateForm}
+      />
+
+      <TransactionFormModal
+        open={isFormOpen}
+        onOpenChange={handleFormOpenChange}
+        primaryCurrency={summary.primaryCurrency}
+        transactionId={editingTransaction?.id}
+        initialValues={
+          editingTransaction ? toFormInitialValues(editingTransaction) : undefined
+        }
+        onSuccess={() => void loadDashboard({ silent: true })}
+      />
+
+      <DeleteTransactionDialog
+        transactionId={deletingTransactionId}
+        open={isDeleteDialogOpen}
+        onOpenChange={handleDeleteDialogOpenChange}
+        onSuccess={() => void loadDashboard({ silent: true })}
+      />
     </div>
   );
 }

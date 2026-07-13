@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Ausgabe bestätigen",
       "saveTransaction": "Transaktion speichern",
-      "editTransaction": "Transaktion bearbeiten",
-      "deleteTransaction": "Transaktion löschen"
+      "editTransaction": "Ausgabe bearbeiten",
+      "editTransactionHint": "Betrag, Kategorie oder Datum dieser Ausgabe aktualisieren.",
+      "deleteTransaction": "Löschen",
+      "addManualExpense": "Ausgabe manuell hinzufügen",
+      "addManualExpenseHint": "Betrag, Kategorie und Datum für eine neue Transaktion eingeben."
+    },
+    "categories": {
+      "groceries": "Lebensmittel",
+      "transport": "Transport",
+      "coffee": "Kaffee",
+      "restaurants": "Restaurants",
+      "entertainment": "Unterhaltung",
+      "shopping": "Einkäufe",
+      "utilities": "Nebenkosten",
+      "health": "Gesundheit",
+      "other": "Sonstiges"
     },
     "success": {
       "created": "Transaktion erfolgreich gespeichert",
@@ -219,9 +233,28 @@
     "categories": {
       "title": "Ausgaben nach Kategorie"
     },
+    "chartFilter": {
+      "period": "Aktueller Zeitraum",
+      "last7Days": "Letzte 7 Tage",
+      "today": "Heute",
+      "empty": "Keine Ausgaben in diesem Datumsbereich."
+    },
+    "budget": {
+      "label": "Monatsbudget",
+      "preview": "Vorschau",
+      "spent": "{{amount}} ausgegeben",
+      "remaining": "{{amount}} übrig"
+    },
     "recent": {
       "title": "Letzte Transaktionen",
-      "empty": "Noch keine Transaktionen. Scannen Sie einen Beleg oder fügen Sie eine Ausgabe hinzu."
+      "emptyTitle": "Keine Ausgaben in diesem Zeitraum",
+      "empty": "Scannen Sie einen Beleg oder fügen Sie eine Ausgabe hinzu, um Ihre Finanzen zu verfolgen.",
+      "emptyCta": "Erste Ausgabe hinzufügen",
+      "actions": "Transaktionsaktionen"
+    },
+    "delete": {
+      "title": "Diese Ausgabe löschen?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Die Transaktion wird dauerhaft aus Ihren Daten entfernt."
     },
     "form": {
       "amount": "Betrag",
@@ -229,7 +262,15 @@
       "category": "Kategorie",
       "date": "Datum",
       "description": "Beschreibung",
+      "descriptionOptional": "Beschreibung (optional)",
+      "descriptionPlaceholder": "z. B. Wocheneinkauf, Taxi zum Flughafen…",
       "cancel": "Abbrechen"
+    },
+    "cta": {
+      "addManual": "Ausgabe manuell hinzufügen",
+      "addManualHint": "Betrag, Kategorie und Datum eingeben",
+      "scanReceipt": "Beleg scannen",
+      "scanReceiptHint": "KI extrahiert Details aus einem Foto"
     }
   },
   "settings": {

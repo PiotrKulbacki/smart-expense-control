@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Zatwierdź wydatek",
       "saveTransaction": "Zapisz transakcję",
-      "editTransaction": "Edytuj transakcję",
-      "deleteTransaction": "Usuń transakcję"
+      "editTransaction": "Edytuj wydatek",
+      "editTransactionHint": "Zaktualizuj kwotę, kategorię lub datę tego wydatku.",
+      "deleteTransaction": "Usuń",
+      "addManualExpense": "Dodaj wydatek ręcznie",
+      "addManualExpenseHint": "Wprowadź kwotę, kategorię i datę nowej transakcji."
+    },
+    "categories": {
+      "groceries": "Zakupy spożywcze",
+      "transport": "Transport",
+      "coffee": "Kawa",
+      "restaurants": "Restauracje",
+      "entertainment": "Rozrywka",
+      "shopping": "Zakupy",
+      "utilities": "Rachunki",
+      "health": "Zdrowie",
+      "other": "Inne"
     },
     "success": {
       "created": "Transakcja zapisana pomyślnie",
@@ -219,9 +233,28 @@
     "categories": {
       "title": "Wydatki wg kategorii"
     },
+    "chartFilter": {
+      "period": "Bieżący okres",
+      "last7Days": "Ostatnie 7 dni",
+      "today": "Dziś",
+      "empty": "Brak wydatków w tym zakresie dat."
+    },
+    "budget": {
+      "label": "Budżet miesięczny",
+      "preview": "Podgląd",
+      "spent": "Wydano {{amount}}",
+      "remaining": "Pozostało {{amount}}"
+    },
     "recent": {
       "title": "Ostatnie transakcje",
-      "empty": "Brak transakcji. Zeskanuj paragon lub dodaj wydatek, aby zacząć."
+      "emptyTitle": "Brak wydatków w tym okresie",
+      "empty": "Zeskanuj paragon lub dodaj wydatek, aby zacząć śledzić wydatki.",
+      "emptyCta": "Dodaj pierwszy wydatek",
+      "actions": "Akcje transakcji"
+    },
+    "delete": {
+      "title": "Usunąć ten wydatek?",
+      "description": "Tej operacji nie można cofnąć. Transakcja zostanie trwale usunięta z Twoich danych."
     },
     "form": {
       "amount": "Kwota",
@@ -229,7 +262,15 @@
       "category": "Kategoria",
       "date": "Data",
       "description": "Opis",
+      "descriptionOptional": "Opis (opcjonalnie)",
+      "descriptionPlaceholder": "np. cotygodniowe zakupy, taxi na lotnisko…",
       "cancel": "Anuluj"
+    },
+    "cta": {
+      "addManual": "Dodaj wydatek ręcznie",
+      "addManualHint": "Wpisz kwotę, kategorię i datę",
+      "scanReceipt": "Skanuj paragon",
+      "scanReceiptHint": "AI odczyta dane ze zdjęcia"
     }
   },
   "settings": {

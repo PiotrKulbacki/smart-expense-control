@@ -8,10 +8,37 @@
 4. **Predykcyjny Czat AI (Asystent Finansowy)** — [✅ Zrobione]
 5. **PostHog (Flags & Analytics) i Stripe** — [✅ Zrobione]
 6. **UI Dashboard, i18n UI i Sentry** — [✅ Zrobione]
+7. **Dashboard UX: formularz ręczny, wykresy, CTA** — [✅ Zrobione]
+8. **Dashboard Premium: filtry wykresu, CRUD transakcji, budżet preview** — [✅ Zrobione]
 
 ## Latest Handoff Log
 
-**2026-07-13 — Utwardzenie Fazy 6: billing wielowalutowy, cennik promocyjny, Upstash prefix.**
+**2026-07-13 — Faza 8 zamknięta: tuning Premium dashboardu (filtry, CRUD, budżet preview).**
+
+### Faza 8 — Dashboard Premium: filtry wykresu, CRUD transakcji, budżet preview
+
+- **Typografia i CTA** — tytuł `text-3xl font-bold tracking-tight`; kompaktowy pasek akcji (Dodaj ręcznie + Skanuj z badge quota).
+- **Filtr wykresu donut** — `Select` w karcie kategorii: Bieżący okres / Ostatnie 7 dni / Dziś; filtrowanie po stronie klienta z `chartTransactions` z API; skeleton przy przełączaniu.
+- **Lista transakcji** — wszystkie transakcje bieżącego miesiąca finansowego (`financialMonthStartDay`); `ScrollArea` max-h; empty state z ikoną i CTA.
+- **CRUD UI** — `DropdownMenu` (Edytuj / Usuń); edycja przez ten sam Sheet/Drawer + `PATCH /api/transactions/[id]`; usuwanie z `AlertDialog` + `DELETE /api/transactions/[id]`.
+- **Premium sznyt** — pastelowe tła ikon kategorii (`CATEGORY_ICON_STYLES`); `BudgetProgress` (fikcyjny budżet 3000, preview pod sumą wydatków).
+- **i18n** — nowe klucze `dashboard.chartFilter.*`, `dashboard.budget.*`, `dashboard.delete.*`, `dashboard.recent.empty*` w en/pl/de/es.
+- **Shadcn UI** — `Select`, `DropdownMenu`, `AlertDialog`, `ScrollArea`, `Progress`.
+
+---
+
+**2026-07-13 — Faza 7 zamknięta: formularz ręczny, wykres donut, CTA, rozbudowana lista transakcji.**
+
+### Faza 7 — Dashboard UX: formularz ręczny, wykresy, CTA
+
+- **Formularz ręczny** — `TransactionFormModal`: Sheet (desktop) / Drawer (mobile), React Hook Form + Zod (`transactionFormSchema` w `@shared`), `POST /api/transactions`, toasty sonner, odświeżanie dashboardu po sukcesie.
+- **Główne CTA** — `DashboardCtas`: „Dodaj wydatek ręcznie” + „Skanuj paragon” (`/scanner`) z badge quota z `GET /api/ai/scan-quota`.
+- **Wykres donut** — `CategoryDonutChart` (Recharts): podział `categoryTotals` z bieżącego okresu rozliczeniowego, legenda z % i kwotami w `primaryCurrency`.
+- **Lista transakcji** — `RecentTransactionsList`: ikony kategorii (lucide-react), opis pod kategorią, oryginalna kwota (szara) + skonwertowana (pogrubiona).
+- **i18n** — nazwy kategorii (`transactions.categories.*`), etykiety CTA i formularza w en/pl/de/es; skaner używa tłumaczeń kategorii.
+- **Walidacja** — `createTransactionSchema.category` jako `z.enum(TRANSACTION_CATEGORIES)`.
+
+---
 
 ### Billing i cennik (post-Faza 6)
 
@@ -183,6 +210,15 @@ _(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez uży
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-13 — Dashboard Premium (Faza 8): filtry wykresu, CRUD transakcji, budżet preview**
+
+- Kompaktowy pasek CTA, większy tytuł dashboardu, filtr dat wykresu donut (okres / 7 dni / dziś).
+- Lista transakcji z bieżącego miesiąca finansowego w `ScrollArea`; empty state z CTA.
+- Edycja (`PATCH`) i usuwanie (`DELETE`) transakcji z DropdownMenu + AlertDialog.
+- Pastelowe ikony kategorii; `BudgetProgress` (preview budżetu pod sumą wydatków).
+- Nowe komponenty Shadcn: Select, DropdownMenu, AlertDialog, ScrollArea, Progress.
+- i18n: `dashboard.chartFilter.*`, `dashboard.budget.*`, `dashboard.delete.*` w 4 językach.
 
 **2026-07-13 — Billing wielowalutowy, cennik promocyjny, Upstash prefix**
 

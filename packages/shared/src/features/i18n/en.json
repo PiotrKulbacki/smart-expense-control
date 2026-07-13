@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Confirm expense",
       "saveTransaction": "Save transaction",
-      "editTransaction": "Edit transaction",
-      "deleteTransaction": "Delete transaction"
+      "editTransaction": "Edit expense",
+      "editTransactionHint": "Update amount, category, or date for this expense.",
+      "deleteTransaction": "Delete",
+      "addManualExpense": "Add expense manually",
+      "addManualExpenseHint": "Enter amount, category, and date for a new transaction."
+    },
+    "categories": {
+      "groceries": "Groceries",
+      "transport": "Transport",
+      "coffee": "Coffee",
+      "restaurants": "Restaurants",
+      "entertainment": "Entertainment",
+      "shopping": "Shopping",
+      "utilities": "Utilities",
+      "health": "Health",
+      "other": "Other"
     },
     "success": {
       "created": "Transaction saved successfully",
@@ -219,9 +233,28 @@
     "categories": {
       "title": "Spending by category"
     },
+    "chartFilter": {
+      "period": "Current period",
+      "last7Days": "Last 7 days",
+      "today": "Today",
+      "empty": "No spending in this date range."
+    },
+    "budget": {
+      "label": "Monthly budget",
+      "preview": "Preview",
+      "spent": "{{amount}} spent",
+      "remaining": "{{amount}} left"
+    },
     "recent": {
       "title": "Recent transactions",
-      "empty": "No transactions yet. Scan a receipt or add an expense to get started."
+      "emptyTitle": "No expenses this period",
+      "empty": "Scan a receipt or add an expense to start tracking your spending.",
+      "emptyCta": "Add your first expense",
+      "actions": "Transaction actions"
+    },
+    "delete": {
+      "title": "Delete this expense?",
+      "description": "This action cannot be undone. The transaction will be permanently removed from your records."
     },
     "form": {
       "amount": "Amount",
@@ -229,7 +262,15 @@
       "category": "Category",
       "date": "Date",
       "description": "Description",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "e.g. Weekly groceries, taxi to airport…",
       "cancel": "Cancel"
+    },
+    "cta": {
+      "addManual": "Add expense manually",
+      "addManualHint": "Type in amount, category, and date",
+      "scanReceipt": "Scan receipt",
+      "scanReceiptHint": "AI extracts details from a photo"
     }
   },
   "settings": {

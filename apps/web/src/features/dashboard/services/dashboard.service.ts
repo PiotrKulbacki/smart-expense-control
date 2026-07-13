@@ -3,6 +3,7 @@ import { getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
+import { getChartDataFetchStart } from '@web/features/transactions/lib/chart-date-filter';
 
 export type DashboardTransaction = {
   id: string;
@@ -13,6 +14,12 @@ export type DashboardTransaction = {
   description: string | null;
   date: string;
   isAiScanned: boolean;
+};
+
+export type DashboardChartTransaction = {
+  date: string;
+  category: string;
+  convertedAmount: number;
 };
 
 export type DashboardSummary = {
@@ -28,6 +35,7 @@ export type DashboardSummary = {
 export type DashboardData = {
   summary: DashboardSummary;
   recentTransactions: DashboardTransaction[];
+  chartTransactions: DashboardChartTransaction[];
 };
 
 export async function getDashboardData(userId: string): Promise<DashboardData | null> {
@@ -45,10 +53,11 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
 
   const now = new Date();
   const periodStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
+  const chartDataStart = getChartDataFetchStart(periodStart, now);
   const primaryCurrency = user.primaryCurrency as CurrencyCode;
   const rateMap = await getExchangeRates();
 
-  const [periodTransactions, recentTransactions] = await Promise.all([
+  const [periodTransactions, chartSourceTransactions, recentTransactions] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         userId,
@@ -61,9 +70,23 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
       },
     }),
     prisma.transaction.findMany({
-      where: { userId },
+      where: {
+        userId,
+        date: { gte: chartDataStart, lte: now },
+      },
+      select: {
+        amount: true,
+        currency: true,
+        category: true,
+        date: true,
+      },
+    }),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: periodStart, lte: now },
+      },
       orderBy: { date: 'desc' },
-      take: 20,
       select: {
         id: true,
         amount: true,
@@ -121,6 +144,19 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
         description: transaction.description,
         date: transaction.date.toISOString(),
         isAiScanned: transaction.isAiScanned,
+      };
+    }),
+    chartTransactions: chartSourceTransactions.map((transaction) => {
+      const amount = transaction.amount.toNumber();
+      return {
+        date: transaction.date.toISOString(),
+        category: transaction.category,
+        convertedAmount: convertAmount(
+          amount,
+          transaction.currency as CurrencyCode,
+          primaryCurrency,
+          rateMap
+        ),
       };
     }),
   };
