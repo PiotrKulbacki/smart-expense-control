@@ -29,6 +29,7 @@ export async function GET(request: Request) {
         id: true,
         financialMonthStartDay: true,
         lastQuotaResetAt: true,
+        defaultMonthlyBudget: true,
       },
     });
 
@@ -44,10 +45,10 @@ export async function GET(request: Request) {
       });
     }
 
-    const result = await prisma.user.updateMany({
-      where: {
-        id: { in: usersToReset.map((user) => user.id) },
-      },
+    const resetIds = usersToReset.map((user) => user.id);
+
+    const quotaResult = await prisma.user.updateMany({
+      where: { id: { in: resetIds } },
       data: {
         monthlyAiScansCount: 0,
         monthlyAiChatCount: 0,
@@ -55,9 +56,22 @@ export async function GET(request: Request) {
       },
     });
 
+    const budgetUpdates = usersToReset.filter((user) => user.defaultMonthlyBudget != null);
+
+    if (budgetUpdates.length > 0) {
+      await Promise.all(
+        budgetUpdates.map((user) =>
+          prisma.user.update({
+            where: { id: user.id },
+            data: { currentMonthBudget: user.defaultMonthlyBudget },
+          })
+        )
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      usersReset: result.count,
+      usersReset: quotaResult.count,
       timestamp: now.toISOString(),
     });
   } catch {

@@ -37,6 +37,8 @@ model User {
   monthlyAiChatCount     Int       @default(0)
   primaryCurrency        Currency  @default(PLN)
   financialMonthStartDay Int       @default(1)
+  defaultMonthlyBudget   Float?
+  currentMonthBudget     Float?
   lastQuotaResetAt       DateTime?
   pastDueSince           DateTime?
 

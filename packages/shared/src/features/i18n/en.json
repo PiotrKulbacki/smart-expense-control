@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Confirm expense",
       "saveTransaction": "Save transaction",
-      "editTransaction": "Edit transaction",
-      "deleteTransaction": "Delete transaction"
+      "editTransaction": "Edit expense",
+      "editTransactionHint": "Update amount, category, or date for this expense.",
+      "deleteTransaction": "Delete",
+      "addManualExpense": "Add expense manually",
+      "addManualExpenseHint": "Enter amount, category, and date for a new transaction."
+    },
+    "categories": {
+      "groceries": "Groceries",
+      "transport": "Transport",
+      "coffee": "Coffee",
+      "restaurants": "Restaurants",
+      "entertainment": "Entertainment",
+      "shopping": "Shopping",
+      "utilities": "Utilities",
+      "health": "Health",
+      "other": "Other"
     },
     "success": {
       "created": "Transaction saved successfully",
@@ -147,6 +161,7 @@
       "features": "Features",
       "pricing": "Pricing",
       "dashboard": "Dashboard",
+      "history": "History",
       "scanner": "Scanner",
       "chat": "AI Chat",
       "settings": "Settings"
@@ -213,15 +228,42 @@
     "title": "Dashboard",
     "subtitle": "Your spending overview for the current billing period",
     "summary": {
-      "totalSpent": "Total spent this period",
+      "totalSpent": "Total spending",
       "transactions": "Transactions"
     },
     "categories": {
-      "title": "Spending by category"
+      "title": "Spending by category",
+      "fixedCosts": "Fixed costs"
+    },
+    "chartFilter": {
+      "period": "Current period",
+      "last7Days": "Last 7 days",
+      "today": "Today",
+      "customRange": "Custom range",
+      "customRangePlaceholder": "Select date range",
+      "apply": "Apply",
+      "toggleHint": "Click a category to show or hide it on the chart",
+      "allHidden": "All categories are hidden. Click a category below to show it.",
+      "empty": "No spending in this date range."
+    },
+    "budget": {
+      "label": "Monthly budget",
+      "spent": "{{amount}} spent",
+      "remaining": "{{amount}} left",
+      "editCurrent": "Edit this month's budget",
+      "editCurrentHint": "Override the budget for the current billing cycle only.",
+      "updated": "Budget updated for this month"
     },
     "recent": {
       "title": "Recent transactions",
-      "empty": "No transactions yet. Scan a receipt or add an expense to get started."
+      "emptyTitle": "No expenses this period",
+      "empty": "Scan a receipt or add an expense to start tracking your spending.",
+      "emptyCta": "Add your first expense",
+      "actions": "Transaction actions"
+    },
+    "delete": {
+      "title": "Delete this expense?",
+      "description": "This action cannot be undone. The transaction will be permanently removed from your records."
     },
     "form": {
       "amount": "Amount",
@@ -229,8 +271,25 @@
       "category": "Category",
       "date": "Date",
       "description": "Description",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "e.g. Weekly groceries, taxi to airport…",
       "cancel": "Cancel"
+    },
+    "cta": {
+      "addManual": "Add expense manually",
+      "addManualHint": "Type in amount, category, and date",
+      "scanReceipt": "Scan receipt",
+      "scanReceiptHint": "AI extracts details from a photo"
     }
+  },
+  "history": {
+    "title": "Transaction history",
+    "subtitle": "Browse and manage expenses from past billing cycles",
+    "previousMonth": "Previous billing cycle",
+    "nextMonth": "Next billing cycle",
+    "transactionsTitle": "Transactions",
+    "emptyTitle": "No transactions in this cycle",
+    "empty": "There are no recorded expenses for the selected billing period."
   },
   "settings": {
     "title": "Settings",
@@ -241,6 +300,9 @@
     "labels": {
       "primaryCurrency": "Primary currency",
       "financialMonthStartDay": "Billing month start day (1–28)",
+      "defaultMonthlyBudget": "Default monthly budget",
+      "defaultMonthlyBudgetPlaceholder": "e.g. 3000",
+      "defaultMonthlyBudgetHint": "Renewable budget copied to each new billing cycle. First save also sets the current month.",
       "saveChanges": "Save changes"
     },
     "success": {
@@ -251,6 +313,7 @@
       "invalidName": "Name must be between 2 and 100 characters",
       "invalidCurrency": "Please select a valid currency",
       "invalidFinancialDay": "Billing day must be between 1 and 28",
+      "invalidBudget": "Please enter a valid positive budget amount",
       "deleteFailed": "Could not delete account. Please try again",
       "updateFailed": "Could not save settings. Please try again",
       "confirmEmailMismatch": "Email confirmation does not match"
@@ -260,6 +323,16 @@
       "description": "Permanently delete your account and all associated data. This action cannot be undone.",
       "confirmLabel": "Type your email ({{email}}) to confirm",
       "deleteAccount": "Delete my account permanently"
+    },
+    "recurring": {
+      "title": "Fixed costs (subscriptions, rent)",
+      "description": "Monthly recurring expenses shown separately on your dashboard chart.",
+      "namePlaceholder": "Name / description",
+      "amountPlaceholder": "Amount",
+      "add": "Add fixed cost",
+      "empty": "No fixed costs added yet.",
+      "monthlyTotal": "Monthly total",
+      "actions": "Fixed cost actions"
     }
   },
   "billing": {

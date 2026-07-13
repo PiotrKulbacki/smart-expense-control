@@ -15,6 +15,7 @@ import {
   readStoredBillingCurrency,
 } from '@web/features/billing/components/BillingCurrencySwitcher';
 import { ProPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
+import { RecurringExpensesSection } from '@web/features/settings/components/RecurringExpensesSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 export function SettingsView() {
@@ -26,6 +27,7 @@ export function SettingsView() {
   const [name, setName] = useState('');
   const [primaryCurrency, setPrimaryCurrency] = useState<'PLN' | 'EUR' | 'GBP'>('PLN');
   const [financialMonthStartDay, setFinancialMonthStartDay] = useState(1);
+  const [defaultMonthlyBudget, setDefaultMonthlyBudget] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -57,6 +59,9 @@ export function SettingsView() {
         setName(data.user.name ?? '');
         setPrimaryCurrency(data.user.primaryCurrency);
         setFinancialMonthStartDay(data.user.financialMonthStartDay);
+        setDefaultMonthlyBudget(
+          data.user.defaultMonthlyBudget != null ? String(data.user.defaultMonthlyBudget) : ''
+        );
         setCheckoutCurrency(readStoredBillingCurrency() ?? data.user.primaryCurrency);
       } catch {
         toast.error(t('auth.errors.networkError'));
@@ -73,6 +78,14 @@ export function SettingsView() {
     setIsSaving(true);
 
     try {
+      const parsedBudget = defaultMonthlyBudget.trim() ? Number(defaultMonthlyBudget) : null;
+
+      if (defaultMonthlyBudget.trim() && (!Number.isFinite(parsedBudget) || parsedBudget! <= 0)) {
+        toast.error(t('settings.errors.invalidBudget'));
+        setIsSaving(false);
+        return;
+      }
+
       const response = await fetch('/api/auth/me', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -80,6 +93,9 @@ export function SettingsView() {
           name: name.trim() || undefined,
           primaryCurrency,
           financialMonthStartDay,
+          ...(defaultMonthlyBudget.trim()
+            ? { defaultMonthlyBudget: parsedBudget }
+            : { defaultMonthlyBudget: null }),
         }),
       });
 
@@ -236,6 +252,24 @@ export function SettingsView() {
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 disabled:opacity-50"
               />
             </label>
+            <label className="block text-sm sm:col-span-2">
+              <span className="mb-1 block font-medium text-gray-700">
+                {t('settings.labels.defaultMonthlyBudget')}
+              </span>
+              <input
+                type="number"
+                min={1}
+                step="0.01"
+                value={defaultMonthlyBudget}
+                disabled={isSaving}
+                onChange={(event) => setDefaultMonthlyBudget(event.target.value)}
+                placeholder={t('settings.labels.defaultMonthlyBudgetPlaceholder')}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 disabled:opacity-50"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                {t('settings.labels.defaultMonthlyBudgetHint')}
+              </p>
+            </label>
           </div>
           <button
             type="submit"
@@ -246,6 +280,8 @@ export function SettingsView() {
           </button>
         </section>
       </form>
+
+      <RecurringExpensesSection primaryCurrency={primaryCurrency} />
 
       <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">{t('billing.labels.subscription')}</h2>

@@ -1,0 +1,147 @@
+'use client';
+
+import { useState } from 'react';
+import { Pencil } from 'lucide-react';
+import { toast } from 'sonner';
+import { translateError } from '@shared/features/i18n';
+import { Button } from '@web/components/ui/button';
+import { Input } from '@web/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@web/components/ui/popover';
+import { Progress } from '@web/components/ui/progress';
+import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+
+type BudgetProgressProps = {
+  totalSpent: number;
+  currentMonthBudget: number | null;
+  primaryCurrency: string;
+  locale: string;
+  onBudgetUpdated?: (budget: number | null) => void;
+};
+
+function formatMoney(amount: number, currency: string, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function BudgetProgress({
+  totalSpent,
+  currentMonthBudget,
+  primaryCurrency,
+  locale,
+  onBudgetUpdated,
+}: BudgetProgressProps) {
+  const t = useT();
+  const { locale: appLocale } = useLocale();
+  const [isOpen, setIsOpen] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  if (currentMonthBudget == null || currentMonthBudget <= 0) {
+    return null;
+  }
+
+  const budget = currentMonthBudget;
+  const percentage = Math.min(Math.round((totalSpent / budget) * 100), 100);
+  const remaining = Math.max(budget - totalSpent, 0);
+
+  function openEditor() {
+    setEditValue(String(budget));
+    setIsOpen(true);
+  }
+
+  async function handleSave() {
+    const parsed = Number(editValue);
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      toast.error(t('settings.errors.invalidBudget'));
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await fetch('/api/auth/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentMonthBudget: parsed }),
+      });
+
+      const data = (await response.json()) as {
+        user?: { currentMonthBudget: number | null };
+        error?: string;
+      };
+
+      if (!response.ok) {
+        toast.error(translateError(data.error ?? 'settings.errors.updateFailed', appLocale));
+        return;
+      }
+
+      toast.success(t('dashboard.budget.updated'));
+      onBudgetUpdated?.(data.user?.currentMonthBudget ?? parsed);
+      setIsOpen(false);
+    } catch {
+      toast.error(t('auth.errors.networkError'));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-medium text-gray-500">{t('dashboard.budget.label')}</span>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              onClick={openEditor}
+              className="flex items-center gap-1 text-gray-500 transition hover:text-gray-700"
+              aria-label={t('dashboard.budget.editCurrent')}
+            >
+              <span>{formatMoney(budget, primaryCurrency, locale)}</span>
+              <Pencil className="h-3 w-3" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-56">
+            <p className="text-sm font-medium text-gray-900">{t('dashboard.budget.editCurrent')}</p>
+            <p className="mt-1 text-xs text-gray-500">{t('dashboard.budget.editCurrentHint')}</p>
+            <Input
+              type="number"
+              min={1}
+              step="0.01"
+              value={editValue}
+              disabled={isSaving}
+              onChange={(event) => setEditValue(event.target.value)}
+              className="mt-3"
+            />
+            <Button
+              type="button"
+              size="default"
+              className="mt-3 w-full"
+              disabled={isSaving}
+              onClick={() => void handleSave()}
+            >
+              {t('settings.labels.saveChanges')}
+            </Button>
+          </PopoverContent>
+        </Popover>
+      </div>
+      <Progress value={percentage} className="h-1.5" />
+      <div className="flex items-center justify-between text-xs text-gray-500">
+        <span>
+          {t('dashboard.budget.spent', {
+            amount: formatMoney(totalSpent, primaryCurrency, locale),
+          })}
+        </span>
+        <span>
+          {t('dashboard.budget.remaining', {
+            amount: formatMoney(remaining, primaryCurrency, locale),
+          })}
+        </span>
+      </div>
+    </div>
+  );
+}

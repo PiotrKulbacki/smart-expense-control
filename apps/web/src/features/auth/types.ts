@@ -9,6 +9,8 @@ export type SafeUser = Pick<
   | 'currentPlan'
   | 'primaryCurrency'
   | 'financialMonthStartDay'
+  | 'defaultMonthlyBudget'
+  | 'currentMonthBudget'
   | 'stripeCustomerId'
   | 'createdAt'
 >;
@@ -22,6 +24,8 @@ export function toSafeUser(user: User): SafeUser {
     currentPlan: user.currentPlan,
     primaryCurrency: user.primaryCurrency,
     financialMonthStartDay: user.financialMonthStartDay,
+    defaultMonthlyBudget: user.defaultMonthlyBudget,
+    currentMonthBudget: user.currentMonthBudget,
     stripeCustomerId: user.stripeCustomerId,
     createdAt: user.createdAt,
   };

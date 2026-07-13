@@ -5,6 +5,7 @@ export const USER_ERROR_CODES = {
   INVALID_NAME: 'settings.errors.invalidName',
   INVALID_CURRENCY: 'settings.errors.invalidCurrency',
   INVALID_FINANCIAL_DAY: 'settings.errors.invalidFinancialDay',
+  INVALID_BUDGET: 'settings.errors.invalidBudget',
   DELETE_FAILED: 'settings.errors.deleteFailed',
   UPDATE_FAILED: 'settings.errors.updateFailed',
 } as const;
@@ -24,6 +25,18 @@ export const updateUserSchema = z
       .int(USER_ERROR_CODES.INVALID_FINANCIAL_DAY)
       .min(FINANCIAL_MONTH_DAY_MIN, USER_ERROR_CODES.INVALID_FINANCIAL_DAY)
       .max(FINANCIAL_MONTH_DAY_MAX, USER_ERROR_CODES.INVALID_FINANCIAL_DAY)
+      .optional(),
+    defaultMonthlyBudget: z
+      .number({ invalid_type_error: USER_ERROR_CODES.INVALID_BUDGET })
+      .positive(USER_ERROR_CODES.INVALID_BUDGET)
+      .max(999_999_999.99, USER_ERROR_CODES.INVALID_BUDGET)
+      .nullable()
+      .optional(),
+    currentMonthBudget: z
+      .number({ invalid_type_error: USER_ERROR_CODES.INVALID_BUDGET })
+      .positive(USER_ERROR_CODES.INVALID_BUDGET)
+      .max(999_999_999.99, USER_ERROR_CODES.INVALID_BUDGET)
+      .nullable()
       .optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {

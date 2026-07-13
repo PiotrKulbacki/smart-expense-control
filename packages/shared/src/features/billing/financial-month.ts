@@ -54,3 +54,37 @@ export function isPastDueGraceExpired(
 
   return reference.getTime() - pastDueSince.getTime() >= PAST_DUE_GRACE_MS;
 }
+
+export function getQuotaPeriodEnd(periodStart: Date): Date {
+  const end = new Date(periodStart);
+  end.setUTCMonth(end.getUTCMonth() + 1);
+  end.setUTCDate(end.getUTCDate() - 1);
+  end.setUTCHours(23, 59, 59, 999);
+  return end;
+}
+
+export function getPreviousQuotaPeriodStart(
+  financialMonthStartDay: number,
+  reference: Date = new Date()
+): Date {
+  const currentStart = getQuotaPeriodStart(financialMonthStartDay, reference);
+  const previous = new Date(currentStart);
+  previous.setUTCMonth(previous.getUTCMonth() - 1);
+  return previous;
+}
+
+export function formatBillingPeriodLabel(
+  periodStart: Date,
+  periodEnd: Date,
+  locale: string
+): string {
+  const formatter = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' });
+  const startMonth = formatter.format(periodStart);
+  const endMonth = formatter.format(periodEnd);
+
+  if (startMonth === endMonth) {
+    return startMonth;
+  }
+
+  return `${startMonth} – ${endMonth}`;
+}

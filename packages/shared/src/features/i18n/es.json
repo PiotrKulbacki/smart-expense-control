@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Confirmar gasto",
       "saveTransaction": "Guardar transacción",
-      "editTransaction": "Editar transacción",
-      "deleteTransaction": "Eliminar transacción"
+      "editTransaction": "Editar gasto",
+      "editTransactionHint": "Actualiza el importe, la categoría o la fecha de este gasto.",
+      "deleteTransaction": "Eliminar",
+      "addManualExpense": "Añadir gasto manualmente",
+      "addManualExpenseHint": "Introduce importe, categoría y fecha de una nueva transacción."
+    },
+    "categories": {
+      "groceries": "Comestibles",
+      "transport": "Transporte",
+      "coffee": "Café",
+      "restaurants": "Restaurantes",
+      "entertainment": "Ocio",
+      "shopping": "Compras",
+      "utilities": "Servicios",
+      "health": "Salud",
+      "other": "Otros"
     },
     "success": {
       "created": "Transacción guardada correctamente",
@@ -147,6 +161,7 @@
       "features": "Funciones",
       "pricing": "Precios",
       "dashboard": "Panel",
+      "history": "Historial",
       "scanner": "Escáner",
       "chat": "Chat IA",
       "settings": "Ajustes"
@@ -213,15 +228,42 @@
     "title": "Panel",
     "subtitle": "Resumen de gastos del periodo de facturación actual",
     "summary": {
-      "totalSpent": "Total gastado en este periodo",
+      "totalSpent": "Suma de gastos",
       "transactions": "Transacciones"
     },
     "categories": {
-      "title": "Gastos por categoría"
+      "title": "Gastos por categoría",
+      "fixedCosts": "Gastos fijos"
+    },
+    "chartFilter": {
+      "period": "Periodo actual",
+      "last7Days": "Últimos 7 días",
+      "today": "Hoy",
+      "customRange": "Rango personalizado",
+      "customRangePlaceholder": "Seleccionar rango de fechas",
+      "apply": "Aplicar",
+      "toggleHint": "Haz clic en una categoría para mostrarla u ocultarla en el gráfico",
+      "allHidden": "Todas las categorías están ocultas. Haz clic en una categoría para mostrarla.",
+      "empty": "Sin gastos en este rango de fechas."
+    },
+    "budget": {
+      "label": "Presupuesto mensual",
+      "spent": "{{amount}} gastado",
+      "remaining": "{{amount}} restante",
+      "editCurrent": "Editar presupuesto de este mes",
+      "editCurrentHint": "Sobrescribe el presupuesto solo para el ciclo de facturación actual.",
+      "updated": "Presupuesto actualizado para este mes"
     },
     "recent": {
       "title": "Transacciones recientes",
-      "empty": "Sin transacciones aún. Escanea un recibo o añade un gasto para empezar."
+      "emptyTitle": "Sin gastos en este periodo",
+      "empty": "Escanea un recibo o añade un gasto para empezar a controlar tus finanzas.",
+      "emptyCta": "Añadir primer gasto",
+      "actions": "Acciones de transacción"
+    },
+    "delete": {
+      "title": "¿Eliminar este gasto?",
+      "description": "Esta acción no se puede deshacer. La transacción se eliminará permanentemente de tus registros."
     },
     "form": {
       "amount": "Importe",
@@ -229,8 +271,25 @@
       "category": "Categoría",
       "date": "Fecha",
       "description": "Descripción",
+      "descriptionOptional": "Descripción (opcional)",
+      "descriptionPlaceholder": "p. ej. compra semanal, taxi al aeropuerto…",
       "cancel": "Cancelar"
+    },
+    "cta": {
+      "addManual": "Añadir gasto manualmente",
+      "addManualHint": "Introduce importe, categoría y fecha",
+      "scanReceipt": "Escanear recibo",
+      "scanReceiptHint": "La IA extrae los datos de una foto"
     }
+  },
+  "history": {
+    "title": "Historial de transacciones",
+    "subtitle": "Consulta y gestiona gastos de ciclos de facturación anteriores",
+    "previousMonth": "Ciclo de facturación anterior",
+    "nextMonth": "Siguiente ciclo de facturación",
+    "transactionsTitle": "Transacciones",
+    "emptyTitle": "Sin transacciones en este ciclo",
+    "empty": "No hay gastos registrados para el periodo de facturación seleccionado."
   },
   "settings": {
     "title": "Ajustes",
@@ -241,6 +300,9 @@
     "labels": {
       "primaryCurrency": "Moneda principal",
       "financialMonthStartDay": "Día de inicio del mes de facturación (1–28)",
+      "defaultMonthlyBudget": "Presupuesto mensual predeterminado",
+      "defaultMonthlyBudgetPlaceholder": "p. ej. 3000",
+      "defaultMonthlyBudgetHint": "Presupuesto renovable en cada ciclo de facturación. El primer guardado también establece el mes actual.",
       "saveChanges": "Guardar cambios"
     },
     "success": {
@@ -251,6 +313,7 @@
       "invalidName": "El nombre debe tener entre 2 y 100 caracteres",
       "invalidCurrency": "Selecciona una moneda válida",
       "invalidFinancialDay": "El día de facturación debe estar entre 1 y 28",
+      "invalidBudget": "Introduce un importe de presupuesto positivo válido",
       "deleteFailed": "No se pudo eliminar la cuenta. Inténtalo de nuevo",
       "updateFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo",
       "confirmEmailMismatch": "La confirmación del email no coincide"
@@ -260,6 +323,16 @@
       "description": "Elimina permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
       "confirmLabel": "Escribe tu email ({{email}}) para confirmar",
       "deleteAccount": "Eliminar mi cuenta permanentemente"
+    },
+    "recurring": {
+      "title": "Gastos fijos (suscripciones, alquiler)",
+      "description": "Gastos recurrentes mensuales mostrados por separado en el gráfico del panel.",
+      "namePlaceholder": "Nombre / descripción",
+      "amountPlaceholder": "Importe",
+      "add": "Añadir gasto fijo",
+      "empty": "Aún no hay gastos fijos añadidos.",
+      "monthlyTotal": "Total mensual",
+      "actions": "Acciones de gasto fijo"
     }
   },
   "billing": {

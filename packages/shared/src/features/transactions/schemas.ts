@@ -50,16 +50,21 @@ const transactionBaseSchema = z.object({
     .positive(TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
     .max(999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT),
   currency: currencyEnum,
-  category: z
-    .string()
-    .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)
-    .max(100, TRANSACTION_ERROR_CODES.INVALID_CATEGORY),
+  category: z.enum(TRANSACTION_CATEGORIES, {
+    errorMap: () => ({ message: TRANSACTION_ERROR_CODES.INVALID_CATEGORY }),
+  }),
   description: z.string().max(500, TRANSACTION_ERROR_CODES.INVALID_DESCRIPTION).optional(),
   date: z.coerce.date({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_DATE }),
   isAiScanned: z.boolean().optional().default(false),
 });
 
 export const createTransactionSchema = transactionBaseSchema;
+
+export const transactionFormSchema = transactionBaseSchema
+  .omit({ date: true, isAiScanned: true })
+  .extend({
+    date: z.string().min(1, TRANSACTION_ERROR_CODES.INVALID_DATE),
+  });
 
 export const updateTransactionSchema = transactionBaseSchema
   .partial()
@@ -107,6 +112,7 @@ export const updateRecurringExpenseSchema = createRecurringExpenseSchema
   });
 
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
+export type TransactionFormInput = z.infer<typeof transactionFormSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
 export type ReceiptScanResult = z.infer<typeof receiptScanResultSchema>;
 export type CreateRecurringExpenseInput = z.infer<typeof createRecurringExpenseSchema>;

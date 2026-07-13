@@ -10,9 +10,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="flex h-screen overflow-hidden">
       <AppSidebar userName={user.name} userEmail={user.email} userPlan={user.currentPlan} />
-      <main className="flex-1 bg-gray-50 p-4 sm:p-6 lg:p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-gray-50 p-4 sm:p-6 lg:p-8">{children}</main>
     </div>
   );
 }

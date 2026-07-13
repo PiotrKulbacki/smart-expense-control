@@ -3,6 +3,16 @@ import type { UpdateUserInput } from '@shared/features/user/schemas';
 import { toSafeUser, type SafeUser } from '@web/features/auth/types';
 
 export async function updateUser(userId: string, input: UpdateUserInput): Promise<SafeUser> {
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { defaultMonthlyBudget: true },
+  });
+
+  const isFirstBudgetSet =
+    input.defaultMonthlyBudget !== undefined &&
+    input.defaultMonthlyBudget !== null &&
+    existing?.defaultMonthlyBudget == null;
+
   const user = await prisma.user.update({
     where: { id: userId },
     data: {
@@ -10,6 +20,15 @@ export async function updateUser(userId: string, input: UpdateUserInput): Promis
       ...(input.primaryCurrency !== undefined && { primaryCurrency: input.primaryCurrency }),
       ...(input.financialMonthStartDay !== undefined && {
         financialMonthStartDay: input.financialMonthStartDay,
+      }),
+      ...(input.defaultMonthlyBudget !== undefined && {
+        defaultMonthlyBudget: input.defaultMonthlyBudget,
+      }),
+      ...(input.currentMonthBudget !== undefined && {
+        currentMonthBudget: input.currentMonthBudget,
+      }),
+      ...(isFirstBudgetSet && {
+        currentMonthBudget: input.defaultMonthlyBudget,
       }),
     },
   });

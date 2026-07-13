@@ -1,9 +1,12 @@
 import { prisma, type Transaction } from '@smart-expense-control/database';
+import { convertAmount } from '@shared/features/currency';
 import type {
   CreateTransactionInput,
+  CurrencyCode,
   UpdateTransactionInput,
 } from '@shared/features/transactions/schemas';
 import { TRANSACTION_ERROR_CODES } from '@shared/features/transactions/schemas';
+import { getExchangeRates } from '@web/features/currency/services/currency.service';
 
 export type TransactionDto = {
   id: string;
@@ -15,6 +18,16 @@ export type TransactionDto = {
   date: string;
   isAiScanned: boolean;
   createdAt: string;
+};
+
+export type TransactionWithConversionDto = TransactionDto & {
+  convertedAmount: number;
+};
+
+export type ListTransactionsOptions = {
+  from?: Date;
+  to?: Date;
+  primaryCurrency?: CurrencyCode;
 };
 
 function toTransactionDto(transaction: Transaction): TransactionDto {
@@ -31,13 +44,45 @@ function toTransactionDto(transaction: Transaction): TransactionDto {
   };
 }
 
-export async function listTransactions(userId: string): Promise<TransactionDto[]> {
+export async function listTransactions(
+  userId: string,
+  options: ListTransactionsOptions = {}
+): Promise<TransactionDto[] | TransactionWithConversionDto[]> {
+  const where = {
+    userId,
+    ...(options.from || options.to
+      ? {
+          date: {
+            ...(options.from && { gte: options.from }),
+            ...(options.to && { lte: options.to }),
+          },
+        }
+      : {}),
+  };
+
   const transactions = await prisma.transaction.findMany({
-    where: { userId },
+    where,
     orderBy: { date: 'desc' },
   });
 
-  return transactions.map(toTransactionDto);
+  if (!options.primaryCurrency) {
+    return transactions.map(toTransactionDto);
+  }
+
+  const rateMap = await getExchangeRates();
+
+  return transactions.map((transaction) => {
+    const dto = toTransactionDto(transaction);
+    return {
+      ...dto,
+      convertedAmount: convertAmount(
+        dto.amount,
+        dto.currency as CurrencyCode,
+        options.primaryCurrency!,
+        rateMap
+      ),
+    };
+  });
 }
 
 export async function getTransactionById(

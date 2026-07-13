@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Ausgabe bestätigen",
       "saveTransaction": "Transaktion speichern",
-      "editTransaction": "Transaktion bearbeiten",
-      "deleteTransaction": "Transaktion löschen"
+      "editTransaction": "Ausgabe bearbeiten",
+      "editTransactionHint": "Betrag, Kategorie oder Datum dieser Ausgabe aktualisieren.",
+      "deleteTransaction": "Löschen",
+      "addManualExpense": "Ausgabe manuell hinzufügen",
+      "addManualExpenseHint": "Betrag, Kategorie und Datum für eine neue Transaktion eingeben."
+    },
+    "categories": {
+      "groceries": "Lebensmittel",
+      "transport": "Transport",
+      "coffee": "Kaffee",
+      "restaurants": "Restaurants",
+      "entertainment": "Unterhaltung",
+      "shopping": "Einkäufe",
+      "utilities": "Nebenkosten",
+      "health": "Gesundheit",
+      "other": "Sonstiges"
     },
     "success": {
       "created": "Transaktion erfolgreich gespeichert",
@@ -147,6 +161,7 @@
       "features": "Funktionen",
       "pricing": "Preise",
       "dashboard": "Dashboard",
+      "history": "Verlauf",
       "scanner": "Scanner",
       "chat": "KI-Chat",
       "settings": "Einstellungen"
@@ -213,15 +228,42 @@
     "title": "Dashboard",
     "subtitle": "Ihre Ausgabenübersicht für den aktuellen Abrechnungszeitraum",
     "summary": {
-      "totalSpent": "Gesamtausgaben in diesem Zeitraum",
+      "totalSpent": "Ausgabensumme",
       "transactions": "Transaktionen"
     },
     "categories": {
-      "title": "Ausgaben nach Kategorie"
+      "title": "Ausgaben nach Kategorie",
+      "fixedCosts": "Fixkosten"
+    },
+    "chartFilter": {
+      "period": "Aktueller Zeitraum",
+      "last7Days": "Letzte 7 Tage",
+      "today": "Heute",
+      "customRange": "Eigener Zeitraum",
+      "customRangePlaceholder": "Datumsbereich wählen",
+      "apply": "Anwenden",
+      "toggleHint": "Kategorie anklicken, um sie im Diagramm ein- oder auszublenden",
+      "allHidden": "Alle Kategorien sind ausgeblendet. Klicken Sie unten auf eine Kategorie, um sie anzuzeigen.",
+      "empty": "Keine Ausgaben in diesem Datumsbereich."
+    },
+    "budget": {
+      "label": "Monatsbudget",
+      "spent": "{{amount}} ausgegeben",
+      "remaining": "{{amount}} übrig",
+      "editCurrent": "Budget dieses Monats bearbeiten",
+      "editCurrentHint": "Überschreibt das Budget nur für den aktuellen Abrechnungszyklus.",
+      "updated": "Budget für diesen Monat aktualisiert"
     },
     "recent": {
       "title": "Letzte Transaktionen",
-      "empty": "Noch keine Transaktionen. Scannen Sie einen Beleg oder fügen Sie eine Ausgabe hinzu."
+      "emptyTitle": "Keine Ausgaben in diesem Zeitraum",
+      "empty": "Scannen Sie einen Beleg oder fügen Sie eine Ausgabe hinzu, um Ihre Finanzen zu verfolgen.",
+      "emptyCta": "Erste Ausgabe hinzufügen",
+      "actions": "Transaktionsaktionen"
+    },
+    "delete": {
+      "title": "Diese Ausgabe löschen?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Die Transaktion wird dauerhaft aus Ihren Daten entfernt."
     },
     "form": {
       "amount": "Betrag",
@@ -229,8 +271,25 @@
       "category": "Kategorie",
       "date": "Datum",
       "description": "Beschreibung",
+      "descriptionOptional": "Beschreibung (optional)",
+      "descriptionPlaceholder": "z. B. Wocheneinkauf, Taxi zum Flughafen…",
       "cancel": "Abbrechen"
+    },
+    "cta": {
+      "addManual": "Ausgabe manuell hinzufügen",
+      "addManualHint": "Betrag, Kategorie und Datum eingeben",
+      "scanReceipt": "Beleg scannen",
+      "scanReceiptHint": "KI extrahiert Details aus einem Foto"
     }
+  },
+  "history": {
+    "title": "Transaktionsverlauf",
+    "subtitle": "Ausgaben vergangener Abrechnungszyklen durchsuchen und verwalten",
+    "previousMonth": "Vorheriger Abrechnungszyklus",
+    "nextMonth": "Nächster Abrechnungszyklus",
+    "transactionsTitle": "Transaktionen",
+    "emptyTitle": "Keine Transaktionen in diesem Zyklus",
+    "empty": "Für den gewählten Abrechnungszeitraum sind keine Ausgaben erfasst."
   },
   "settings": {
     "title": "Einstellungen",
@@ -241,6 +300,9 @@
     "labels": {
       "primaryCurrency": "Hauptwährung",
       "financialMonthStartDay": "Starttag des Abrechnungsmonats (1–28)",
+      "defaultMonthlyBudget": "Standard-Monatsbudget",
+      "defaultMonthlyBudgetPlaceholder": "z. B. 3000",
+      "defaultMonthlyBudgetHint": "Erneuerbares Budget, das jeden neuen Abrechnungszyklus übernommen wird. Beim ersten Speichern wird auch der aktuelle Monat gesetzt.",
       "saveChanges": "Änderungen speichern"
     },
     "success": {
@@ -251,6 +313,7 @@
       "invalidName": "Name muss zwischen 2 und 100 Zeichen lang sein",
       "invalidCurrency": "Bitte wählen Sie eine gültige Währung",
       "invalidFinancialDay": "Abrechnungstag muss zwischen 1 und 28 liegen",
+      "invalidBudget": "Bitte geben Sie einen gültigen positiven Budgetbetrag ein",
       "deleteFailed": "Konto konnte nicht gelöscht werden. Bitte erneut versuchen",
       "updateFailed": "Einstellungen konnten nicht gespeichert werden. Bitte erneut versuchen",
       "confirmEmailMismatch": "E-Mail-Bestätigung stimmt nicht überein"
@@ -260,6 +323,16 @@
       "description": "Konto und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
       "confirmLabel": "Geben Sie Ihre E-Mail ein ({{email}}), um zu bestätigen",
       "deleteAccount": "Mein Konto dauerhaft löschen"
+    },
+    "recurring": {
+      "title": "Fixkosten (Abos, Miete)",
+      "description": "Monatliche wiederkehrende Ausgaben, separat im Dashboard-Diagramm angezeigt.",
+      "namePlaceholder": "Name / Beschreibung",
+      "amountPlaceholder": "Betrag",
+      "add": "Fixkosten hinzufügen",
+      "empty": "Noch keine Fixkosten hinzugefügt.",
+      "monthlyTotal": "Monatliche Summe",
+      "actions": "Fixkosten-Aktionen"
     }
   },
   "billing": {

@@ -1,8 +1,11 @@
+import { endOfDay, startOfDay } from 'date-fns';
 import { prisma } from '@smart-expense-control/database';
 import { getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
+import { FIXED_COSTS_CATEGORY } from '@shared/features/transactions/fixed-costs';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
+import { getChartDataFetchStart } from '@web/features/transactions/lib/chart-date-filter';
 
 export type DashboardTransaction = {
   id: string;
@@ -15,27 +18,119 @@ export type DashboardTransaction = {
   isAiScanned: boolean;
 };
 
+export type DashboardChartTransaction = {
+  date: string;
+  category: string;
+  convertedAmount: number;
+};
+
 export type DashboardSummary = {
   primaryCurrency: CurrencyCode;
   financialMonthStartDay: number;
   periodStart: string;
   periodEnd: string;
   totalSpent: number;
+  billingPeriodTotalSpent: number;
+  fixedCostsTotal: number;
   transactionCount: number;
   categoryTotals: Array<{ category: string; amount: number }>;
+  currentMonthBudget: number | null;
+  defaultMonthlyBudget: number | null;
 };
 
 export type DashboardData = {
   summary: DashboardSummary;
   recentTransactions: DashboardTransaction[];
+  chartTransactions: DashboardChartTransaction[];
 };
 
-export async function getDashboardData(userId: string): Promise<DashboardData | null> {
+export type DashboardDateRange = {
+  from?: Date;
+  to?: Date;
+};
+
+function parseDateParam(value: string | null): Date | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return undefined;
+  }
+
+  return parsed;
+}
+
+export function parseDashboardDateRange(searchParams: URLSearchParams): DashboardDateRange {
+  const from = parseDateParam(searchParams.get('from'));
+  const to = parseDateParam(searchParams.get('to'));
+
+  if (!from && !to) {
+    return {};
+  }
+
+  return { from, to };
+}
+
+async function getFixedCostsTotal(
+  userId: string,
+  primaryCurrency: CurrencyCode,
+  rateMap: Awaited<ReturnType<typeof getExchangeRates>>
+): Promise<number> {
+  const recurringExpenses = await prisma.recurringExpense.findMany({
+    where: { userId, isActive: true },
+    select: { amount: true, currency: true },
+  });
+
+  let total = 0;
+
+  for (const expense of recurringExpenses) {
+    total += convertAmount(
+      expense.amount.toNumber(),
+      expense.currency as CurrencyCode,
+      primaryCurrency,
+      rateMap
+    );
+  }
+
+  return Math.round(total * 100) / 100;
+}
+
+function appendFixedCostsCategory(
+  categoryTotals: Array<{ category: string; amount: number }>,
+  fixedCostsTotal: number
+): Array<{ category: string; amount: number }> {
+  if (fixedCostsTotal <= 0) {
+    return categoryTotals;
+  }
+
+  const totals = [...categoryTotals];
+  const existingIndex = totals.findIndex((item) => item.category === FIXED_COSTS_CATEGORY);
+
+  if (existingIndex >= 0) {
+    totals[existingIndex] = {
+      category: FIXED_COSTS_CATEGORY,
+      amount: Math.round((totals[existingIndex].amount + fixedCostsTotal) * 100) / 100,
+    };
+  } else {
+    totals.push({ category: FIXED_COSTS_CATEGORY, amount: fixedCostsTotal });
+  }
+
+  return totals.sort((a, b) => b.amount - a.amount);
+}
+
+export async function getDashboardData(
+  userId: string,
+  dateRange: DashboardDateRange = {}
+): Promise<DashboardData | null> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       primaryCurrency: true,
       financialMonthStartDay: true,
+      defaultMonthlyBudget: true,
+      currentMonthBudget: true,
     },
   });
 
@@ -44,15 +139,24 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
   }
 
   const now = new Date();
-  const periodStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
+  const defaultPeriodStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
+  const periodStart = dateRange.from ? startOfDay(dateRange.from) : defaultPeriodStart;
+  const periodEnd = dateRange.to ? endOfDay(dateRange.to) : now;
+  const chartDataStart = getChartDataFetchStart(periodStart, periodEnd);
   const primaryCurrency = user.primaryCurrency as CurrencyCode;
   const rateMap = await getExchangeRates();
 
-  const [periodTransactions, recentTransactions] = await Promise.all([
+  const [
+    periodTransactions,
+    chartSourceTransactions,
+    recentTransactions,
+    fixedCostsTotal,
+    billingPeriodTransactions,
+  ] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         userId,
-        date: { gte: periodStart, lte: now },
+        date: { gte: periodStart, lte: periodEnd },
       },
       select: {
         amount: true,
@@ -61,9 +165,23 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
       },
     }),
     prisma.transaction.findMany({
-      where: { userId },
+      where: {
+        userId,
+        date: { gte: chartDataStart, lte: periodEnd },
+      },
+      select: {
+        amount: true,
+        currency: true,
+        category: true,
+        date: true,
+      },
+    }),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: defaultPeriodStart, lte: now },
+      },
       orderBy: { date: 'desc' },
-      take: 20,
       select: {
         id: true,
         amount: true,
@@ -72,6 +190,17 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
         description: true,
         date: true,
         isAiScanned: true,
+      },
+    }),
+    getFixedCostsTotal(userId, primaryCurrency, rateMap),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: defaultPeriodStart, lte: now },
+      },
+      select: {
+        amount: true,
+        currency: true,
       },
     }),
   ]);
@@ -91,19 +220,63 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
     categoryMap.set(transaction.category, (categoryMap.get(transaction.category) ?? 0) + converted);
   }
 
-  const categoryTotals = Array.from(categoryMap.entries())
-    .map(([category, amount]) => ({ category, amount }))
-    .sort((a, b) => b.amount - a.amount);
+  const categoryTotals = appendFixedCostsCategory(
+    Array.from(categoryMap.entries())
+      .map(([category, amount]) => ({ category, amount: Math.round(amount * 100) / 100 }))
+      .sort((a, b) => b.amount - a.amount),
+    fixedCostsTotal
+  );
+
+  let billingPeriodTotalSpent = fixedCostsTotal;
+
+  for (const transaction of billingPeriodTransactions) {
+    billingPeriodTotalSpent += convertAmount(
+      transaction.amount.toNumber(),
+      transaction.currency as CurrencyCode,
+      primaryCurrency,
+      rateMap
+    );
+  }
+
+  totalSpent += fixedCostsTotal;
+
+  const chartTransactions: DashboardChartTransaction[] = chartSourceTransactions.map(
+    (transaction) => {
+      const amount = transaction.amount.toNumber();
+      return {
+        date: transaction.date.toISOString(),
+        category: transaction.category,
+        convertedAmount: convertAmount(
+          amount,
+          transaction.currency as CurrencyCode,
+          primaryCurrency,
+          rateMap
+        ),
+      };
+    }
+  );
+
+  if (fixedCostsTotal > 0) {
+    chartTransactions.push({
+      date: periodStart.toISOString(),
+      category: FIXED_COSTS_CATEGORY,
+      convertedAmount: fixedCostsTotal,
+    });
+  }
 
   return {
     summary: {
       primaryCurrency,
       financialMonthStartDay: user.financialMonthStartDay,
       periodStart: periodStart.toISOString(),
-      periodEnd: now.toISOString(),
+      periodEnd: periodEnd.toISOString(),
       totalSpent: Math.round(totalSpent * 100) / 100,
+      billingPeriodTotalSpent: Math.round(billingPeriodTotalSpent * 100) / 100,
+      fixedCostsTotal: Math.round(fixedCostsTotal * 100) / 100,
       transactionCount: periodTransactions.length,
       categoryTotals,
+      currentMonthBudget: user.currentMonthBudget,
+      defaultMonthlyBudget: user.defaultMonthlyBudget,
     },
     recentTransactions: recentTransactions.map((transaction) => {
       const amount = transaction.amount.toNumber();
@@ -123,5 +296,6 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
         isAiScanned: transaction.isAiScanned,
       };
     }),
+    chartTransactions,
   };
 }

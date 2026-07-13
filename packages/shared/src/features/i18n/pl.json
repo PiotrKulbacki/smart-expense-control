@@ -39,8 +39,22 @@
     "labels": {
       "confirmExpense": "Zatwierdź wydatek",
       "saveTransaction": "Zapisz transakcję",
-      "editTransaction": "Edytuj transakcję",
-      "deleteTransaction": "Usuń transakcję"
+      "editTransaction": "Edytuj wydatek",
+      "editTransactionHint": "Zaktualizuj kwotę, kategorię lub datę tego wydatku.",
+      "deleteTransaction": "Usuń",
+      "addManualExpense": "Dodaj wydatek ręcznie",
+      "addManualExpenseHint": "Wprowadź kwotę, kategorię i datę nowej transakcji."
+    },
+    "categories": {
+      "groceries": "Zakupy spożywcze",
+      "transport": "Transport",
+      "coffee": "Kawa",
+      "restaurants": "Restauracje",
+      "entertainment": "Rozrywka",
+      "shopping": "Zakupy",
+      "utilities": "Rachunki",
+      "health": "Zdrowie",
+      "other": "Inne"
     },
     "success": {
       "created": "Transakcja zapisana pomyślnie",
@@ -147,6 +161,7 @@
       "features": "Funkcje",
       "pricing": "Cennik",
       "dashboard": "Dashboard",
+      "history": "Historia",
       "scanner": "Skaner",
       "chat": "Czat AI",
       "settings": "Ustawienia"
@@ -213,15 +228,42 @@
     "title": "Dashboard",
     "subtitle": "Przegląd wydatków w bieżącym okresie rozliczeniowym",
     "summary": {
-      "totalSpent": "Suma wydatków w okresie",
+      "totalSpent": "Suma wydatków",
       "transactions": "Transakcje"
     },
     "categories": {
-      "title": "Wydatki wg kategorii"
+      "title": "Wydatki wg kategorii",
+      "fixedCosts": "Koszty stałe"
+    },
+    "chartFilter": {
+      "period": "Bieżący okres",
+      "last7Days": "Ostatnie 7 dni",
+      "today": "Dziś",
+      "customRange": "Własny zakres",
+      "customRangePlaceholder": "Wybierz zakres dat",
+      "apply": "Zastosuj",
+      "toggleHint": "Kliknij kategorię, aby pokazać lub ukryć ją na wykresie",
+      "allHidden": "Wszystkie kategorie są ukryte. Kliknij kategorię poniżej, aby ją pokazać.",
+      "empty": "Brak wydatków w tym zakresie dat."
+    },
+    "budget": {
+      "label": "Budżet miesięczny",
+      "spent": "Wydano {{amount}}",
+      "remaining": "Pozostało {{amount}}",
+      "editCurrent": "Edytuj budżet tego miesiąca",
+      "editCurrentHint": "Nadpisz budżet tylko na bieżący cykl rozliczeniowy.",
+      "updated": "Budżet na ten miesiąc zaktualizowany"
     },
     "recent": {
       "title": "Ostatnie transakcje",
-      "empty": "Brak transakcji. Zeskanuj paragon lub dodaj wydatek, aby zacząć."
+      "emptyTitle": "Brak wydatków w tym okresie",
+      "empty": "Zeskanuj paragon lub dodaj wydatek, aby zacząć śledzić wydatki.",
+      "emptyCta": "Dodaj pierwszy wydatek",
+      "actions": "Akcje transakcji"
+    },
+    "delete": {
+      "title": "Usunąć ten wydatek?",
+      "description": "Tej operacji nie można cofnąć. Transakcja zostanie trwale usunięta z Twoich danych."
     },
     "form": {
       "amount": "Kwota",
@@ -229,8 +271,25 @@
       "category": "Kategoria",
       "date": "Data",
       "description": "Opis",
+      "descriptionOptional": "Opis (opcjonalnie)",
+      "descriptionPlaceholder": "np. cotygodniowe zakupy, taxi na lotnisko…",
       "cancel": "Anuluj"
+    },
+    "cta": {
+      "addManual": "Dodaj wydatek ręcznie",
+      "addManualHint": "Wpisz kwotę, kategorię i datę",
+      "scanReceipt": "Skanuj paragon",
+      "scanReceiptHint": "AI odczyta dane ze zdjęcia"
     }
+  },
+  "history": {
+    "title": "Historia transakcji",
+    "subtitle": "Przeglądaj i zarządzaj wydatkami z poprzednich cykli rozliczeniowych",
+    "previousMonth": "Poprzedni cykl rozliczeniowy",
+    "nextMonth": "Następny cykl rozliczeniowy",
+    "transactionsTitle": "Transakcje",
+    "emptyTitle": "Brak transakcji w tym cyklu",
+    "empty": "Brak zarejestrowanych wydatków w wybranym okresie rozliczeniowym."
   },
   "settings": {
     "title": "Ustawienia",
@@ -241,6 +300,9 @@
     "labels": {
       "primaryCurrency": "Główna waluta",
       "financialMonthStartDay": "Dzień startu miesiąca rozliczeniowego (1–28)",
+      "defaultMonthlyBudget": "Domyślny budżet miesięczny",
+      "defaultMonthlyBudgetPlaceholder": "np. 3000",
+      "defaultMonthlyBudgetHint": "Budżet odnawialny co cykl rozliczeniowy. Pierwsze ustawienie ustawia też bieżący miesiąc.",
       "saveChanges": "Zapisz zmiany"
     },
     "success": {
@@ -251,6 +313,7 @@
       "invalidName": "Imię musi mieć od 2 do 100 znaków",
       "invalidCurrency": "Wybierz prawidłową walutę",
       "invalidFinancialDay": "Dzień rozliczeniowy musi być między 1 a 28",
+      "invalidBudget": "Podaj prawidłową dodatnią kwotę budżetu",
       "deleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie",
       "updateFailed": "Nie udało się zapisać ustawień. Spróbuj ponownie",
       "confirmEmailMismatch": "Potwierdzenie e-maila nie pasuje"
@@ -260,6 +323,16 @@
       "description": "Trwale usuń konto i wszystkie powiązane dane. Tej operacji nie można cofnąć.",
       "confirmLabel": "Wpisz swój e-mail ({{email}}), aby potwierdzić",
       "deleteAccount": "Trwale usuń moje konto"
+    },
+    "recurring": {
+      "title": "Koszty stałe (abonamenty, czynsz)",
+      "description": "Cykliczne wydatki miesięczne widoczne osobno na wykresie dashboardu.",
+      "namePlaceholder": "Nazwa / opis",
+      "amountPlaceholder": "Kwota",
+      "add": "Dodaj koszt stały",
+      "empty": "Brak dodanych kosztów stałych.",
+      "monthlyTotal": "Suma miesięczna",
+      "actions": "Akcje kosztu stałego"
     }
   },
   "billing": {

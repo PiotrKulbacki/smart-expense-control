@@ -9,6 +9,7 @@ import { LocaleSwitcher } from '@web/features/layout/components/LocaleSwitcher';
 
 const NAV_ITEMS = [
   { href: '/dashboard', key: 'layout.nav.dashboard' },
+  { href: '/history', key: 'layout.nav.history' },
   { href: '/scanner', key: 'layout.nav.scanner' },
   { href: '/chat', key: 'layout.nav.chat' },
   { href: '/settings', key: 'layout.nav.settings' },
@@ -61,7 +62,7 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   const initials = (userName ?? userEmail).slice(0, 2).toUpperCase();
 
   return (
-    <aside className="flex w-full flex-col border-r border-gray-200 bg-white md:min-h-screen md:w-64">
+    <aside className="sticky top-0 flex h-screen w-full shrink-0 flex-col border-r border-gray-200 bg-white md:w-64">
       <div className="border-b border-gray-200 px-4 py-5">
         <Link href="/dashboard" className="text-lg font-bold tracking-tight text-gray-900">
           {t('layout.brand')}
