@@ -61,10 +61,7 @@ function getDayHeaderLabel(options: {
   }).format(date);
 }
 
-function mergeOlderMessages(
-  current: HistoryMessage[],
-  older: HistoryMessage[]
-): HistoryMessage[] {
+function mergeOlderMessages(current: HistoryMessage[], older: HistoryMessage[]): HistoryMessage[] {
   if (older.length === 0) {
     return current;
   }
@@ -159,9 +156,7 @@ export function AiChatView() {
 
     try {
       const nextPage = historyPage + 1;
-      const response = await fetch(
-        `/api/ai/history?limit=${HISTORY_PAGE_SIZE}&page=${nextPage}`
-      );
+      const response = await fetch(`/api/ai/history?limit=${HISTORY_PAGE_SIZE}&page=${nextPage}`);
       const data = (await response.json()) as HistoryResponse;
 
       if (!response.ok) {
@@ -314,7 +309,9 @@ export function AiChatView() {
           <div ref={topSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
           {isLoadingMore && (
-            <p className="py-1 text-center text-xs text-gray-500">{t('chat.history.loadingOlder')}</p>
+            <p className="py-1 text-center text-xs text-gray-500">
+              {t('chat.history.loadingOlder')}
+            </p>
           )}
 
           {isLoadingHistory && messages.length === 0 && (

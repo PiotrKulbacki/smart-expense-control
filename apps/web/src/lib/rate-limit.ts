@@ -78,7 +78,10 @@ export type RateLimitResult = {
 };
 
 function isStrictProduction(): boolean {
-  return process.env.VERCEL_ENV === 'production' || (!process.env.VERCEL && process.env.NODE_ENV === 'production');
+  return (
+    process.env.VERCEL_ENV === 'production' ||
+    (!process.env.VERCEL && process.env.NODE_ENV === 'production')
+  );
 }
 
 export async function checkAiRateLimit(
@@ -90,7 +93,27 @@ export async function checkAiRateLimit(
 
   if (!limiter) {
     // #region agent log
-    fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'0d7c5c'},body:JSON.stringify({sessionId:'0d7c5c',runId:'pre-fix',hypothesisId:'H1',location:'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:no-limiter',message:'No Upstash redis client/limiter available',data:{scope,nodeEnv:process.env.NODE_ENV,vercel:!!process.env.VERCEL,vercelEnv:process.env.VERCEL_ENV??null,hasUpstashUrl:!!env.UPSTASH_REDIS_REST_URL,hasUpstashToken:!!env.UPSTASH_REDIS_REST_TOKEN,isStrictProduction:isStrictProduction()},timestamp:Date.now()})}).catch(()=>{});
+    fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '0d7c5c' },
+      body: JSON.stringify({
+        sessionId: '0d7c5c',
+        runId: 'pre-fix',
+        hypothesisId: 'H1',
+        location: 'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:no-limiter',
+        message: 'No Upstash redis client/limiter available',
+        data: {
+          scope,
+          nodeEnv: process.env.NODE_ENV,
+          vercel: !!process.env.VERCEL,
+          vercelEnv: process.env.VERCEL_ENV ?? null,
+          hasUpstashUrl: !!env.UPSTASH_REDIS_REST_URL,
+          hasUpstashToken: !!env.UPSTASH_REDIS_REST_TOKEN,
+          isStrictProduction: isStrictProduction(),
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
     // #endregion agent log
 
     if (isStrictProduction()) {
@@ -102,7 +125,28 @@ export async function checkAiRateLimit(
 
   const identifier = userId ?? `ip:${getClientIp(request)}`;
   // #region agent log
-  fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'0d7c5c'},body:JSON.stringify({sessionId:'0d7c5c',runId:'pre-fix',hypothesisId:'H2',location:'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:before-limit',message:'About to call limiter.limit',data:{scope,identifier,ip:getClientIp(request),usingUserId:!!userId,nodeEnv:process.env.NODE_ENV,vercel:!!process.env.VERCEL,vercelEnv:process.env.VERCEL_ENV??null,prefix:AI_RATE_LIMIT_PREFIX[scope]},timestamp:Date.now()})}).catch(()=>{});
+  fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '0d7c5c' },
+    body: JSON.stringify({
+      sessionId: '0d7c5c',
+      runId: 'pre-fix',
+      hypothesisId: 'H2',
+      location: 'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:before-limit',
+      message: 'About to call limiter.limit',
+      data: {
+        scope,
+        identifier,
+        ip: getClientIp(request),
+        usingUserId: !!userId,
+        nodeEnv: process.env.NODE_ENV,
+        vercel: !!process.env.VERCEL,
+        vercelEnv: process.env.VERCEL_ENV ?? null,
+        prefix: AI_RATE_LIMIT_PREFIX[scope],
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
   // #endregion agent log
 
   let result: Awaited<ReturnType<typeof limiter.limit>>;
@@ -112,7 +156,25 @@ export async function checkAiRateLimit(
     const errorName = error instanceof Error ? error.name : null;
     const errorMessage = error instanceof Error ? error.message : String(error);
     // #region agent log
-    fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'0d7c5c'},body:JSON.stringify({sessionId:'0d7c5c',runId:'pre-fix',hypothesisId:'H3',location:'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:limit-error',message:'limiter.limit threw (redis/network/config issue likely)',data:{scope,identifier,isStrictProduction:isStrictProduction(),errorName,errorMessage},timestamp:Date.now()})}).catch(()=>{});
+    fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '0d7c5c' },
+      body: JSON.stringify({
+        sessionId: '0d7c5c',
+        runId: 'pre-fix',
+        hypothesisId: 'H3',
+        location: 'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:limit-error',
+        message: 'limiter.limit threw (redis/network/config issue likely)',
+        data: {
+          scope,
+          identifier,
+          isStrictProduction: isStrictProduction(),
+          errorName,
+          errorMessage,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
     // #endregion agent log
 
     if (isStrictProduction()) {
@@ -122,7 +184,25 @@ export async function checkAiRateLimit(
   }
 
   // #region agent log
-  fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'0d7c5c'},body:JSON.stringify({sessionId:'0d7c5c',runId:'pre-fix',hypothesisId:'H4',location:'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:after-limit',message:'limiter.limit result',data:{scope,identifier,success:result.success,remaining:result.remaining,reset:result.reset},timestamp:Date.now()})}).catch(()=>{});
+  fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '0d7c5c' },
+    body: JSON.stringify({
+      sessionId: '0d7c5c',
+      runId: 'pre-fix',
+      hypothesisId: 'H4',
+      location: 'apps/web/src/lib/rate-limit.ts:checkAiRateLimit:after-limit',
+      message: 'limiter.limit result',
+      data: {
+        scope,
+        identifier,
+        success: result.success,
+        remaining: result.remaining,
+        reset: result.reset,
+      },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
   // #endregion agent log
 
   return {

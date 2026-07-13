@@ -46,9 +46,10 @@ function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-async function fetchFinancialContext(
-  userId: string
-): Promise<{ context: Awaited<ReturnType<typeof aggregateFinancialContext>>; cycleMeta: FinancialCycleMeta }> {
+async function fetchFinancialContext(userId: string): Promise<{
+  context: Awaited<ReturnType<typeof aggregateFinancialContext>>;
+  cycleMeta: FinancialCycleMeta;
+}> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { financialMonthStartDay: true },
