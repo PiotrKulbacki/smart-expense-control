@@ -47,8 +47,22 @@ model User {
   refreshTokens     RefreshToken[]
   transactions      Transaction[]
   recurringExpenses RecurringExpense[]
+  chatMessages      ChatMessage[]
 
   @@map("users")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("chat_messages")
 }
 
 model Account {

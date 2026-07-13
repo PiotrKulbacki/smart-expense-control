@@ -16,7 +16,7 @@ describe('chat-context', () => {
       []
     );
 
-    expect(context.totalSpentThisMonth).toBe(77.8);
+    expect(context.totalSpentThisCycle).toBe(77.8);
     expect(context.categoryTotals).toEqual(
       expect.arrayContaining([
         { category: 'Groceries', total: 57.8, currency: 'PLN' },
@@ -53,9 +53,14 @@ describe('chat-context', () => {
 
   it('returns empty-state labels when user has no transactions', () => {
     const context = aggregateFinancialContext('2026-07', [], []);
-    const prompt = buildChatSystemPrompt(context, 'pl');
+    const prompt = buildChatSystemPrompt(context, 'pl', {
+      todayIso: '2026-07-13',
+      financialMonthStartDay: 12,
+      cycleStartIso: '2026-07-12',
+      cycleEndIso: '2026-08-12',
+    });
 
-    expect(context.totalSpentThisMonth).toBe(0);
+    expect(context.totalSpentThisCycle).toBe(0);
     expect(context.categoryTotals).toEqual([]);
     expect(prompt).toContain('Always respond in Polish');
     expect(prompt).toContain('No transactions this month.');
@@ -68,10 +73,15 @@ describe('chat-context', () => {
       [{ amount: 30, currency: 'PLN', category: 'Groceries' }],
       []
     );
-    const prompt = buildChatSystemPrompt(context, 'en');
+    const prompt = buildChatSystemPrompt(context, 'en', {
+      todayIso: '2026-07-13',
+      financialMonthStartDay: 12,
+      cycleStartIso: '2026-07-12',
+      cycleEndIso: '2026-08-12',
+    });
 
     expect(prompt).toContain('"category": "Groceries"');
     expect(prompt).toContain('"total": 30');
-    expect(prompt).toContain('Current month: 2026-07');
+    expect(prompt).toContain('Current cycle label: 2026-07');
   });
 });

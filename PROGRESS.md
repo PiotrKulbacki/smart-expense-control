@@ -17,6 +17,8 @@
 
 **2026-07-13 — Faza 8.1.2 zamknięta: eliminacja podwójnego odświeżania wykresu, logika „Własny zakres", naprawa kalendarza Shadcn.**
 
+**2026-07-13 — Faza 8.2 zamknięta: czat AI jako asystent finansowy z pamięcią (ChatMessage), historia czatu i kontekst oparty o bieżący cykl rozliczeniowy użytkownika.**
+
 ### Faza 8.1.2 — Poprawki filtra wykresu i kalendarza
 
 - **Podwójne odświeżanie** — rozdzielono `filterSelection` (UI dropdown) od `appliedFilter` (dane wykresu); przełączanie opcji predefiniowanych nie wywołuje API; skeleton tylko przy zmianie `appliedFilter`.

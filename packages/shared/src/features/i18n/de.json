@@ -141,6 +141,11 @@
     "success": {
       "replied": "Antwort erhalten"
     },
+    "history": {
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "loadingOlder": "Ältere Nachrichten werden geladen..."
+    },
     "errors": {
       "invalidMessage": "Bitte geben Sie eine gültige Nachricht ein",
       "quotaExceeded": "Sie haben alle 10 kostenlosen Chat-Nachrichten verbraucht. Upgraden Sie auf Pro für unbegrenzten Chat",
