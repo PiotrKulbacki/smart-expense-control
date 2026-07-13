@@ -141,6 +141,11 @@
     "success": {
       "replied": "Otrzymano odpowiedź"
     },
+    "history": {
+      "today": "Dzisiaj",
+      "yesterday": "Wczoraj",
+      "loadingOlder": "Ładowanie starszych wiadomości..."
+    },
     "errors": {
       "invalidMessage": "Wprowadź prawidłową wiadomość",
       "quotaExceeded": "Wykorzystałeś 10 darmowych wiadomości czatu. Przejdź na Pro, aby korzystać bez limitu",

@@ -141,6 +141,11 @@
     "success": {
       "replied": "Response received"
     },
+    "history": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "loadingOlder": "Loading older messages..."
+    },
     "errors": {
       "invalidMessage": "Please enter a valid message",
       "quotaExceeded": "You've used all 10 free chat messages. Upgrade to Pro for unlimited chat",
