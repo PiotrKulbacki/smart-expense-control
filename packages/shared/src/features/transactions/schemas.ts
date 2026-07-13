@@ -60,9 +60,11 @@ const transactionBaseSchema = z.object({
 
 export const createTransactionSchema = transactionBaseSchema;
 
-export const transactionFormSchema = transactionBaseSchema.omit({ date: true, isAiScanned: true }).extend({
-  date: z.string().min(1, TRANSACTION_ERROR_CODES.INVALID_DATE),
-});
+export const transactionFormSchema = transactionBaseSchema
+  .omit({ date: true, isAiScanned: true })
+  .extend({
+    date: z.string().min(1, TRANSACTION_ERROR_CODES.INVALID_DATE),
+  });
 
 export const updateTransactionSchema = transactionBaseSchema
   .partial()

@@ -31,7 +31,7 @@ export const SheetContent = forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-gray-200 bg-white shadow-xl duration-300 data-[state=open]:animate-slide-in-from-right data-[state=closed]:animate-slide-out-to-right',
+        'data-[state=open]:animate-slide-in-from-right data-[state=closed]:animate-slide-out-to-right fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-md flex-col border-l border-gray-200 bg-white shadow-xl duration-300',
         className
       )}
       {...props}
@@ -47,7 +47,12 @@ export const SheetContent = forwardRef<
 SheetContent.displayName = DialogPrimitive.Content.displayName;
 
 export function SheetHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col space-y-1.5 border-b border-gray-100 px-6 py-5', className)} {...props} />;
+  return (
+    <div
+      className={cn('flex flex-col space-y-1.5 border-b border-gray-100 px-6 py-5', className)}
+      {...props}
+    />
+  );
 }
 
 export function SheetTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {

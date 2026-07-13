@@ -94,9 +94,7 @@ export function RecentTransactionsList({
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-50 text-gray-400">
             <Receipt className="h-7 w-7" />
           </span>
-          <p className="mt-4 max-w-xs text-sm font-medium text-gray-900">
-            {t(emptyTitleKey)}
-          </p>
+          <p className="mt-4 max-w-xs text-sm font-medium text-gray-900">{t(emptyTitleKey)}</p>
           <p className="mt-1 max-w-xs text-sm text-gray-500">{t(emptyDescriptionKey)}</p>
           {!hideEmptyCta && (
             <Button type="button" className="mt-5" onClick={onAddFirst}>

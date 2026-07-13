@@ -49,7 +49,9 @@ export const DrawerContent = forwardRef<
 DrawerContent.displayName = DrawerPrimitive.Content.displayName;
 
 export function DrawerHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('border-b border-gray-100 px-6 py-4 text-left', className)} {...props} />;
+  return (
+    <div className={cn('border-b border-gray-100 px-6 py-4 text-left', className)} {...props} />
+  );
 }
 
 export function DrawerTitle({ className, ...props }: HTMLAttributes<HTMLHeadingElement>) {

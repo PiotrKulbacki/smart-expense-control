@@ -250,9 +250,7 @@ export function CategoryDonutChart({
                       )}
                       style={{ backgroundColor: fill }}
                     />
-                    <span
-                      className={cn('truncate text-gray-700', isHidden && 'line-through')}
-                    >
+                    <span className={cn('truncate text-gray-700', isHidden && 'line-through')}>
                       {label}
                     </span>
                     {!isHidden && percentage !== null && (
@@ -260,10 +258,7 @@ export function CategoryDonutChart({
                     )}
                   </div>
                   <span
-                    className={cn(
-                      'shrink-0 font-medium text-gray-900',
-                      isHidden && 'line-through'
-                    )}
+                    className={cn('shrink-0 font-medium text-gray-900', isHidden && 'line-through')}
                   >
                     {formatMoney(item.amount, primaryCurrency, locale)}
                   </span>

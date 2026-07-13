@@ -58,11 +58,7 @@ export function HistoryView() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const loadTransactions = useCallback(
-    async (options: {
-      start: Date;
-      end: Date;
-      silent?: boolean;
-    }) => {
+    async (options: { start: Date; end: Date; silent?: boolean }) => {
       if (!options.silent) {
         setIsLoading(true);
       } else {
@@ -213,7 +209,9 @@ export function HistoryView() {
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
-        <p className="text-center text-sm font-semibold text-gray-900 sm:text-base">{periodLabel}</p>
+        <p className="text-center text-sm font-semibold text-gray-900 sm:text-base">
+          {periodLabel}
+        </p>
         <Button
           type="button"
           variant="ghost"
@@ -245,9 +243,7 @@ export function HistoryView() {
         onOpenChange={handleFormOpenChange}
         primaryCurrency={userMeta.primaryCurrency}
         transactionId={editingTransaction?.id}
-        initialValues={
-          editingTransaction ? toFormInitialValues(editingTransaction) : undefined
-        }
+        initialValues={editingTransaction ? toFormInitialValues(editingTransaction) : undefined}
         onSuccess={reloadCurrentPeriod}
       />
 

@@ -2,9 +2,7 @@ import { endOfDay, startOfDay } from 'date-fns';
 import { prisma } from '@smart-expense-control/database';
 import { getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
-import {
-  FIXED_COSTS_CATEGORY,
-} from '@shared/features/transactions/fixed-costs';
+import { FIXED_COSTS_CATEGORY } from '@shared/features/transactions/fixed-costs';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
 import { getChartDataFetchStart } from '@web/features/transactions/lib/chart-date-filter';
@@ -148,59 +146,64 @@ export async function getDashboardData(
   const primaryCurrency = user.primaryCurrency as CurrencyCode;
   const rateMap = await getExchangeRates();
 
-  const [periodTransactions, chartSourceTransactions, recentTransactions, fixedCostsTotal, billingPeriodTransactions] =
-    await Promise.all([
-      prisma.transaction.findMany({
-        where: {
-          userId,
-          date: { gte: periodStart, lte: periodEnd },
-        },
-        select: {
-          amount: true,
-          currency: true,
-          category: true,
-        },
-      }),
-      prisma.transaction.findMany({
-        where: {
-          userId,
-          date: { gte: chartDataStart, lte: periodEnd },
-        },
-        select: {
-          amount: true,
-          currency: true,
-          category: true,
-          date: true,
-        },
-      }),
-      prisma.transaction.findMany({
-        where: {
-          userId,
-          date: { gte: defaultPeriodStart, lte: now },
-        },
-        orderBy: { date: 'desc' },
-        select: {
-          id: true,
-          amount: true,
-          currency: true,
-          category: true,
-          description: true,
-          date: true,
-          isAiScanned: true,
-        },
-      }),
-      getFixedCostsTotal(userId, primaryCurrency, rateMap),
-      prisma.transaction.findMany({
-        where: {
-          userId,
-          date: { gte: defaultPeriodStart, lte: now },
-        },
-        select: {
-          amount: true,
-          currency: true,
-        },
-      }),
-    ]);
+  const [
+    periodTransactions,
+    chartSourceTransactions,
+    recentTransactions,
+    fixedCostsTotal,
+    billingPeriodTransactions,
+  ] = await Promise.all([
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: periodStart, lte: periodEnd },
+      },
+      select: {
+        amount: true,
+        currency: true,
+        category: true,
+      },
+    }),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: chartDataStart, lte: periodEnd },
+      },
+      select: {
+        amount: true,
+        currency: true,
+        category: true,
+        date: true,
+      },
+    }),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: defaultPeriodStart, lte: now },
+      },
+      orderBy: { date: 'desc' },
+      select: {
+        id: true,
+        amount: true,
+        currency: true,
+        category: true,
+        description: true,
+        date: true,
+        isAiScanned: true,
+      },
+    }),
+    getFixedCostsTotal(userId, primaryCurrency, rateMap),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: defaultPeriodStart, lte: now },
+      },
+      select: {
+        amount: true,
+        currency: true,
+      },
+    }),
+  ]);
 
   const categoryMap = new Map<string, number>();
   let totalSpent = 0;

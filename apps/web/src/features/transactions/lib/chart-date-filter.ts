@@ -6,7 +6,11 @@ export type ChartTransaction = {
   convertedAmount: number;
 };
 
-export function getChartRangeStart(range: ChartDateRange, periodStart: string, now = new Date()): Date {
+export function getChartRangeStart(
+  range: ChartDateRange,
+  periodStart: string,
+  now = new Date()
+): Date {
   if (range === 'custom') {
     return new Date(periodStart);
   }

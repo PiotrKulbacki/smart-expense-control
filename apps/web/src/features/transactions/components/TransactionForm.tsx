@@ -196,7 +196,9 @@ export function TransactionForm({
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={isSubmitting}>
           {t(
-            isEditing ? 'transactions.labels.saveTransaction' : 'transactions.labels.saveTransaction'
+            isEditing
+              ? 'transactions.labels.saveTransaction'
+              : 'transactions.labels.saveTransaction'
           )}
         </Button>
         <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>

@@ -181,9 +181,7 @@ export function DashboardView() {
   }
 
   function handleBudgetUpdated(budget: number | null) {
-    setSummary((current) =>
-      current ? { ...current, currentMonthBudget: budget } : current
-    );
+    setSummary((current) => (current ? { ...current, currentMonthBudget: budget } : current));
   }
 
   if (isLoading) {
@@ -261,9 +259,7 @@ export function DashboardView() {
         onOpenChange={handleFormOpenChange}
         primaryCurrency={summary.primaryCurrency}
         transactionId={editingTransaction?.id}
-        initialValues={
-          editingTransaction ? toFormInitialValues(editingTransaction) : undefined
-        }
+        initialValues={editingTransaction ? toFormInitialValues(editingTransaction) : undefined}
         onSuccess={() => void loadDashboard({ silent: true, dateRange: customDateRange })}
       />
 

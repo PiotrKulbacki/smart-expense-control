@@ -69,7 +69,10 @@ export function BudgetProgress({
         body: JSON.stringify({ currentMonthBudget: parsed }),
       });
 
-      const data = (await response.json()) as { user?: { currentMonthBudget: number | null }; error?: string };
+      const data = (await response.json()) as {
+        user?: { currentMonthBudget: number | null };
+        error?: string;
+      };
 
       if (!response.ok) {
         toast.error(translateError(data.error ?? 'settings.errors.updateFailed', appLocale));

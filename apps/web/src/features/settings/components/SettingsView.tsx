@@ -78,9 +78,7 @@ export function SettingsView() {
     setIsSaving(true);
 
     try {
-      const parsedBudget = defaultMonthlyBudget.trim()
-        ? Number(defaultMonthlyBudget)
-        : null;
+      const parsedBudget = defaultMonthlyBudget.trim() ? Number(defaultMonthlyBudget) : null;
 
       if (defaultMonthlyBudget.trim() && (!Number.isFinite(parsedBudget) || parsedBudget! <= 0)) {
         toast.error(t('settings.errors.invalidBudget'));
