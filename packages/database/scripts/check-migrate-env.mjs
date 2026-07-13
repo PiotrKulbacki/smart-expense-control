@@ -3,9 +3,6 @@
  * Used to debug Vercel P1001 connection failures.
  */
 
-const DEBUG_ENDPOINT = 'http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c';
-const SESSION_ID = '1200b1';
-
 function parseDbUrl(url) {
   if (!url) return null;
   try {
@@ -24,29 +21,8 @@ function parseDbUrl(url) {
 }
 
 function logEvent(hypothesisId, message, data) {
-  const payload = {
-    sessionId: SESSION_ID,
-    runId: process.env.VERCEL ? 'vercel-build' : 'local',
-    hypothesisId,
-    location: 'check-migrate-env.mjs',
-    message,
-    data,
-    timestamp: Date.now(),
-  };
-
   // Visible in Vercel build logs
   console.log(`[migrate-env-check] ${message}`, JSON.stringify(data));
-
-  // #region agent log
-  fetch(DEBUG_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Debug-Session-Id': SESSION_ID,
-    },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-  // #endregion
 }
 
 const databaseUrl = process.env.DATABASE_URL;

@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
-// import './globals.css';
 import { PostHogProvider } from '@web/features/analytics/components/PostHogProvider';
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Smart Expense Control',
