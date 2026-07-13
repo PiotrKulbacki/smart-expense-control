@@ -62,12 +62,12 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   const initials = (userName ?? userEmail).slice(0, 2).toUpperCase();
 
   return (
-    <aside className="sticky top-0 flex h-screen w-full shrink-0 flex-col border-r border-[var(--border)] bg-surface/80 backdrop-blur-md md:w-64">
+    <aside className="bg-surface/80 sticky top-0 flex h-screen w-full shrink-0 flex-col border-r border-[var(--border)] backdrop-blur-md md:w-64">
       <div className="border-b border-[var(--border)] px-4 py-5">
         <Link href="/dashboard" className="group flex items-center gap-3">
           <div className="relative flex h-9 w-9 items-center justify-center">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-warm/20 to-cool/20" />
-            <div className="relative font-mono text-sm font-bold text-warm">◈</div>
+            <div className="from-warm/20 to-cool/20 absolute inset-0 rounded-lg bg-gradient-to-br" />
+            <div className="text-warm relative font-mono text-sm font-bold">◈</div>
           </div>
           <span className="font-display text-lg font-semibold tracking-tight text-[var(--text)]">
             {t('layout.brand')}
@@ -96,12 +96,14 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
 
       <div className="border-t border-[var(--border)] px-4 py-4">
         <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-warm/20 to-cool/20 font-mono text-sm font-semibold text-warm">
+          <div className="from-warm/20 to-cool/20 text-warm flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br font-mono text-sm font-semibold">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-[var(--text)]">{userName ?? userEmail}</p>
-            <p className="truncate font-mono text-xs text-muted">{userPlan}</p>
+            <p className="truncate text-sm font-medium text-[var(--text)]">
+              {userName ?? userEmail}
+            </p>
+            <p className="text-muted truncate font-mono text-xs">{userPlan}</p>
           </div>
         </div>
 
@@ -122,7 +124,7 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full rounded-lg px-3 py-2 font-mono text-sm text-glow transition hover:bg-glow/10"
+          className="text-glow hover:bg-glow/10 w-full rounded-lg px-3 py-2 font-mono text-sm transition"
         >
           {t('auth.labels.logout')}
         </button>

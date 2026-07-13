@@ -23,7 +23,7 @@ export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
       onChange={(event) => setLocale(event.target.value as Locale)}
       className={
         className ??
-        'rounded-lg border border-[var(--border)] bg-elevated/50 px-2 py-1.5 font-mono text-sm text-[var(--text)] focus:border-warm/30 focus:outline-none focus:ring-1 focus:ring-warm/20'
+        'bg-elevated/50 focus:border-warm/30 focus:ring-warm/20 rounded-lg border border-[var(--border)] px-2 py-1.5 font-mono text-sm text-[var(--text)] focus:outline-none focus:ring-1'
       }
       aria-label="Language"
     >

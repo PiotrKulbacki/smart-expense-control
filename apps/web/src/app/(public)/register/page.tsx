@@ -34,14 +34,14 @@ export default function RegisterPage() {
           <h1 className="font-display text-2xl font-bold text-[var(--text)]">
             {t('auth.labels.register')}
           </h1>
-          <p className="mt-2 text-sm text-muted">{t('auth.labels.signUp')}</p>
+          <p className="text-muted mt-2 text-sm">{t('auth.labels.signUp')}</p>
         </div>
         <Suspense fallback={null}>
           <AuthForm mode="register" />
         </Suspense>
-        <p className="text-center text-sm text-muted">
+        <p className="text-muted text-center text-sm">
           {t('auth.labels.hasAccount')}{' '}
-          <Link href="/login" className="font-medium text-cool hover:text-warm">
+          <Link href="/login" className="text-cool hover:text-warm font-medium">
             {t('auth.labels.signIn')}
           </Link>
         </p>

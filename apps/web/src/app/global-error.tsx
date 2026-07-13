@@ -16,12 +16,12 @@ export default function GlobalError({
 
   return (
     <html lang="en" className="dark">
-      <body className="flex min-h-screen items-center justify-center bg-void p-8">
+      <body className="bg-void flex min-h-screen items-center justify-center p-8">
         <div className="panel max-w-md p-8 text-center">
-          <h1 className="relative z-10 font-display text-2xl font-bold text-[var(--text)]">
+          <h1 className="font-display relative z-10 text-2xl font-bold text-[var(--text)]">
             Something went wrong
           </h1>
-          <p className="relative z-10 mt-2 text-sm text-muted">An unexpected error occurred.</p>
+          <p className="text-muted relative z-10 mt-2 text-sm">An unexpected error occurred.</p>
           <button type="button" onClick={reset} className="btn-primary relative z-10 mt-6">
             Try again
           </button>

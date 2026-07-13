@@ -180,15 +180,17 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
     <section className="panel relative z-10 p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">
+          <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
             {t('settings.recurring.title')}
           </h2>
-          <p className="relative z-10 mt-1 text-sm text-muted">{t('settings.recurring.description')}</p>
+          <p className="text-muted relative z-10 mt-1 text-sm">
+            {t('settings.recurring.description')}
+          </p>
         </div>
         {!isLoading && expenses.length > 0 && (
-          <div className="relative z-10 rounded-xl border border-cool/30 bg-cool/10 px-4 py-3 text-right">
-            <p className="text-xs font-medium text-cool">{t('settings.recurring.monthlyTotal')}</p>
-            <p className="mt-0.5 font-display text-lg font-bold text-[var(--text)]">
+          <div className="border-cool/30 bg-cool/10 relative z-10 rounded-xl border px-4 py-3 text-right">
+            <p className="text-cool text-xs font-medium">{t('settings.recurring.monthlyTotal')}</p>
+            <p className="font-display mt-0.5 text-lg font-bold text-[var(--text)]">
               {formatMoney(monthlyTotal, primaryCurrency, locale)}
             </p>
           </div>
@@ -235,16 +237,18 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
       </form>
 
       {isLoading ? (
-        <div className="relative z-10 mt-6 h-24 animate-pulse rounded-xl bg-elevated" />
+        <div className="bg-elevated relative z-10 mt-6 h-24 animate-pulse rounded-xl" />
       ) : expenses.length === 0 ? (
-        <p className="relative z-10 mt-6 text-sm text-muted">{t('settings.recurring.empty')}</p>
+        <p className="text-muted relative z-10 mt-6 text-sm">{t('settings.recurring.empty')}</p>
       ) : (
         <ul className="relative z-10 mt-6 divide-y divide-[var(--border)]">
           {expenses.map((expense) => (
             <li key={expense.id} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-[var(--text)]">{expense.category}</p>
-                <p className="text-xs text-muted">
+                <p className="truncate text-sm font-medium text-[var(--text)]">
+                  {expense.category}
+                </p>
+                <p className="text-muted text-xs">
                   {formatMoney(expense.amount, expense.currency, locale)}
                 </p>
               </div>
@@ -254,7 +258,7 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted"
+                    className="text-muted h-8 w-8"
                     aria-label={t('settings.recurring.actions')}
                   >
                     <MoreHorizontal className="h-4 w-4" />

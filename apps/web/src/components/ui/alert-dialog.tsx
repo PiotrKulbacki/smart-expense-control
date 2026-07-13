@@ -16,7 +16,7 @@ export const AlertDialogOverlay = forwardRef<
   <AlertDialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'data-[state=open]:animate-in data-[state=closed]:animate-out fixed inset-0 z-50 bg-void/80 backdrop-blur-sm',
+      'data-[state=open]:animate-in data-[state=closed]:animate-out bg-void/80 fixed inset-0 z-50 backdrop-blur-sm',
       className
     )}
     {...props}
@@ -44,14 +44,20 @@ AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName;
 
 export function AlertDialogHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('relative z-10 flex flex-col space-y-2 text-center sm:text-left', className)} {...props} />
+    <div
+      className={cn('relative z-10 flex flex-col space-y-2 text-center sm:text-left', className)}
+      {...props}
+    />
   );
 }
 
 export function AlertDialogFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('relative z-10 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
+      className={cn(
+        'relative z-10 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+        className
+      )}
       {...props}
     />
   );
@@ -75,7 +81,7 @@ export const AlertDialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-muted', className)}
+    className={cn('text-muted text-sm', className)}
     {...props}
   />
 ));

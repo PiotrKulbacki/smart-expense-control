@@ -29,7 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${outfit.variable} ${jetbrains.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`dark ${outfit.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+    >
       <body suppressHydrationWarning>
         <MeshBackground />
         <LocaleProvider>

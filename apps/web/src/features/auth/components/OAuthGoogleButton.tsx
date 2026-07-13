@@ -24,7 +24,7 @@ export function AuthDivider({ label }: { label: string }) {
   return (
     <div className="relative z-10 flex items-center gap-3 py-1">
       <div className="h-px flex-1 bg-[var(--border)]" />
-      <span className="font-mono text-xs uppercase tracking-widest text-muted">{label}</span>
+      <span className="text-muted font-mono text-xs uppercase tracking-widest">{label}</span>
       <div className="h-px flex-1 bg-[var(--border)]" />
     </div>
   );

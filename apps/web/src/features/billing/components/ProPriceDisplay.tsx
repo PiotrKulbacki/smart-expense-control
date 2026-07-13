@@ -34,7 +34,7 @@ export function ProPriceDisplay({ currency, forcePromo, className }: ProPriceDis
     <div className={className}>
       {isPromoActive && (
         <div className="mb-1 flex flex-wrap items-center gap-2">
-          <span className="text-lg font-medium text-muted line-through">{formattedRegular}</span>
+          <span className="text-muted text-lg font-medium line-through">{formattedRegular}</span>
           <span className="chip chip-ready">
             {t('landing.pricing.pro.discount', { percent: discountPercent })}
           </span>
@@ -42,7 +42,7 @@ export function ProPriceDisplay({ currency, forcePromo, className }: ProPriceDis
       )}
       <p className="font-display text-3xl font-bold text-[var(--text)]">
         {formattedDisplay}
-        <span className="ml-1 text-base font-medium text-muted">
+        <span className="text-muted ml-1 text-base font-medium">
           {t('landing.pricing.perMonth')}
         </span>
       </p>

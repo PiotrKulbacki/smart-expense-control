@@ -49,7 +49,7 @@ export function BillingCurrencySwitcher({
     <div
       className={
         className ??
-        'inline-flex rounded-xl border border-[var(--border)] bg-elevated/50 p-1 font-mono text-sm font-medium'
+        'bg-elevated/50 inline-flex rounded-xl border border-[var(--border)] p-1 font-mono text-sm font-medium'
       }
       role="group"
       aria-label="Billing currency"
@@ -62,7 +62,9 @@ export function BillingCurrencySwitcher({
             type="button"
             onClick={() => handleSelect(currency)}
             className={`rounded-lg px-3 py-1.5 transition ${
-              isActive ? 'bg-warm/20 text-warm' : 'text-muted hover:bg-elevated hover:text-[var(--text)]'
+              isActive
+                ? 'bg-warm/20 text-warm'
+                : 'text-muted hover:bg-elevated hover:text-[var(--text)]'
             }`}
           >
             {currency}

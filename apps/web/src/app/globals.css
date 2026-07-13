@@ -26,7 +26,7 @@ body {
 
 @layer components {
   .panel {
-    @apply relative overflow-hidden rounded-2xl border border-[var(--border)] bg-surface/80 backdrop-blur-md;
+    @apply bg-surface/80 relative overflow-hidden rounded-2xl border border-[var(--border)] backdrop-blur-md;
   }
 
   .panel::before {
@@ -61,7 +61,7 @@ body {
   }
 
   .nav-link {
-    @apply font-mono text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:text-warm;
+    @apply text-muted hover:text-warm font-mono text-xs uppercase tracking-[0.2em] transition-colors;
   }
 
   .nav-link-active {
@@ -69,20 +69,20 @@ body {
   }
 
   .btn-primary {
-    @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-5 py-2.5 font-mono text-sm font-medium text-void transition-transform hover:scale-[1.02];
+    @apply text-void relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-5 py-2.5 font-mono text-sm font-medium transition-transform hover:scale-[1.02];
     background: linear-gradient(135deg, var(--warm) 0%, #f0c060 50%, var(--cool) 100%);
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] bg-elevated/50 px-4 py-2 font-mono text-sm text-muted transition-colors hover:border-warm/30 hover:text-[var(--text)];
+    @apply bg-elevated/50 text-muted hover:border-warm/30 inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)] px-4 py-2 font-mono text-sm transition-colors hover:text-[var(--text)];
   }
 
   .auth-input {
-    @apply mt-1 w-full rounded-lg border border-[var(--border)] bg-elevated/50 px-3 py-2.5 font-display text-sm text-[var(--text)] placeholder:text-muted transition-colors focus:border-warm/30 focus:outline-none focus:ring-1 focus:ring-warm/20 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply bg-elevated/50 font-display placeholder:text-muted focus:border-warm/30 focus:ring-warm/20 mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2.5 text-sm text-[var(--text)] transition-colors focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .auth-label {
-    @apply block text-sm font-medium text-muted;
+    @apply text-muted block text-sm font-medium;
   }
 }
 

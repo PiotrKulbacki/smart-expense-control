@@ -8,12 +8,12 @@ export function PublicHeader() {
   const t = useT();
 
   return (
-    <header className="panel-cut sticky top-0 z-40 border-b border-[var(--border)] bg-void/90 backdrop-blur-xl">
+    <header className="panel-cut bg-void/90 sticky top-0 z-40 border-b border-[var(--border)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="group flex items-center gap-3">
           <div className="relative flex h-9 w-9 items-center justify-center">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-warm/20 to-cool/20" />
-            <div className="relative font-mono text-sm font-bold text-warm">◈</div>
+            <div className="from-warm/20 to-cool/20 absolute inset-0 rounded-lg bg-gradient-to-br" />
+            <div className="text-warm relative font-mono text-sm font-bold">◈</div>
           </div>
           <span className="font-display text-lg font-semibold tracking-tight text-[var(--text)]">
             {t('layout.brand')}

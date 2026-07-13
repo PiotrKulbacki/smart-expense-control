@@ -181,8 +181,8 @@ export function HistoryView() {
   if (isLoading || !userMeta || !periodStart) {
     return (
       <div className="space-y-4">
-        <div className="h-10 w-48 animate-pulse rounded-lg bg-elevated" />
-        <div className="h-72 animate-pulse rounded-2xl bg-elevated" />
+        <div className="bg-elevated h-10 w-48 animate-pulse rounded-lg" />
+        <div className="bg-elevated h-72 animate-pulse rounded-2xl" />
       </div>
     );
   }
@@ -198,7 +198,7 @@ export function HistoryView() {
         <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--text)]">
           {t('history.title')}
         </h1>
-        <p className="mt-1 text-sm text-muted">{t('history.subtitle')}</p>
+        <p className="text-muted mt-1 text-sm">{t('history.subtitle')}</p>
       </div>
 
       <div className="panel relative z-10 flex items-center justify-between gap-3 px-4 py-3">

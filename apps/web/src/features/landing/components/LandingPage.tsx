@@ -57,13 +57,13 @@ export function LandingPage() {
     <div>
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-4 font-mono text-xs uppercase tracking-[0.25em] text-warm">
+          <p className="text-warm mb-4 font-mono text-xs uppercase tracking-[0.25em]">
             {t('landing.hero.eyebrow')}
           </p>
           <h1 className="font-display text-4xl font-bold tracking-tight text-[var(--text)] sm:text-5xl lg:text-6xl">
             {t('landing.hero.title')}
           </h1>
-          <p className="mt-6 text-lg leading-8 text-muted">{t('landing.hero.subtitle')}</p>
+          <p className="text-muted mt-6 text-lg leading-8">{t('landing.hero.subtitle')}</p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href={registerHref} className="btn-primary w-full sm:w-auto">
               {t('landing.hero.ctaPrimary')}
@@ -81,15 +81,15 @@ export function LandingPage() {
             <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text)]">
               {t('landing.features.title')}
             </h2>
-            <p className="mt-4 text-muted">{t('landing.features.subtitle')}</p>
+            <p className="text-muted mt-4">{t('landing.features.subtitle')}</p>
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {features.map((feature) => (
               <article key={feature.title} className="panel relative z-10 p-6">
-                <h3 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">
+                <h3 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
                   {feature.title}
                 </h3>
-                <p className="relative z-10 mt-3 text-sm leading-6 text-muted">
+                <p className="text-muted relative z-10 mt-3 text-sm leading-6">
                   {feature.description}
                 </p>
               </article>
@@ -104,9 +104,9 @@ export function LandingPage() {
             <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text)]">
               {t('landing.pricing.title')}
             </h2>
-            <p className="mt-4 text-muted">{t('landing.pricing.subtitle')}</p>
+            <p className="text-muted mt-4">{t('landing.pricing.subtitle')}</p>
             <div className="mt-6 flex flex-col items-center gap-2">
-              <p className="text-sm font-medium text-muted">
+              <p className="text-muted text-sm font-medium">
                 {t('billing.labels.paymentCurrency')}
               </p>
               <BillingCurrencySwitcher value={billingCurrency} onChange={setBillingCurrency} />
@@ -114,13 +114,13 @@ export function LandingPage() {
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
             <article className="panel relative z-10 p-8">
-              <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-muted">
+              <p className="text-muted relative z-10 font-mono text-xs uppercase tracking-widest">
                 FREE
               </p>
-              <h3 className="relative z-10 mt-2 font-display text-3xl font-bold text-[var(--text)]">
+              <h3 className="font-display relative z-10 mt-2 text-3xl font-bold text-[var(--text)]">
                 {t(FREE_PRICE_KEYS[billingCurrency])}
               </h3>
-              <ul className="relative z-10 mt-6 space-y-3 text-sm text-muted">
+              <ul className="text-muted relative z-10 mt-6 space-y-3 text-sm">
                 {freeFeatures.map((feature) => (
                   <li key={feature}>• {feature}</li>
                 ))}
@@ -130,8 +130,8 @@ export function LandingPage() {
               </Link>
             </article>
 
-            <article className="panel relative z-10 border-warm/30 p-8">
-              <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-warm">
+            <article className="panel border-warm/30 relative z-10 p-8">
+              <p className="text-warm relative z-10 font-mono text-xs uppercase tracking-widest">
                 PRO
               </p>
               <ProPriceDisplay currency={billingCurrency} className="relative z-10 mt-2" />
@@ -153,7 +153,7 @@ export function LandingPage() {
           <h2 className="font-display text-3xl font-bold text-[var(--text)]">
             {t('landing.cta.title')}
           </h2>
-          <p className="mt-4 text-muted">{t('landing.cta.subtitle')}</p>
+          <p className="text-muted mt-4">{t('landing.cta.subtitle')}</p>
           <Link href={registerHref} className="btn-primary mt-8 inline-flex">
             {t('landing.cta.button')}
           </Link>

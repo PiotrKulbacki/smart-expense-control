@@ -289,37 +289,42 @@ export function AiChatView() {
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col gap-4">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text)]">{t('chat.page.title')}</h1>
-        <p className="mt-1 text-sm text-muted">{t('chat.page.subtitle')}</p>
+        <h1 className="font-display text-2xl font-bold text-[var(--text)]">
+          {t('chat.page.title')}
+        </h1>
+        <p className="text-muted mt-1 text-sm">{t('chat.page.subtitle')}</p>
         {quota && !isBlocked && quota.remaining < Number.MAX_SAFE_INTEGER && (
-          <p className="mt-2 text-xs text-muted">
+          <p className="text-muted mt-2 text-xs">
             {t('chat.status.messagesRemaining', { count: quota.remaining })}
           </p>
         )}
         {isBlocked && (
-          <p className="mt-2 text-xs font-medium text-warm">{t('chat.errors.quotaExceeded')}</p>
+          <p className="text-warm mt-2 text-xs font-medium">{t('chat.errors.quotaExceeded')}</p>
         )}
-        <p className="mt-2 text-xs text-muted">{t('chat.page.disclaimer')}</p>
+        <p className="text-muted mt-2 text-xs">{t('chat.page.disclaimer')}</p>
       </div>
 
       <div className="panel relative z-10 flex flex-1 flex-col overflow-hidden">
-        <div ref={scrollContainerRef} className="relative z-10 flex-1 space-y-4 overflow-y-auto p-4">
+        <div
+          ref={scrollContainerRef}
+          className="relative z-10 flex-1 space-y-4 overflow-y-auto p-4"
+        >
           <div ref={topSentinelRef} className="h-px w-full shrink-0" aria-hidden />
 
           {isLoadingMore && (
-            <p className="py-1 text-center text-xs text-muted">{t('chat.history.loadingOlder')}</p>
+            <p className="text-muted py-1 text-center text-xs">{t('chat.history.loadingOlder')}</p>
           )}
 
           {isLoadingHistory && messages.length === 0 && (
             <div className="space-y-3">
-              <div className="h-5 w-28 animate-pulse rounded bg-elevated" />
-              <div className="h-10 w-64 animate-pulse rounded-2xl bg-elevated" />
-              <div className="h-10 w-56 animate-pulse rounded-2xl bg-elevated" />
+              <div className="bg-elevated h-5 w-28 animate-pulse rounded" />
+              <div className="bg-elevated h-10 w-64 animate-pulse rounded-2xl" />
+              <div className="bg-elevated h-10 w-56 animate-pulse rounded-2xl" />
             </div>
           )}
 
           {!isLoadingHistory && messages.length === 0 && (
-            <p className="text-sm text-muted">{t('chat.page.empty')}</p>
+            <p className="text-muted text-sm">{t('chat.page.empty')}</p>
           )}
 
           {messages.map((message, index) => {
@@ -336,7 +341,7 @@ export function AiChatView() {
                 {headerLabel && (
                   <div className="flex items-center gap-3 py-2">
                     <div className="h-px flex-1 bg-[var(--border)]" />
-                    <p className="text-xs font-medium text-muted">{headerLabel}</p>
+                    <p className="text-muted text-xs font-medium">{headerLabel}</p>
                     <div className="h-px flex-1 bg-[var(--border)]" />
                   </div>
                 )}
@@ -344,7 +349,7 @@ export function AiChatView() {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 ${
                     message.role === 'user'
-                      ? 'ml-auto btn-primary'
+                      ? 'btn-primary ml-auto'
                       : 'bg-elevated text-[var(--text)]'
                   }`}
                 >
@@ -354,7 +359,7 @@ export function AiChatView() {
             );
           })}
           {isSending && (
-            <div className="max-w-[85%] rounded-2xl bg-elevated px-4 py-3 text-sm text-muted">
+            <div className="bg-elevated text-muted max-w-[85%] rounded-2xl px-4 py-3 text-sm">
               {t('chat.status.thinking')}
             </div>
           )}

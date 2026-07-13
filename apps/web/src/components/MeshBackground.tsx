@@ -1,9 +1,9 @@
 export function MeshBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      <div className="grid-floor absolute inset-0 animate-drift opacity-60" />
+      <div className="grid-floor animate-drift absolute inset-0 opacity-60" />
       <svg
-        className="absolute -left-1/4 top-1/4 h-[140%] w-[140%] animate-pulseSlow opacity-20"
+        className="animate-pulseSlow absolute -left-1/4 top-1/4 h-[140%] w-[140%] opacity-20"
         viewBox="0 0 800 800"
       >
         <defs>

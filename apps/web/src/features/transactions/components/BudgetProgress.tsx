@@ -92,13 +92,13 @@ export function BudgetProgress({
   return (
     <div className="mt-4 space-y-2">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium text-muted">{t('dashboard.budget.label')}</span>
+        <span className="text-muted font-medium">{t('dashboard.budget.label')}</span>
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <button
               type="button"
               onClick={openEditor}
-              className="flex items-center gap-1 text-muted transition hover:text-warm"
+              className="text-muted hover:text-warm flex items-center gap-1 transition"
               aria-label={t('dashboard.budget.editCurrent')}
             >
               <span>{formatMoney(budget, primaryCurrency, locale)}</span>
@@ -106,8 +106,10 @@ export function BudgetProgress({
             </button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-56">
-            <p className="text-sm font-medium text-[var(--text)]">{t('dashboard.budget.editCurrent')}</p>
-            <p className="mt-1 text-xs text-muted">{t('dashboard.budget.editCurrentHint')}</p>
+            <p className="text-sm font-medium text-[var(--text)]">
+              {t('dashboard.budget.editCurrent')}
+            </p>
+            <p className="text-muted mt-1 text-xs">{t('dashboard.budget.editCurrentHint')}</p>
             <Input
               type="number"
               min={1}
@@ -130,7 +132,7 @@ export function BudgetProgress({
         </Popover>
       </div>
       <Progress value={percentage} className="h-1.5" />
-      <div className="flex items-center justify-between text-xs text-muted">
+      <div className="text-muted flex items-center justify-between text-xs">
         <span>
           {t('dashboard.budget.spent', {
             amount: formatMoney(totalSpent, primaryCurrency, locale),

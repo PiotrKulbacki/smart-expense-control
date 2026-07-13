@@ -191,7 +191,7 @@ export function SettingsView() {
   }
 
   if (isLoading) {
-    return <div className="h-64 animate-pulse rounded-2xl bg-elevated" />;
+    return <div className="bg-elevated h-64 animate-pulse rounded-2xl" />;
   }
 
   if (!user) {
@@ -201,13 +201,15 @@ export function SettingsView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-[var(--text)]">{t('settings.title')}</h1>
-        <p className="mt-1 text-sm text-muted">{t('settings.subtitle')}</p>
+        <h1 className="font-display text-2xl font-bold text-[var(--text)]">
+          {t('settings.title')}
+        </h1>
+        <p className="text-muted mt-1 text-sm">{t('settings.subtitle')}</p>
       </div>
 
       <form onSubmit={(event) => void handleSave(event)} className="space-y-6">
         <section className="panel relative z-10 p-6">
-          <h2 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">
+          <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
             {t('settings.profile.title')}
           </h2>
           <div className="relative z-10 mt-4 grid gap-4 sm:grid-cols-2">
@@ -262,7 +264,7 @@ export function SettingsView() {
                 placeholder={t('settings.labels.defaultMonthlyBudgetPlaceholder')}
                 className="auth-input"
               />
-              <p className="mt-1 text-xs text-muted">
+              <p className="text-muted mt-1 text-xs">
                 {t('settings.labels.defaultMonthlyBudgetHint')}
               </p>
             </label>
@@ -280,10 +282,10 @@ export function SettingsView() {
       <RecurringExpensesSection primaryCurrency={primaryCurrency} />
 
       <section className="panel relative z-10 p-6">
-        <h2 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">
+        <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
           {t('billing.labels.subscription')}
         </h2>
-        <p className="relative z-10 mt-2 text-sm text-muted">
+        <p className="text-muted relative z-10 mt-2 text-sm">
           {t('billing.labels.currentPlan', { plan: user.currentPlan })}
         </p>
         {user.currentPlan === 'FREE' && (
@@ -322,11 +324,11 @@ export function SettingsView() {
         </div>
       </section>
 
-      <section className="panel relative z-10 border-glow/30 p-6">
-        <h2 className="relative z-10 font-display text-lg font-semibold text-glow">
+      <section className="panel border-glow/30 relative z-10 p-6">
+        <h2 className="font-display text-glow relative z-10 text-lg font-semibold">
           {t('settings.danger.title')}
         </h2>
-        <p className="relative z-10 mt-2 text-sm text-muted">{t('settings.danger.description')}</p>
+        <p className="text-muted relative z-10 mt-2 text-sm">{t('settings.danger.description')}</p>
         <label className="relative z-10 mt-4 block text-sm">
           <span className="auth-label text-glow">
             {t('settings.danger.confirmLabel', { email: user.email })}
@@ -343,7 +345,7 @@ export function SettingsView() {
           type="button"
           disabled={isDeleting}
           onClick={() => void handleDeleteAccount()}
-          className="relative z-10 mt-4 rounded-xl bg-glow px-4 py-2.5 font-mono text-sm font-semibold text-void transition hover:bg-glow/90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-glow text-void hover:bg-glow/90 relative z-10 mt-4 rounded-xl px-4 py-2.5 font-mono text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t('settings.danger.deleteAccount')}
         </button>

@@ -141,7 +141,7 @@ export function ReceiptScanner() {
         <h1 className="font-display text-2xl font-bold text-[var(--text)]">
           {t('scanner.labels.scanReceipt')}
         </h1>
-        <p className="mt-1 text-sm text-muted">{t('scanner.status.readyToConfirm')}</p>
+        <p className="text-muted mt-1 text-sm">{t('scanner.status.readyToConfirm')}</p>
       </div>
 
       <section className="panel relative z-10 p-6">
@@ -168,11 +168,9 @@ export function ReceiptScanner() {
           >
             {isScanning ? t('scanner.status.analyzing') : t('scanner.labels.uploadReceipt')}
           </button>
-          {isBlocked && (
-            <span className="chip chip-needed">{t('scanner.labels.scanBlocked')}</span>
-          )}
+          {isBlocked && <span className="chip chip-needed">{t('scanner.labels.scanBlocked')}</span>}
           {quota && !isBlocked && (
-            <span className="text-sm text-muted">
+            <span className="text-muted text-sm">
               {t('scanner.status.scansRemaining', { count: quota.remaining })}
             </span>
           )}
@@ -181,7 +179,7 @@ export function ReceiptScanner() {
 
       {draft && (
         <section className="panel relative z-10 p-6">
-          <h2 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">
+          <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
             {t('scanner.labels.confirmExpense')}
           </h2>
           <div className="relative z-10 mt-4 grid gap-4 sm:grid-cols-2">

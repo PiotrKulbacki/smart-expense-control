@@ -53,13 +53,13 @@ function TransactionRowSkeleton() {
   return (
     <div className="flex items-start justify-between gap-4 py-4">
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 animate-pulse rounded-xl bg-elevated" />
+        <div className="bg-elevated h-10 w-10 animate-pulse rounded-xl" />
         <div className="space-y-2">
-          <div className="h-4 w-28 animate-pulse rounded bg-elevated" />
-          <div className="h-3 w-20 animate-pulse rounded bg-elevated" />
+          <div className="bg-elevated h-4 w-28 animate-pulse rounded" />
+          <div className="bg-elevated h-3 w-20 animate-pulse rounded" />
         </div>
       </div>
-      <div className="h-4 w-16 animate-pulse rounded bg-elevated" />
+      <div className="bg-elevated h-4 w-16 animate-pulse rounded" />
     </div>
   );
 }
@@ -81,7 +81,9 @@ export function RecentTransactionsList({
 
   return (
     <section className="panel relative z-10 p-6">
-      <h2 className="relative z-10 font-display text-lg font-semibold text-[var(--text)]">{t(titleKey)}</h2>
+      <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
+        {t(titleKey)}
+      </h2>
 
       {isRefreshing ? (
         <div className="relative z-10 mt-4 divide-y divide-[var(--border)]">
@@ -91,11 +93,11 @@ export function RecentTransactionsList({
         </div>
       ) : transactions.length === 0 ? (
         <div className="relative z-10 mt-8 flex flex-col items-center justify-center py-6 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-elevated text-muted">
+          <span className="bg-elevated text-muted flex h-14 w-14 items-center justify-center rounded-2xl">
             <Receipt className="h-7 w-7" />
           </span>
           <p className="mt-4 max-w-xs text-sm font-medium text-[var(--text)]">{t(emptyTitleKey)}</p>
-          <p className="mt-1 max-w-xs text-sm text-muted">{t(emptyDescriptionKey)}</p>
+          <p className="text-muted mt-1 max-w-xs text-sm">{t(emptyDescriptionKey)}</p>
           {!hideEmptyCta && (
             <Button type="button" className="mt-5" onClick={onAddFirst}>
               {t('dashboard.recent.emptyCta')}
@@ -126,11 +128,11 @@ export function RecentTransactionsList({
                         {t(getCategoryLabelKey(transaction.category))}
                       </p>
                       {transaction.description && (
-                        <p className="mt-0.5 truncate text-sm text-muted">
+                        <p className="text-muted mt-0.5 truncate text-sm">
                           {transaction.description}
                         </p>
                       )}
-                      <p className="mt-1 text-xs text-muted">
+                      <p className="text-muted mt-1 text-xs">
                         {new Date(transaction.date).toLocaleDateString(locale, {
                           day: 'numeric',
                           month: 'short',
@@ -146,7 +148,7 @@ export function RecentTransactionsList({
                         {formatMoney(transaction.convertedAmount, primaryCurrency, locale)}
                       </p>
                       {showOriginal && (
-                        <p className="text-xs text-muted">
+                        <p className="text-muted text-xs">
                           {formatMoney(transaction.amount, transaction.currency, locale)}
                         </p>
                       )}
@@ -158,7 +160,7 @@ export function RecentTransactionsList({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted"
+                          className="text-muted h-8 w-8"
                           aria-label={t('dashboard.recent.actions')}
                         >
                           <MoreHorizontal className="h-4 w-4" />

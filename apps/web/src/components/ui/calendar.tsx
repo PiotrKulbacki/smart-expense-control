@@ -33,8 +33,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_button: cn(
           'inline-flex h-9 w-9 items-center justify-center rounded-md p-0 font-normal text-[var(--text)] transition hover:bg-elevated aria-selected:opacity-100'
         ),
-        selected:
-          'bg-warm text-void hover:bg-warm hover:text-void focus:bg-warm focus:text-void',
+        selected: 'bg-warm text-void hover:bg-warm hover:text-void focus:bg-warm focus:text-void',
         today: 'bg-elevated font-semibold text-warm',
         outside: 'text-muted opacity-50',
         disabled: 'text-muted opacity-50',

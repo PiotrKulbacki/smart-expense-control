@@ -18,7 +18,7 @@ export const DropdownMenuContent = forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 z-50 min-w-[10rem] overflow-hidden rounded-xl border border-[var(--border)] bg-surface p-1 text-[var(--text)] shadow-lg',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 bg-surface z-50 min-w-[10rem] overflow-hidden rounded-xl border border-[var(--border)] p-1 text-[var(--text)] shadow-lg',
         className
       )}
       {...props}
@@ -36,7 +36,7 @@ export const DropdownMenuItem = forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition focus:bg-elevated data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'focus:bg-elevated relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
       className
     )}
