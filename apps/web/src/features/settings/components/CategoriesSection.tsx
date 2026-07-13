@@ -247,7 +247,7 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
       </section>
 
       <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md">
+        <SheetContent className="w-full sm:max-w-md">
           <SheetHeader>
             <SheetTitle>
               {t(
