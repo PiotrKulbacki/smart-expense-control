@@ -28,14 +28,22 @@ function resolveKey(tree: TranslationTree, key: string): string | undefined {
   return typeof current === 'string' ? current : undefined;
 }
 
-export function t(key: string, locale: Locale = DEFAULT_LOCALE): string {
+export function t(
+  key: string,
+  locale: Locale = DEFAULT_LOCALE,
+  params?: Record<string, string | number>
+): string {
   const localized = resolveKey(translations[locale], key);
-  if (localized) {
-    return localized;
+  const template = localized ?? resolveKey(translations[DEFAULT_LOCALE], key) ?? key;
+
+  if (!params) {
+    return template;
   }
 
-  const fallback = resolveKey(translations[DEFAULT_LOCALE], key);
-  return fallback ?? key;
+  return Object.entries(params).reduce(
+    (result, [paramKey, value]) => result.replaceAll(`{{${paramKey}}}`, String(value)),
+    template
+  );
 }
 
 export function isLocale(value: string): value is Locale {
@@ -65,6 +73,9 @@ export function translateError(code: string, locale: Locale = DEFAULT_LOCALE): s
     code.startsWith('scanner.') ||
     code.startsWith('chat.') ||
     code.startsWith('currency.') ||
+    code.startsWith('settings.') ||
+    code.startsWith('billing.') ||
+    code.startsWith('dashboard.') ||
     code.startsWith('api.')
   ) {
     return t(code, locale);

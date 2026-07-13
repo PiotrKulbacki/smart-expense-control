@@ -7,9 +7,11 @@ const AI_RATE_LIMIT_WINDOW = '1 m';
 
 export type AiRateLimitScope = 'scan' | 'chat';
 
+const UPSTASH_KEY_PREFIX = 'expense-control';
+
 const AI_RATE_LIMIT_PREFIX: Record<AiRateLimitScope, string> = {
-  scan: 'sec:ai:scan',
-  chat: 'sec:ai:chat',
+  scan: `${UPSTASH_KEY_PREFIX}:ai:scan`,
+  chat: `${UPSTASH_KEY_PREFIX}:ai:chat`,
 };
 
 let redisClient: Redis | null | undefined;

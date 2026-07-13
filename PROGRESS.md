@@ -7,11 +7,103 @@
 3. **Wielowalutowość i Skaner AI (In-Memory Buffer)** — [✅ Zrobione]
 4. **Predykcyjny Czat AI (Asystent Finansowy)** — [✅ Zrobione]
 5. **PostHog (Flags & Analytics) i Stripe** — [✅ Zrobione]
-6. **UI Dashboard, i18n UI i Sentry**
+6. **UI Dashboard, i18n UI i Sentry** — [✅ Zrobione]
 
 ## Latest Handoff Log
 
-**2026-07-10 — Faza 5 zamknięta + utwardzenie billingu. Gotowość do Fazy 6.**
+**2026-07-13 — Utwardzenie Fazy 6: billing wielowalutowy, cennik promocyjny, Upstash prefix.**
+
+### Billing i cennik (post-Faza 6)
+
+- **Stripe checkout w 3 walutach** — env: `STRIPE_PRO_PRICE_PLN`, `STRIPE_PRO_PRICE_EUR`, `STRIPE_PRO_PRICE_GBP` (zamiast pojedynczego `STRIPE_PRO_PRICE_ID`). Checkout: `POST /api/billing/checkout` z body `{ currency: "PLN"|"EUR"|"GBP" }`.
+- **Przełącznik waluty płatności** — `BillingCurrencySwitcher` na landing page (`#pricing`) i w Ustawieniach; wybór zapisywany w `localStorage` (`sec_billing_currency`).
+- **Ceny PRO (źródło prawdy)** — `packages/shared/src/features/billing/pricing.ts`:
+  - standard: 25 PLN / 6 EUR / 4,50 GBP mies.,
+  - promocja: 12 PLN / 4 EUR / 3 GBP mies.
+- **Promocja przez PostHog** — flaga boolean `pro-promo-pricing` (`FEATURE_FLAG_PRO_PROMO_PRICING`); komponent `ProPriceDisplay` (przekreślona cena + badge z % rabatu: PLN 52%, EUR/GBP 33%). Landing + Ustawienia (sekcja subskrypcji).
+- **Etykieta profilu** — jedno pole `User.name`; etykieta i18n zmieniona na „Imię i nazwisko” / „Full name” (bez migracji na firstName/lastName).
+- **Upstash Redis** — prefix kluczy rate limit: `expense-control:ai:scan`, `expense-control:ai:chat` (współdzielona baza z innymi projektami bez kolizji).
+- **Migracja DB** — `20260712200000_add_primary_currency` zastosowana lokalnie i w Supabase; **nie usuwać pliku migracji** (wymagany przy `migrate:deploy` na Vercel).
+
+### Następny agent — start tutaj
+
+1. Produkcja live — zmiany przez `dev` → PR → merge `main`.
+2. **Vercel env:** `STRIPE_PRO_PRICE_PLN|EUR|GBP`, `NEXT_PUBLIC_SENTRY_DSN` (opcjonalnie org/project/token).
+3. **PostHog:** flaga `pro-promo-pricing` — rollout 100% = promocja włączona; 0% lub Disabled = ceny standardowe. MCP wizard (`npx @posthog/wizard mcp add`) opcjonalny — nie wymagany do działania flag.
+4. Migracja `primaryCurrency` wdroży się automatycznie przy następnym deployu (`migrate:deploy` w build).
+
+---
+
+**2026-07-12 — Faza 6 zamknięta: UI web, landing page, Sentry.**
+
+### Faza 6 — UI Dashboard, i18n UI i Sentry
+
+- **Route Groups Next.js:**
+  - `(public)/` — landing page, login, register, terms, privacy; `PublicHeader` + `PublicFooter`.
+  - `(app)/` — chroniona strefa z `AppSidebar` (Dashboard, Skaner, Czat, Ustawienia, menu użytkownika, locale, Stripe, logout).
+- **Landing page** — sekcje Hero, Features (skaner + czat AI + waluty), Pricing (FREE/PRO), CTA do rejestracji/logowania.
+- **Dashboard** — `GET /api/dashboard`: agregacja wydatków okresu `financialMonthStartDay`, lista transakcji z konwersją na `primaryCurrency`.
+- **Skaner paragonów** — quota (`GET /api/ai/scan-quota`), upload → `/api/ai/scan-receipt`, formularz draftu → `POST /api/transactions`.
+- **Czat AI** — `GET /api/ai/chat-quota`, interfejs → `POST /api/ai/chat`, stany ładowania, limity planu.
+- **Ustawienia** — `PATCH /api/auth/me` (name, `primaryCurrency`, `financialMonthStartDay`), Stripe checkout (`POST /api/billing/checkout`) i portal (`POST /api/billing/portal`), Danger Zone z `DELETE /api/auth/me` (kaskadowe usuwanie).
+- **i18n** — pełne klucze UI w en/pl/de/es; `LocaleProvider` + cookie `sec_locale`; interpolacja `{{param}}` w `t()`.
+- **Sentry** — `@sentry/nextjs`: client/server/edge config, `instrumentation.ts`, `global-error.tsx`, `withSentryConfig` w `next.config.ts`; env: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
+- **DB** — migracja `20260712200000_add_primary_currency` (`User.primaryCurrency`, domyślnie PLN).
+- **Middleware** — `/` publiczny dla gości; zalogowani → `/dashboard`; `/login`, `/register` redirect dla sesji.
+
+---
+
+**2026-07-12 — Produkcja na Vercel działa (deploy, OAuth, PostHog, cron-job.org). Gotowość do Fazy 6.**
+
+### Vercel — deploy i gałęzie Git
+
+- **Production branch:** `main` (deploy produkcyjny na `smart-expense-control-web.vercel.app`).
+- **Preview branch:** `dev` (deploy preview po pushu / PR).
+- **Root Directory:** `apps/web` (monorepo).
+- **Build:** `migrate:deploy` (Prisma) + `next build` — bez `dotenv` w skryptach build na Vercel (env z dashboardu).
+- **Baza na Vercel:** `DATABASE_URL` = Transaction pooler (:6543); `DIRECT_DATABASE_URL` = **Session pooler** (`*.pooler.supabase.com:5432`) — **nie** `db.*.supabase.co` (błąd P1001 przy migracji).
+- **turbo.json:** env vars dla Stripe/Upstash/PostHog przekazywane do buildu (eliminacja żółtych ostrzeżeń).
+
+### Vercel Cron vs cron-job.org (plan Hobby)
+
+- **Limit Hobby:** max 1 uruchomienie cron/dzień w `vercel.json` — wyrażenie `0 * * * *` **blokuje deploy**.
+- **W `vercel.json` zostaje tylko:** `GET /api/cron/reset-quotas` (`5 0 * * *`, codziennie 00:05 UTC).
+- **`downgrade-past-due` (co godzinę):** zewnętrzny scheduler **cron-job.org** → `GET https://smart-expense-control-web.vercel.app/api/cron/downgrade-past-due` z nagłówkiem `Authorization: Bearer CRON_SECRET`. Skonfigurowane i zweryfikowane (HTTP 200).
+
+### Google OAuth — produkcja
+
+- Redirect URI w Google Cloud Console (OAuth Client „Smart Expense Control - Web / Dev”):
+  - Lokalnie: `http://localhost:3000/api/auth/google/callback`
+  - Produkcja: `https://smart-expense-control-web.vercel.app/api/auth/google/callback`
+- JavaScript origins: `http://localhost:3000` + `https://smart-expense-control-web.vercel.app`
+- **Vercel Production:** `NEXT_PUBLIC_APP_URL=https://smart-expense-control-web.vercel.app` (wymaga redeploy po zmianie — wartość wbudowana w build).
+- **Logowanie Google na produkcji:** ✅ działa.
+
+### PostHog — skonfigurowane (Free plan)
+
+- Projekt: `smart-expense-control` (EU: `https://eu.i.posthog.com`).
+- Produkty włączone: Product Analytics, Web Analytics, Feature Flags (+ opcjonalnie Session Replay).
+- **Pominięto:** GitHub wizard instalacji (SDK już w repo), Data Warehouse, plan Pay-as-you-go.
+- **Env (Vercel + lokalnie):** `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`; opcjonalnie `POSTHOG_API_KEY` (fallback: public key).
+- Eventy serwerowe już w kodzie: `ai_scan_completed`, `ai_chat_message_sent`, `subscription_upgraded`.
+- **Feature flags:** `useFeatureFlag()` + flaga produkcyjna `pro-promo-pricing` (cennik promocyjny PRO na landing i w ustawieniach).
+- **Nie zrobione:** `identifyPostHogUser()` przy logowaniu/wylogowaniu (opcjonalne usprawnienie Fazy 6).
+
+### Jakość kodu / infra (2026-07-12)
+
+- `packages/database/prisma.config.ts` — seed przeniesiony z `package.json#prisma` (deprecation Prisma 7).
+- ESLint: usunięto martwy `mapDbRates`; poprawiono `PostHogProvider` (`useMemo` + `flagsVersion`).
+- Ostrzeżenia `npm deprecated` (glob, rimraf) — transitive z Expo; bez zmian do upgrade SDK.
+
+### Stripe (przypomnienie operacyjne)
+
+- Webhook endpoint produkcji: `https://smart-expense-control-web.vercel.app/api/webhooks/stripe`
+- `STRIPE_WEBHOOK_SECRET` z **Stripe Dashboard** (nie ze `stripe listen` lokalnego).
+- **Nowe (Faza 6):** `STRIPE_PRO_PRICE_PLN`, `STRIPE_PRO_PRICE_EUR`, `STRIPE_PRO_PRICE_GBP` dla checkoutu UI (`POST /api/billing/checkout`).
+
+---
+
+**2026-07-10 — Faza 5 zamknięta + utwardzenie billingu.**
 
 ### Stripe — webhooki, idempotency i plany
 
@@ -79,28 +171,45 @@ Klucze `chat.*`, `scanner.*`, `api.errors.rateLimitExceeded` w `en`, `pl`, `de`,
 
 ### Świadomie odłożone (kolejne fazy)
 
-- `GET /api/ai/chat-quota` — analog do `scan-quota` (przydatne w UI Fazy 6).
-- UI czatu, dashboard, Sentry — Faza 6.
-- Checkout Stripe (UI upgrade) — Faza 6 (webhooki gotowe).
-- Zmiana dnia wypłaty w ustawieniach (Faza 6) — wpływ na miesiąc finansowy dashboardu.
+- Rozdzielenie `User.name` na `firstName` / `lastName` (wymaga migracji DB — na razie jedno pole + etykieta „Imię i nazwisko”).
+- `identifyPostHogUser()` przy logowaniu/wylogowaniu (opcjonalne usprawnienie).
 
 ---
 
 ## Plan na przyszłe fazy
 
-### Faza 6 — UI Dashboard, i18n UI i Sentry
-
-- Dashboard wydatków z wielowalutowością.
-- **UI czatu AI** z limitami planów (analogicznie do skanera paragonów).
-- Formularz potwierdzenia draftów transakcji ze skanera paragonów.
-- Błędy wyłącznie przez **toast** (sonner).
-- Pole `primaryCurrency` na `User` + wybór w ustawieniach.
-- Zmiana `financialMonthStartDay` (dzień wypłaty) w ustawieniach.
-- Sentry: monitoring błędów AI i API.
+_(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez użytkownika.)_
 
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-13 — Billing wielowalutowy, cennik promocyjny, Upstash prefix**
+
+- Checkout Stripe w PLN/EUR/GBP (`STRIPE_PRO_PRICE_*`, `BillingCurrencySwitcher`).
+- Ceny PRO w `pricing.ts`; promocja sterowana flagą PostHog `pro-promo-pricing` + `ProPriceDisplay`.
+- Etykieta pola profilu: „Imię i nazwisko” (4 języki).
+- Upstash rate limit: prefix `expense-control:ai:*`.
+- Migracja `primaryCurrency` zastosowana lokalnie.
+
+**2026-07-12 — Faza 6 zakończona (UI web, landing, Sentry, ustawienia użytkownika)**
+
+- Route groups `(public)` i `(app)` z headerem/stopką i sidebar.
+- Landing page SaaS z sekcjami Hero, Features, Pricing, CTA.
+- Dashboard, skaner paragonów (draft flow), czat AI, ustawienia + Danger Zone.
+- API: `GET /api/dashboard`, `GET /api/ai/chat-quota`, `PATCH/DELETE /api/auth/me`, `POST /api/billing/checkout|portal`.
+- Migracja `primaryCurrency` na `User`; Sentry (`@sentry/nextjs`).
+- i18n UI w 4 językach; `LocaleProvider` z cookie.
+
+**2026-07-12 — Deploy produkcyjny Vercel, PostHog, OAuth Google, cron-job.org**
+
+- Naprawiono deploy Vercel: cron Hobby (usunięto `downgrade-past-due` z `vercel.json`), `DIRECT_DATABASE_URL` przez session pooler, build bez dotenv.
+- Skonfigurowano gałęzie: `main` → production, `dev` → preview.
+- cron-job.org: hourly `downgrade-past-due` + `CRON_SECRET` (test 200).
+- PostHog: projekt EU, env na Vercel, plan Free; pominięto wizard/Data Warehouse.
+- Google OAuth: redirect URI + origins dla produkcji Vercel; logowanie działa.
+- `prisma.config.ts`, poprawki ESLint (`currency.service.ts`, `PostHogProvider.tsx`).
+- Commity m.in.: `88b383c` (cron-job), `4a632ff` (PostHog env).
 
 **2026-07-10 — Utwardzenie Fazy 5 (idempotency, grace past_due, cykl limitów, rate limit)**
 

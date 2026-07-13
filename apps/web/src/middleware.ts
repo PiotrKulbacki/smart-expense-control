@@ -3,8 +3,8 @@ import type { NextRequest } from 'next/server';
 
 const AUTH_COOKIE_NAME = 'sec_session';
 
-const PUBLIC_PATHS = ['/login', '/register'];
-const PUBLIC_API_PREFIXES = ['/api/auth/', '/api/health'];
+const AUTH_ONLY_PUBLIC_PATHS = ['/login', '/register'];
+const PUBLIC_PATHS = ['/', '/login', '/register', '/terms', '/privacy'];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) {
@@ -15,7 +15,7 @@ function isPublicPath(pathname: string): boolean {
     return true;
   }
 
-  return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  return false;
 }
 
 export function middleware(request: NextRequest) {
@@ -31,11 +31,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isAuthenticated && PUBLIC_PATHS.includes(pathname)) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = '/';
-    homeUrl.search = '';
-    return NextResponse.redirect(homeUrl);
+  if (isAuthenticated && AUTH_ONLY_PUBLIC_PATHS.includes(pathname)) {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = '/dashboard';
+    dashboardUrl.search = '';
+    return NextResponse.redirect(dashboardUrl);
+  }
+
+  if (isAuthenticated && pathname === '/') {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = '/dashboard';
+    dashboardUrl.search = '';
+    return NextResponse.redirect(dashboardUrl);
   }
 
   return NextResponse.next();

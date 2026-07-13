@@ -35,6 +35,7 @@ model User {
   currentPlan            Plan      @default(FREE)
   monthlyAiScansCount    Int       @default(0)
   monthlyAiChatCount     Int       @default(0)
+  primaryCurrency        Currency  @default(PLN)
   financialMonthStartDay Int       @default(1)
   lastQuotaResetAt       DateTime?
   pastDueSince           DateTime?

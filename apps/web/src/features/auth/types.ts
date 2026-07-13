@@ -2,7 +2,15 @@ import type { User } from '@smart-expense-control/database';
 
 export type SafeUser = Pick<
   User,
-  'id' | 'email' | 'name' | 'avatarUrl' | 'currentPlan' | 'createdAt'
+  | 'id'
+  | 'email'
+  | 'name'
+  | 'avatarUrl'
+  | 'currentPlan'
+  | 'primaryCurrency'
+  | 'financialMonthStartDay'
+  | 'stripeCustomerId'
+  | 'createdAt'
 >;
 
 export function toSafeUser(user: User): SafeUser {
@@ -12,6 +20,9 @@ export function toSafeUser(user: User): SafeUser {
     name: user.name,
     avatarUrl: user.avatarUrl,
     currentPlan: user.currentPlan,
+    primaryCurrency: user.primaryCurrency,
+    financialMonthStartDay: user.financialMonthStartDay,
+    stripeCustomerId: user.stripeCustomerId,
     createdAt: user.createdAt,
   };
 }

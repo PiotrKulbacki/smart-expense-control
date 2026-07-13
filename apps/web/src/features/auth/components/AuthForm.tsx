@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
-import { DEFAULT_LOCALE, t, translateError } from '@shared/features/i18n';
+import { translateError } from '@shared/features/i18n';
+import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 type AuthFormProps = {
   mode: 'login' | 'register';
@@ -13,7 +14,8 @@ type AuthFormProps = {
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const locale = DEFAULT_LOCALE;
+  const t = useT();
+  const { locale } = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,11 +62,12 @@ export function AuthForm({ mode }: AuthFormProps) {
         return;
       }
 
-      toast.success(t(mode === 'login' ? 'auth.success.login' : 'auth.success.register', locale));
-      router.push('/');
+      toast.success(t(mode === 'login' ? 'auth.success.login' : 'auth.success.register'));
+      const redirect = searchParams.get('redirect') ?? '/dashboard';
+      router.push(redirect);
       router.refresh();
     } catch {
-      toast.error(t('auth.errors.networkError', locale));
+      toast.error(t('auth.errors.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +78,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       {mode === 'register' && (
         <div>
           <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-            {t('auth.labels.name', locale)}
+            {t('auth.labels.name')}
           </label>
           <input
             id="name"
@@ -90,7 +93,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <div>
         <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-          {t('auth.labels.email', locale)}
+          {t('auth.labels.email')}
         </label>
         <input
           id="email"
@@ -106,7 +109,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <div>
         <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-          {t('auth.labels.password', locale)}
+          {t('auth.labels.password')}
         </label>
         <input
           id="password"
@@ -123,7 +126,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       {mode === 'register' && (
         <div>
           <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium text-gray-700">
-            {t('auth.labels.confirmPassword', locale)}
+            {t('auth.labels.confirmPassword')}
           </label>
           <input
             id="confirmPassword"
@@ -143,14 +146,14 @@ export function AuthForm({ mode }: AuthFormProps) {
         disabled={isLoading}
         className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {t(mode === 'login' ? 'auth.labels.login' : 'auth.labels.register', locale)}
+        {t(mode === 'login' ? 'auth.labels.login' : 'auth.labels.register')}
       </button>
 
       <a
         href="/api/auth/google"
         className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
       >
-        {t('auth.labels.continueWithGoogle', locale)}
+        {t('auth.labels.continueWithGoogle')}
       </a>
     </form>
   );

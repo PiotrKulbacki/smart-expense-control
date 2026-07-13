@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { PostHogProvider } from '@web/features/analytics/components/PostHogProvider';
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
+import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
 
 export const metadata: Metadata = {
   title: 'Smart Expense Control',
@@ -16,10 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
-        <PostHogProvider>
-          {children}
-          <ToastProvider />
-        </PostHogProvider>
+        <LocaleProvider>
+          <PostHogProvider>
+            {children}
+            <ToastProvider />
+          </PostHogProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

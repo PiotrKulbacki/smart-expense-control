@@ -4,7 +4,7 @@
       "email": "Correo electrónico",
       "password": "Contraseña",
       "confirmPassword": "Confirmar contraseña",
-      "name": "Nombre",
+      "name": "Nombre y apellidos",
       "login": "Iniciar sesión",
       "register": "Crear cuenta",
       "logout": "Cerrar sesión",
@@ -132,6 +132,165 @@
       "quotaExceeded": "Has usado los 10 mensajes de chat gratuitos. Actualiza a Pro para chat ilimitado",
       "monthlyLimitReached": "Límite mensual de chat alcanzado. Inténtalo de nuevo el próximo mes",
       "aiFailed": "La solicitud de chat falló. Inténtalo de nuevo"
+    },
+    "page": {
+      "title": "Asistente financiero IA",
+      "subtitle": "Haz preguntas sobre tus gastos y recibe insights personalizados",
+      "placeholder": "Pregunta sobre tu presupuesto, categorías o gastos recientes...",
+      "empty": "Inicia una conversación — tu asistente analiza tus datos reales de transacciones.",
+      "disclaimer": "Los insights de IA son solo informativos y no constituyen asesoramiento financiero."
+    }
+  },
+  "layout": {
+    "brand": "Smart Expense Control",
+    "nav": {
+      "features": "Funciones",
+      "pricing": "Precios",
+      "dashboard": "Panel",
+      "scanner": "Escáner",
+      "chat": "Chat IA",
+      "settings": "Ajustes"
+    },
+    "footer": {
+      "copyright": "© {{year}} Smart Expense Control. Todos los derechos reservados.",
+      "terms": "Términos de servicio",
+      "privacy": "Política de privacidad",
+      "contact": "Contacto"
+    }
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Deja de gastar en piloto automático",
+      "title": "Recupera el control de tu dinero",
+      "subtitle": "Smart Expense Control te ayuda a rastrear cada compra, escanear recibos con IA y obtener insights honestos — para dejar de perder dinero a diestra y siniestra.",
+      "ctaPrimary": "Empieza gratis",
+      "ctaSecondary": "Iniciar sesión"
+    },
+    "features": {
+      "title": "Todo lo que necesitas para mantener el control",
+      "subtitle": "Desde el escáner de recibos hasta el chat IA predictivo — para quienes quieren claridad, no hojas de cálculo.",
+      "scanner": {
+        "title": "Escáner de recibos IA",
+        "description": "Haz una foto, revisa el borrador y guarda — sin escribir manualmente."
+      },
+      "chat": {
+        "title": "Chat IA predictivo",
+        "description": "Pregunta a tu asistente sobre patrones de gasto basados en tus datos reales."
+      },
+      "currency": {
+        "title": "Soporte multi-moneda",
+        "description": "Rastrea PLN, EUR y GBP — todo convertido a tu moneda principal."
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "subtitle": "Empieza gratis. Actualiza cuando necesites más potencia IA.",
+      "perMonth": "/ mes",
+      "free": {
+        "pricePln": "0 PLN / mes",
+        "priceEur": "0 € / mes",
+        "priceGbp": "0 £ / mes",
+        "feature1": "3 escaneos de recibos al mes",
+        "feature2": "10 mensajes de chat IA al mes",
+        "feature3": "Panel de gastos completo",
+        "cta": "Empezar gratis"
+      },
+      "pro": {
+        "discount": "{{percent}}% de descuento",
+        "feature1": "150 escaneos de recibos al mes",
+        "feature2": "Chat IA ilimitado",
+        "feature3": "Soporte prioritario",
+        "cta": "Ir a Pro"
+      }
+    },
+    "cta": {
+      "title": "¿Listo para dejar de gastar sin pensar?",
+      "subtitle": "Únete a Smart Expense Control y construye un presupuesto en el que realmente confíes.",
+      "button": "Crea tu cuenta gratis"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Resumen de gastos del periodo de facturación actual",
+    "summary": {
+      "totalSpent": "Total gastado en este periodo",
+      "transactions": "Transacciones"
+    },
+    "categories": {
+      "title": "Gastos por categoría"
+    },
+    "recent": {
+      "title": "Transacciones recientes",
+      "empty": "Sin transacciones aún. Escanea un recibo o añade un gasto para empezar."
+    },
+    "form": {
+      "amount": "Importe",
+      "currency": "Moneda",
+      "category": "Categoría",
+      "date": "Fecha",
+      "description": "Descripción",
+      "cancel": "Cancelar"
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "subtitle": "Gestiona tu perfil, moneda y suscripción",
+    "profile": {
+      "title": "Perfil y preferencias"
+    },
+    "labels": {
+      "primaryCurrency": "Moneda principal",
+      "financialMonthStartDay": "Día de inicio del mes de facturación (1–28)",
+      "saveChanges": "Guardar cambios"
+    },
+    "success": {
+      "updated": "Ajustes guardados correctamente",
+      "accountDeleted": "Tu cuenta ha sido eliminada permanentemente"
+    },
+    "errors": {
+      "invalidName": "El nombre debe tener entre 2 y 100 caracteres",
+      "invalidCurrency": "Selecciona una moneda válida",
+      "invalidFinancialDay": "El día de facturación debe estar entre 1 y 28",
+      "deleteFailed": "No se pudo eliminar la cuenta. Inténtalo de nuevo",
+      "updateFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo",
+      "confirmEmailMismatch": "La confirmación del email no coincide"
+    },
+    "danger": {
+      "title": "Zona de peligro",
+      "description": "Elimina permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
+      "confirmLabel": "Escribe tu email ({{email}}) para confirmar",
+      "deleteAccount": "Eliminar mi cuenta permanentemente"
+    }
+  },
+  "billing": {
+    "labels": {
+      "subscription": "Suscripción",
+      "currentPlan": "Plan actual: {{plan}}",
+      "upgradeToPro": "Actualizar a Pro",
+      "manageSubscription": "Gestionar suscripción",
+      "paymentCurrency": "Moneda de pago"
+    },
+    "success": {
+      "upgraded": "¡Bienvenido a Pro! Tu suscripción está activa."
+    },
+    "errors": {
+      "checkoutUnavailable": "El checkout no está disponible temporalmente. Inténtalo más tarde",
+      "checkoutCancelled": "El checkout fue cancelado",
+      "portalUnavailable": "El portal de suscripción no está disponible temporalmente",
+      "noSubscription": "No se encontró suscripción activa",
+      "alreadyPro": "Ya tienes una suscripción Pro activa",
+      "invalidCurrency": "Selecciona una moneda de pago válida",
+      "priceUnavailable": "El precio Pro no está disponible para la moneda seleccionada"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Términos de servicio",
+      "content": "Al usar Smart Expense Control aceptas utilizar el servicio de forma responsable. Los insights generados por IA son solo informativos y no constituyen asesoramiento financiero."
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "content": "Procesamos tus datos de cuenta y transacciones para ofrecer seguimiento de gastos y funciones IA. Puedes eliminar permanentemente tu cuenta y todos los datos asociados en cualquier momento desde Ajustes."
     }
   }
 }

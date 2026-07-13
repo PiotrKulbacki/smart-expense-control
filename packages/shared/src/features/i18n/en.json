@@ -4,7 +4,7 @@
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm password",
-      "name": "Name",
+      "name": "Full name",
       "login": "Log in",
       "register": "Create account",
       "logout": "Log out",
@@ -132,6 +132,165 @@
       "quotaExceeded": "You've used all 10 free chat messages. Upgrade to Pro for unlimited chat",
       "monthlyLimitReached": "Monthly chat limit reached. Try again next month",
       "aiFailed": "Chat request failed. Please try again"
+    },
+    "page": {
+      "title": "AI Financial Assistant",
+      "subtitle": "Ask questions about your spending and get personalized insights",
+      "placeholder": "Ask about your budget, categories, or recent expenses...",
+      "empty": "Start a conversation — your assistant analyzes your real transaction data.",
+      "disclaimer": "AI insights are for informational purposes only and do not constitute financial advice."
+    }
+  },
+  "layout": {
+    "brand": "Smart Expense Control",
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "dashboard": "Dashboard",
+      "scanner": "Scanner",
+      "chat": "AI Chat",
+      "settings": "Settings"
+    },
+    "footer": {
+      "copyright": "© {{year}} Smart Expense Control. All rights reserved.",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "contact": "Contact"
+    }
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Stop spending on autopilot",
+      "title": "Take back control of your money",
+      "subtitle": "Smart Expense Control helps you track every purchase, scan receipts with AI, and get honest insights — so you stop bleeding cash left and right.",
+      "ctaPrimary": "Start for free",
+      "ctaSecondary": "Log in"
+    },
+    "features": {
+      "title": "Everything you need to stay in control",
+      "subtitle": "From receipt scanning to predictive AI chat — built for people who want clarity, not spreadsheets.",
+      "scanner": {
+        "title": "AI Receipt Scanner",
+        "description": "Snap a photo, review the draft, and save — no manual typing."
+      },
+      "chat": {
+        "title": "Predictive AI Chat",
+        "description": "Ask your assistant about spending patterns based on your real data."
+      },
+      "currency": {
+        "title": "Multi-currency support",
+        "description": "Track PLN, EUR, and GBP — all converted to your primary currency."
+      }
+    },
+    "pricing": {
+      "title": "Simple, transparent pricing",
+      "subtitle": "Start free. Upgrade when you need more AI power.",
+      "perMonth": "/ month",
+      "free": {
+        "pricePln": "0 PLN / month",
+        "priceEur": "€0 / month",
+        "priceGbp": "£0 / month",
+        "feature1": "3 receipt scans per month",
+        "feature2": "10 AI chat messages per month",
+        "feature3": "Full expense dashboard",
+        "cta": "Get started free"
+      },
+      "pro": {
+        "discount": "{{percent}}% off",
+        "feature1": "150 receipt scans per month",
+        "feature2": "Unlimited AI chat",
+        "feature3": "Priority support",
+        "cta": "Go Pro"
+      }
+    },
+    "cta": {
+      "title": "Ready to stop mindless spending?",
+      "subtitle": "Join Smart Expense Control and build a budget you actually trust.",
+      "button": "Create your free account"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Your spending overview for the current billing period",
+    "summary": {
+      "totalSpent": "Total spent this period",
+      "transactions": "Transactions"
+    },
+    "categories": {
+      "title": "Spending by category"
+    },
+    "recent": {
+      "title": "Recent transactions",
+      "empty": "No transactions yet. Scan a receipt or add an expense to get started."
+    },
+    "form": {
+      "amount": "Amount",
+      "currency": "Currency",
+      "category": "Category",
+      "date": "Date",
+      "description": "Description",
+      "cancel": "Cancel"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your profile, currency, and subscription",
+    "profile": {
+      "title": "Profile & preferences"
+    },
+    "labels": {
+      "primaryCurrency": "Primary currency",
+      "financialMonthStartDay": "Billing month start day (1–28)",
+      "saveChanges": "Save changes"
+    },
+    "success": {
+      "updated": "Settings saved successfully",
+      "accountDeleted": "Your account has been permanently deleted"
+    },
+    "errors": {
+      "invalidName": "Name must be between 2 and 100 characters",
+      "invalidCurrency": "Please select a valid currency",
+      "invalidFinancialDay": "Billing day must be between 1 and 28",
+      "deleteFailed": "Could not delete account. Please try again",
+      "updateFailed": "Could not save settings. Please try again",
+      "confirmEmailMismatch": "Email confirmation does not match"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "Permanently delete your account and all associated data. This action cannot be undone.",
+      "confirmLabel": "Type your email ({{email}}) to confirm",
+      "deleteAccount": "Delete my account permanently"
+    }
+  },
+  "billing": {
+    "labels": {
+      "subscription": "Subscription",
+      "currentPlan": "Current plan: {{plan}}",
+      "upgradeToPro": "Upgrade to Pro",
+      "manageSubscription": "Manage subscription",
+      "paymentCurrency": "Payment currency"
+    },
+    "success": {
+      "upgraded": "Welcome to Pro! Your subscription is active."
+    },
+    "errors": {
+      "checkoutUnavailable": "Checkout is temporarily unavailable. Please try again later",
+      "checkoutCancelled": "Checkout was cancelled",
+      "portalUnavailable": "Subscription portal is temporarily unavailable",
+      "noSubscription": "No active subscription found",
+      "alreadyPro": "You already have an active Pro subscription",
+      "invalidCurrency": "Please select a valid payment currency",
+      "priceUnavailable": "Pro pricing is not available for the selected currency"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Terms of Service",
+      "content": "By using Smart Expense Control you agree to use the service responsibly. AI-generated insights are for informational purposes only and do not constitute financial advice."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "content": "We process your account and transaction data to provide expense tracking and AI features. You can permanently delete your account and all associated data at any time from Settings."
     }
   }
 }

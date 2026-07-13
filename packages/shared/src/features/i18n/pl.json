@@ -4,7 +4,7 @@
       "email": "E-mail",
       "password": "Hasło",
       "confirmPassword": "Potwierdź hasło",
-      "name": "Imię",
+      "name": "Imię i nazwisko",
       "login": "Zaloguj się",
       "register": "Utwórz konto",
       "logout": "Wyloguj się",
@@ -132,6 +132,165 @@
       "quotaExceeded": "Wykorzystałeś 10 darmowych wiadomości czatu. Przejdź na Pro, aby korzystać bez limitu",
       "monthlyLimitReached": "Osiągnięto miesięczny limit wiadomości czatu. Spróbuj ponownie w przyszłym miesiącu",
       "aiFailed": "Zapytanie do czatu nie powiodło się. Spróbuj ponownie"
+    },
+    "page": {
+      "title": "Asystent finansowy AI",
+      "subtitle": "Zadawaj pytania o wydatki i otrzymuj spersonalizowane wskazówki",
+      "placeholder": "Zapytaj o budżet, kategorie lub ostatnie wydatki...",
+      "empty": "Rozpocznij rozmowę — asystent analizuje Twoje rzeczywiste dane transakcyjne.",
+      "disclaimer": "Wskazówki AI mają charakter informacyjny i nie stanowią porady finansowej."
+    }
+  },
+  "layout": {
+    "brand": "Smart Expense Control",
+    "nav": {
+      "features": "Funkcje",
+      "pricing": "Cennik",
+      "dashboard": "Dashboard",
+      "scanner": "Skaner",
+      "chat": "Czat AI",
+      "settings": "Ustawienia"
+    },
+    "footer": {
+      "copyright": "© {{year}} Smart Expense Control. Wszelkie prawa zastrzeżone.",
+      "terms": "Regulamin",
+      "privacy": "Polityka prywatności",
+      "contact": "Kontakt"
+    }
+  },
+  "landing": {
+    "hero": {
+      "eyebrow": "Przestań wydawać na autopilocie",
+      "title": "Odzyskaj kontrolę nad swoimi pieniędzmi",
+      "subtitle": "Smart Expense Control pomaga śledzić każdy zakup, skanować paragony AI i dostawać uczciwe wskazówki — żebyś przestał przepuszczać kasę na prawo i lewo.",
+      "ctaPrimary": "Zacznij za darmo",
+      "ctaSecondary": "Zaloguj się"
+    },
+    "features": {
+      "title": "Wszystko, czego potrzebujesz, by trzymać budżet w ryzach",
+      "subtitle": "Od skanera paragonów po predykcyjny czat AI — dla tych, którzy chcą jasności, nie arkuszy kalkulacyjnych.",
+      "scanner": {
+        "title": "Skaner paragonów AI",
+        "description": "Zrób zdjęcie, sprawdź draft i zapisz — bez ręcznego przepisywania."
+      },
+      "chat": {
+        "title": "Predykcyjny czat AI",
+        "description": "Pytaj asystenta o wzorce wydatków na podstawie Twoich danych."
+      },
+      "currency": {
+        "title": "Wielowalutowość",
+        "description": "Śledź PLN, EUR i GBP — wszystko przeliczone na Twoją główną walutę."
+      }
+    },
+    "pricing": {
+      "title": "Prosty, przejrzysty cennik",
+      "subtitle": "Zacznij za darmo. Przejdź na Pro, gdy potrzebujesz więcej mocy AI.",
+      "perMonth": "/ miesiąc",
+      "free": {
+        "pricePln": "0 zł / miesiąc",
+        "priceEur": "0 € / miesiąc",
+        "priceGbp": "0 £ / miesiąc",
+        "feature1": "3 skany paragonów miesięcznie",
+        "feature2": "10 wiadomości czatu AI miesięcznie",
+        "feature3": "Pełny dashboard wydatków",
+        "cta": "Zacznij za darmo"
+      },
+      "pro": {
+        "discount": "{{percent}}% taniej",
+        "feature1": "150 skanów paragonów miesięcznie",
+        "feature2": "Nielimitowany czat AI",
+        "feature3": "Priorytetowe wsparcie",
+        "cta": "Przejdź na Pro"
+      }
+    },
+    "cta": {
+      "title": "Gotowy, by przestać wydawać bezmyślnie?",
+      "subtitle": "Dołącz do Smart Expense Control i zbuduj budżet, któremu naprawdę ufasz.",
+      "button": "Utwórz darmowe konto"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Przegląd wydatków w bieżącym okresie rozliczeniowym",
+    "summary": {
+      "totalSpent": "Suma wydatków w okresie",
+      "transactions": "Transakcje"
+    },
+    "categories": {
+      "title": "Wydatki wg kategorii"
+    },
+    "recent": {
+      "title": "Ostatnie transakcje",
+      "empty": "Brak transakcji. Zeskanuj paragon lub dodaj wydatek, aby zacząć."
+    },
+    "form": {
+      "amount": "Kwota",
+      "currency": "Waluta",
+      "category": "Kategoria",
+      "date": "Data",
+      "description": "Opis",
+      "cancel": "Anuluj"
+    }
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "subtitle": "Zarządzaj profilem, walutą i subskrypcją",
+    "profile": {
+      "title": "Profil i preferencje"
+    },
+    "labels": {
+      "primaryCurrency": "Główna waluta",
+      "financialMonthStartDay": "Dzień startu miesiąca rozliczeniowego (1–28)",
+      "saveChanges": "Zapisz zmiany"
+    },
+    "success": {
+      "updated": "Ustawienia zapisane pomyślnie",
+      "accountDeleted": "Twoje konto zostało trwale usunięte"
+    },
+    "errors": {
+      "invalidName": "Imię musi mieć od 2 do 100 znaków",
+      "invalidCurrency": "Wybierz prawidłową walutę",
+      "invalidFinancialDay": "Dzień rozliczeniowy musi być między 1 a 28",
+      "deleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie",
+      "updateFailed": "Nie udało się zapisać ustawień. Spróbuj ponownie",
+      "confirmEmailMismatch": "Potwierdzenie e-maila nie pasuje"
+    },
+    "danger": {
+      "title": "Strefa niebezpieczna",
+      "description": "Trwale usuń konto i wszystkie powiązane dane. Tej operacji nie można cofnąć.",
+      "confirmLabel": "Wpisz swój e-mail ({{email}}), aby potwierdzić",
+      "deleteAccount": "Trwale usuń moje konto"
+    }
+  },
+  "billing": {
+    "labels": {
+      "subscription": "Subskrypcja",
+      "currentPlan": "Aktualny plan: {{plan}}",
+      "upgradeToPro": "Przejdź na Pro",
+      "manageSubscription": "Zarządzaj subskrypcją",
+      "paymentCurrency": "Waluta płatności"
+    },
+    "success": {
+      "upgraded": "Witaj w Pro! Twoja subskrypcja jest aktywna."
+    },
+    "errors": {
+      "checkoutUnavailable": "Checkout jest chwilowo niedostępny. Spróbuj ponownie później",
+      "checkoutCancelled": "Checkout został anulowany",
+      "portalUnavailable": "Portal subskrypcji jest chwilowo niedostępny",
+      "noSubscription": "Nie znaleziono aktywnej subskrypcji",
+      "alreadyPro": "Masz już aktywną subskrypcję Pro",
+      "invalidCurrency": "Wybierz prawidłową walutę płatności",
+      "priceUnavailable": "Cennik Pro jest niedostępny dla wybranej waluty"
+    }
+  },
+  "legal": {
+    "terms": {
+      "title": "Regulamin",
+      "content": "Korzystając z Smart Expense Control, zobowiązujesz się do odpowiedzialnego użytkowania serwisu. Wskazówki generowane przez AI mają charakter informacyjny i nie stanowią porady finansowej."
+    },
+    "privacy": {
+      "title": "Polityka prywatności",
+      "content": "Przetwarzamy dane konta i transakcji, aby świadczyć usługi śledzenia wydatków i funkcji AI. Możesz trwale usunąć konto i wszystkie powiązane dane w dowolnym momencie w Ustawieniach."
     }
   }
 }
