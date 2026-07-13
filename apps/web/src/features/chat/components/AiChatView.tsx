@@ -121,16 +121,16 @@ export function AiChatView() {
           </p>
         )}
         {isBlocked && (
-          <p className="mt-2 text-xs font-medium text-amber-700">{t('chat.errors.quotaExceeded')}</p>
+          <p className="mt-2 text-xs font-medium text-amber-700">
+            {t('chat.errors.quotaExceeded')}
+          </p>
         )}
         <p className="mt-2 text-xs text-gray-400">{t('chat.page.disclaimer')}</p>
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
-          {messages.length === 0 && (
-            <p className="text-sm text-gray-500">{t('chat.page.empty')}</p>
-          )}
+          {messages.length === 0 && <p className="text-sm text-gray-500">{t('chat.page.empty')}</p>}
           {messages.map((message) => (
             <div
               key={message.id}

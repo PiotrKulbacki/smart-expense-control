@@ -180,23 +180,27 @@ export function ReceiptScanner() {
 
       {draft && (
         <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">{t('scanner.labels.confirmExpense')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t('scanner.labels.confirmExpense')}
+          </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-gray-700">{t('dashboard.form.amount')}</span>
+              <span className="mb-1 block font-medium text-gray-700">
+                {t('dashboard.form.amount')}
+              </span>
               <input
                 type="number"
                 step="0.01"
                 value={draft.amount}
                 disabled={isSaving}
-                onChange={(event) =>
-                  setDraft({ ...draft, amount: Number(event.target.value) })
-                }
+                onChange={(event) => setDraft({ ...draft, amount: Number(event.target.value) })}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 disabled:opacity-50"
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-gray-700">{t('dashboard.form.currency')}</span>
+              <span className="mb-1 block font-medium text-gray-700">
+                {t('dashboard.form.currency')}
+              </span>
               <select
                 value={draft.currency}
                 disabled={isSaving}
@@ -216,7 +220,9 @@ export function ReceiptScanner() {
               </select>
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-gray-700">{t('dashboard.form.category')}</span>
+              <span className="mb-1 block font-medium text-gray-700">
+                {t('dashboard.form.category')}
+              </span>
               <select
                 value={draft.category}
                 disabled={isSaving}
@@ -231,7 +237,9 @@ export function ReceiptScanner() {
               </select>
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block font-medium text-gray-700">{t('dashboard.form.date')}</span>
+              <span className="mb-1 block font-medium text-gray-700">
+                {t('dashboard.form.date')}
+              </span>
               <input
                 type="date"
                 value={draft.date.slice(0, 10)}

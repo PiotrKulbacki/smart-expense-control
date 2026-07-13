@@ -111,7 +111,9 @@ export function LandingPage() {
             </h2>
             <p className="mt-4 text-gray-600">{t('landing.pricing.subtitle')}</p>
             <div className="mt-6 flex flex-col items-center gap-2">
-              <p className="text-sm font-medium text-gray-700">{t('billing.labels.paymentCurrency')}</p>
+              <p className="text-sm font-medium text-gray-700">
+                {t('billing.labels.paymentCurrency')}
+              </p>
               <BillingCurrencySwitcher value={billingCurrency} onChange={setBillingCurrency} />
             </div>
           </div>

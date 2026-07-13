@@ -9,12 +9,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import {
-  DEFAULT_LOCALE,
-  isLocale,
-  t as translate,
-  type Locale,
-} from '@shared/features/i18n';
+import { DEFAULT_LOCALE, isLocale, t as translate, type Locale } from '@shared/features/i18n';
 
 const LOCALE_COOKIE = 'sec_locale';
 

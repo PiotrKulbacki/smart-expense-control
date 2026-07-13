@@ -1,8 +1,5 @@
 import { z } from 'zod';
-import {
-  FINANCIAL_MONTH_DAY_MAX,
-  FINANCIAL_MONTH_DAY_MIN,
-} from '../billing/financial-month';
+import { FINANCIAL_MONTH_DAY_MAX, FINANCIAL_MONTH_DAY_MIN } from '../billing/financial-month';
 
 export const USER_ERROR_CODES = {
   INVALID_NAME: 'settings.errors.invalidName',

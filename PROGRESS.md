@@ -11,6 +11,29 @@
 
 ## Latest Handoff Log
 
+**2026-07-13 — Utwardzenie Fazy 6: billing wielowalutowy, cennik promocyjny, Upstash prefix.**
+
+### Billing i cennik (post-Faza 6)
+
+- **Stripe checkout w 3 walutach** — env: `STRIPE_PRO_PRICE_PLN`, `STRIPE_PRO_PRICE_EUR`, `STRIPE_PRO_PRICE_GBP` (zamiast pojedynczego `STRIPE_PRO_PRICE_ID`). Checkout: `POST /api/billing/checkout` z body `{ currency: "PLN"|"EUR"|"GBP" }`.
+- **Przełącznik waluty płatności** — `BillingCurrencySwitcher` na landing page (`#pricing`) i w Ustawieniach; wybór zapisywany w `localStorage` (`sec_billing_currency`).
+- **Ceny PRO (źródło prawdy)** — `packages/shared/src/features/billing/pricing.ts`:
+  - standard: 25 PLN / 6 EUR / 4,50 GBP mies.,
+  - promocja: 12 PLN / 4 EUR / 3 GBP mies.
+- **Promocja przez PostHog** — flaga boolean `pro-promo-pricing` (`FEATURE_FLAG_PRO_PROMO_PRICING`); komponent `ProPriceDisplay` (przekreślona cena + badge z % rabatu: PLN 52%, EUR/GBP 33%). Landing + Ustawienia (sekcja subskrypcji).
+- **Etykieta profilu** — jedno pole `User.name`; etykieta i18n zmieniona na „Imię i nazwisko” / „Full name” (bez migracji na firstName/lastName).
+- **Upstash Redis** — prefix kluczy rate limit: `expense-control:ai:scan`, `expense-control:ai:chat` (współdzielona baza z innymi projektami bez kolizji).
+- **Migracja DB** — `20260712200000_add_primary_currency` zastosowana lokalnie i w Supabase; **nie usuwać pliku migracji** (wymagany przy `migrate:deploy` na Vercel).
+
+### Następny agent — start tutaj
+
+1. Produkcja live — zmiany przez `dev` → PR → merge `main`.
+2. **Vercel env:** `STRIPE_PRO_PRICE_PLN|EUR|GBP`, `NEXT_PUBLIC_SENTRY_DSN` (opcjonalnie org/project/token).
+3. **PostHog:** flaga `pro-promo-pricing` — rollout 100% = promocja włączona; 0% lub Disabled = ceny standardowe. MCP wizard (`npx @posthog/wizard mcp add`) opcjonalny — nie wymagany do działania flag.
+4. Migracja `primaryCurrency` wdroży się automatycznie przy następnym deployu (`migrate:deploy` w build).
+
+---
+
 **2026-07-12 — Faza 6 zamknięta: UI web, landing page, Sentry.**
 
 ### Faza 6 — UI Dashboard, i18n UI i Sentry
@@ -27,12 +50,6 @@
 - **Sentry** — `@sentry/nextjs`: client/server/edge config, `instrumentation.ts`, `global-error.tsx`, `withSentryConfig` w `next.config.ts`; env: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
 - **DB** — migracja `20260712200000_add_primary_currency` (`User.primaryCurrency`, domyślnie PLN).
 - **Middleware** — `/` publiczny dla gości; zalogowani → `/dashboard`; `/login`, `/register` redirect dla sesji.
-
-### Następny agent — start tutaj
-
-1. Produkcja live — zmiany przez `dev` → PR → merge `main`.
-2. Ustaw na Vercel: `NEXT_PUBLIC_SENTRY_DSN`, `STRIPE_PRO_PRICE_PLN|EUR|GBP` dla checkoutu UI.
-3. Uruchom migrację `add_primary_currency` na produkcji przy następnym deployu.
 
 ---
 
@@ -69,7 +86,7 @@
 - **Pominięto:** GitHub wizard instalacji (SDK już w repo), Data Warehouse, plan Pay-as-you-go.
 - **Env (Vercel + lokalnie):** `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`; opcjonalnie `POSTHOG_API_KEY` (fallback: public key).
 - Eventy serwerowe już w kodzie: `ai_scan_completed`, `ai_chat_message_sent`, `subscription_upgraded`.
-- **Feature flags:** `useFeatureFlag()` gotowe — flagi tworzyć w dashboardzie PostHog (Faza 6).
+- **Feature flags:** `useFeatureFlag()` + flaga produkcyjna `pro-promo-pricing` (cennik promocyjny PRO na landing i w ustawieniach).
 - **Nie zrobione:** `identifyPostHogUser()` przy logowaniu/wylogowaniu (opcjonalne usprawnienie Fazy 6).
 
 ### Jakość kodu / infra (2026-07-12)
@@ -154,10 +171,8 @@ Klucze `chat.*`, `scanner.*`, `api.errors.rateLimitExceeded` w `en`, `pl`, `de`,
 
 ### Świadomie odłożone (kolejne fazy)
 
-- `GET /api/ai/chat-quota` — analog do `scan-quota` (przydatne w UI Fazy 6).
-- UI czatu, dashboard, Sentry — Faza 6.
-- Checkout Stripe (UI upgrade) — Faza 6 (webhooki gotowe).
-- Zmiana dnia wypłaty w ustawieniach (Faza 6) — wpływ na miesiąc finansowy dashboardu.
+- Rozdzielenie `User.name` na `firstName` / `lastName` (wymaga migracji DB — na razie jedno pole + etykieta „Imię i nazwisko”).
+- `identifyPostHogUser()` przy logowaniu/wylogowaniu (opcjonalne usprawnienie).
 
 ---
 
@@ -168,6 +183,14 @@ _(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez uży
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-13 — Billing wielowalutowy, cennik promocyjny, Upstash prefix**
+
+- Checkout Stripe w PLN/EUR/GBP (`STRIPE_PRO_PRICE_*`, `BillingCurrencySwitcher`).
+- Ceny PRO w `pricing.ts`; promocja sterowana flagą PostHog `pro-promo-pricing` + `ProPriceDisplay`.
+- Etykieta pola profilu: „Imię i nazwisko” (4 języki).
+- Upstash rate limit: prefix `expense-control:ai:*`.
+- Migracja `primaryCurrency` zastosowana lokalnie.
 
 **2026-07-12 — Faza 6 zakończona (UI web, landing, Sentry, ustawienia użytkownika)**
 

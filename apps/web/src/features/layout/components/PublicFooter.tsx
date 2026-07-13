@@ -17,7 +17,10 @@ export function PublicFooter() {
           <Link href="/privacy" className="transition hover:text-gray-900">
             {t('layout.footer.privacy')}
           </Link>
-          <a href="mailto:support@smartexpensecontrol.app" className="transition hover:text-gray-900">
+          <a
+            href="mailto:support@smartexpensecontrol.app"
+            className="transition hover:text-gray-900"
+          >
             {t('layout.footer.contact')}
           </a>
         </div>

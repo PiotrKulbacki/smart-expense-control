@@ -1,9 +1,7 @@
 import type { BillingCurrency } from './checkout';
 
 export type StripeProPriceEnvKey =
-  | 'STRIPE_PRO_PRICE_PLN'
-  | 'STRIPE_PRO_PRICE_EUR'
-  | 'STRIPE_PRO_PRICE_GBP';
+  'STRIPE_PRO_PRICE_PLN' | 'STRIPE_PRO_PRICE_EUR' | 'STRIPE_PRO_PRICE_GBP';
 
 const STRIPE_PRO_PRICE_ENV_KEYS: Record<BillingCurrency, StripeProPriceEnvKey> = {
   PLN: 'STRIPE_PRO_PRICE_PLN',

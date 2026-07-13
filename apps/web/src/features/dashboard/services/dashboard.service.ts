@@ -88,10 +88,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData | 
       rateMap
     );
     totalSpent += converted;
-    categoryMap.set(
-      transaction.category,
-      (categoryMap.get(transaction.category) ?? 0) + converted
-    );
+    categoryMap.set(transaction.category, (categoryMap.get(transaction.category) ?? 0) + converted);
   }
 
   const categoryTotals = Array.from(categoryMap.entries())
