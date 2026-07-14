@@ -17,6 +17,20 @@
 
 ## Latest Handoff Log
 
+**2026-07-14 — Hotfix: czat AI 429 mimo dostępnej quota (FREE plan).**
+
+### Czat AI — synchronizacja limitów planu vs Redis rate limit
+
+- **Przyczyna:** `/api/ai/chat` sprawdzał Redis (5 req/min, fail-closed bez Upstash) **przed** quota planu w DB. UI pokazywało np. 8/10 wiadomości, a endpoint zwracał `api.errors.rateLimitExceeded` (429).
+- **Naprawa:**
+  - Kolejność: najpierw `checkAiChatQuota()` (DB), potem ewentualny rate limit.
+  - **FREE:** pominięcie Redis per-minute — limit miesięczny w DB (`monthlyAiChatCount`) jest jedynym limitem biznesowym.
+  - **PRO:** Redis jako ochrona przed spamem (30 req/min zamiast 5).
+  - **Chat bez Upstash:** fail-open (quota DB chroni koszty); skan paragonów nadal fail-closed bez Redis.
+- **Debug:** logi `[AI Chat 429]` / `[RateLimit]` w route handlerze i `rate-limit.ts` (do usunięcia po weryfikacji na produkcji).
+
+---
+
 **2026-07-14 — Faza 8.4 zamknięta: odświeżone kategorie, własne kategorie użytkownika, sync średnich dziennych z Sumą wydatków, CTA i sidebar.**
 
 ### Faza 8.4 — Kategorie, CTA, sidebar, tryb analizy
@@ -271,6 +285,12 @@ _(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez uży
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-14 — Hotfix: czat AI 429 mimo dostępnej quota FREE**
+
+- Naprawiono konflikt między limitem Redis (5 req/min, fail-closed) a quota planu w DB (10/mies.).
+- FREE: tylko limit miesięczny w DB; PRO: Redis 30 req/min jako anti-spam.
+- Chat fail-open gdy brak Upstash; scan nadal fail-closed.
 
 **2026-07-14 — Faza 8.4: kategorie, własne kategorie, sync średnich dziennych, CTA, sidebar**
 
