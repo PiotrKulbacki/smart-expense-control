@@ -65,7 +65,8 @@
     "success": {
       "created": "Transaktion erfolgreich gespeichert",
       "updated": "Transaktion aktualisiert",
-      "deleted": "Transaktion gelöscht"
+      "deleted": "Transaktion gelöscht",
+      "batchCreated": "Aufgeteilte Ausgaben erfolgreich gespeichert"
     },
     "errors": {
       "invalidAmount": "Bitte geben Sie einen gültigen positiven Betrag ein",
@@ -73,7 +74,9 @@
       "invalidDate": "Bitte geben Sie ein gültiges Datum ein",
       "invalidDescription": "Die Beschreibung ist zu lang",
       "notFound": "Transaktion nicht gefunden",
-      "forbidden": "Sie haben keine Berechtigung, diese Transaktion zu ändern"
+      "forbidden": "Sie haben keine Berechtigung, diese Transaktion zu ändern",
+      "splitSumMismatch": "Die Aufteilungsbeträge müssen der Belegsumme entsprechen",
+      "tooManySplits": "Sie können maximal 5 Kategorien aufteilen"
     }
   },
   "recurring": {
@@ -122,6 +125,19 @@
       "monthlyLimitReached": "Monatliches Scan-Limit erreicht. Versuchen Sie es nächsten Monat erneut",
       "aiFailed": "Beleganalyse fehlgeschlagen. Bitte versuchen Sie es erneut",
       "parseFailed": "Belegdaten konnten nicht verarbeitet werden. Bitte manuell eingeben"
+    },
+    "split": {
+      "toggleOn": "Ausgabe aufteilen",
+      "toggleOff": "Ohne Aufteilung speichern",
+      "addCategory": "Kategorie hinzufügen",
+      "removeCategory": "Kategorie entfernen",
+      "sumLabel": "Aufteilungssumme",
+      "sumValid": "Entspricht der Belegsumme",
+      "sumInvalid": "Die Aufteilungsbeträge müssen der Belegsumme entsprechen",
+      "aiSuggested": "KI hat diesen Beleg nach Kategorien gruppiert — bitte vor dem Speichern prüfen",
+      "expandItems": "Artikel anzeigen",
+      "collapseItems": "Artikel ausblenden",
+      "moreItems": "+{{count}} weitere"
     }
   },
   "currency": {

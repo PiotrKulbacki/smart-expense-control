@@ -16,6 +16,8 @@ export const TRANSACTION_ERROR_CODES = {
   INVALID_DESCRIPTION: 'transactions.errors.invalidDescription',
   NOT_FOUND: 'transactions.errors.notFound',
   FORBIDDEN: 'transactions.errors.forbidden',
+  SPLIT_SUM_MISMATCH: 'transactions.errors.splitSumMismatch',
+  TOO_MANY_SPLITS: 'transactions.errors.tooManySplits',
 } as const;
 
 export const RECURRING_EXPENSE_ERROR_CODES = {
@@ -71,6 +73,65 @@ export const updateTransactionSchema = transactionBaseSchema
     message: TRANSACTION_ERROR_CODES.INVALID_AMOUNT,
   });
 
+export const SPLIT_AMOUNT_TOLERANCE = 0.01;
+export const MAX_TRANSACTION_SPLITS = 5;
+
+const splitAmountSchema = z
+  .number({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_AMOUNT })
+  .positive(TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
+  .max(999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT);
+
+export const transactionSplitLineSchema = z.object({
+  category: z
+    .string()
+    .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)
+    .max(100, TRANSACTION_ERROR_CODES.INVALID_CATEGORY),
+  amount: splitAmountSchema,
+});
+
+export const receiptSplitSuggestionSchema = z.object({
+  category: z
+    .string()
+    .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)
+    .max(100, TRANSACTION_ERROR_CODES.INVALID_CATEGORY),
+  amount: splitAmountSchema,
+  items: z.array(z.string().max(200)).max(20).optional(),
+});
+
+export function sumSplitAmounts(splits: Array<{ amount: number }>): number {
+  return splits.reduce((total, split) => total + split.amount, 0);
+}
+
+export function splitAmountsMatchTotal(
+  splits: Array<{ amount: number }>,
+  totalAmount: number,
+  tolerance = SPLIT_AMOUNT_TOLERANCE
+): boolean {
+  return Math.abs(sumSplitAmounts(splits) - totalAmount) <= tolerance;
+}
+
+export const createTransactionBatchSchema = z
+  .object({
+    shared: z.object({
+      totalAmount: splitAmountSchema,
+      currency: currencyEnum,
+      description: z.string().max(500, TRANSACTION_ERROR_CODES.INVALID_DESCRIPTION).optional(),
+      date: z.preprocess(
+        parseCalendarDateInput,
+        z.date({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_DATE })
+      ),
+      isAiScanned: z.boolean().optional().default(false),
+    }),
+    splits: z
+      .array(transactionSplitLineSchema)
+      .min(1, TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
+      .max(MAX_TRANSACTION_SPLITS, TRANSACTION_ERROR_CODES.TOO_MANY_SPLITS),
+  })
+  .refine((data) => splitAmountsMatchTotal(data.splits, data.shared.totalAmount), {
+    message: TRANSACTION_ERROR_CODES.SPLIT_SUM_MISMATCH,
+    path: ['splits'],
+  });
+
 export const receiptScanResultSchema = z.object({
   amount: z
     .number({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_AMOUNT })
@@ -87,6 +148,8 @@ export const receiptScanResultSchema = z.object({
     z.date({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_DATE })
   ),
   needsManualReview: z.boolean().default(false),
+  hasMultipleCategories: z.boolean().default(false),
+  suggestedSplits: z.array(receiptSplitSuggestionSchema).max(8).optional(),
 });
 
 const frequencyEnum = z.enum(['MONTHLY', 'YEARLY']);
@@ -117,6 +180,9 @@ export const updateRecurringExpenseSchema = createRecurringExpenseSchema
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type TransactionFormInput = z.infer<typeof transactionFormSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
+export type CreateTransactionBatchInput = z.infer<typeof createTransactionBatchSchema>;
+export type TransactionSplitLine = z.infer<typeof transactionSplitLineSchema>;
+export type ReceiptSplitSuggestion = z.infer<typeof receiptSplitSuggestionSchema>;
 export type ReceiptScanResult = z.infer<typeof receiptScanResultSchema>;
 export type CreateRecurringExpenseInput = z.infer<typeof createRecurringExpenseSchema>;
 export type UpdateRecurringExpenseInput = z.infer<typeof updateRecurringExpenseSchema>;

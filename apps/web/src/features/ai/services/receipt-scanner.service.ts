@@ -13,6 +13,7 @@ import {
   type ReceiptScanResult,
 } from '@shared/features/transactions/schemas';
 import { env } from '@web/env';
+import { normalizeReceiptSuggestedSplits } from '@web/features/ai/services/receipt-scan-splits';
 import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import { captureServerException } from '@web/lib/sentry-server';
@@ -36,11 +37,17 @@ Return ONLY valid JSON with these fields:
 - amount (number, positive, total paid)
 - currency (one of: PLN, EUR, GBP)
 - date (ISO 8601 date string YYYY-MM-DD)
-- category (exactly one of: ${categories})
+- category (exactly one of: ${categories}) — the dominant category if the receipt were recorded as a single expense
 - description (short string, e.g. store or vendor name)
 - needsManualReview (boolean — true if any field is uncertain or unreadable)
+- hasMultipleCategories (boolean — true if the receipt clearly contains items from multiple spending categories)
+- suggestedSplits (optional array; include only when hasMultipleCategories is true):
+  - Each element: { "category": one of the allowed categories, "amount": number, "items": optional array of short product name strings }
+  - Use 2-5 groups maximum; group similar items together instead of returning every line item separately
+  - Map cleaning/household products to Household, cosmetics to Cosmetics, food to Groceries, alcohol to Alcohol, fuel to Fuel, etc.
+  - The sum of suggestedSplits[].amount must equal amount within 0.01
 
-If the image is not a financial document or is completely unreadable, set needsManualReview to true and use your best guess for other fields.`;
+If the image is not a financial document or is completely unreadable, set needsManualReview to true and use your best guess for other fields. Omit suggestedSplits or return an empty array when the receipt is single-category or unreadable.`;
 }
 
 function validateImageFile(file: File): string | null {
@@ -202,7 +209,20 @@ export async function scanReceiptFromFile(
       return { error: RECEIPT_SCAN_ERROR_CODES.PARSE_FAILED };
     }
 
-    const result = { ...validated.data, category: normalizedCategory };
+    const normalizedSuggestedSplits = normalizeReceiptSuggestedSplits(
+      validated.data.suggestedSplits,
+      allowedCategories,
+      validated.data.amount
+    );
+
+    const result: ReceiptScanResult = {
+      ...validated.data,
+      category: normalizedCategory,
+      hasMultipleCategories: normalizedSuggestedSplits
+        ? true
+        : validated.data.hasMultipleCategories,
+      suggestedSplits: normalizedSuggestedSplits,
+    };
 
     if (result.needsManualReview && result.amount <= 0) {
       return { error: RECEIPT_SCAN_ERROR_CODES.UNREADABLE };

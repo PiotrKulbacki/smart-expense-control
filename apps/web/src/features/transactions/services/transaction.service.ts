@@ -1,6 +1,7 @@
 import { prisma, type Transaction } from '@smart-expense-control/database';
 import { convertAmount } from '@shared/features/currency';
 import type {
+  CreateTransactionBatchInput,
   CreateTransactionInput,
   CurrencyCode,
   UpdateTransactionInput,
@@ -18,6 +19,7 @@ export type TransactionDto = {
   description: string | null;
   date: string;
   isAiScanned: boolean;
+  receiptGroupId: string | null;
   createdAt: string;
 };
 
@@ -41,6 +43,7 @@ function toTransactionDto(transaction: Transaction): TransactionDto {
     description: transaction.description,
     date: transaction.date.toISOString(),
     isAiScanned: transaction.isAiScanned,
+    receiptGroupId: transaction.receiptGroupId,
     createdAt: transaction.createdAt.toISOString(),
   };
 }
@@ -120,6 +123,35 @@ export async function createTransaction(
   await invalidateAggregationForTransactionDates(userId, [input.date]);
 
   return toTransactionDto(transaction);
+}
+
+export async function createTransactionBatch(
+  userId: string,
+  input: CreateTransactionBatchInput
+): Promise<TransactionDto[]> {
+  const { shared, splits } = input;
+  const receiptGroupId = splits.length > 1 ? crypto.randomUUID() : null;
+
+  const transactions = await prisma.$transaction(
+    splits.map((split) =>
+      prisma.transaction.create({
+        data: {
+          userId,
+          amount: split.amount,
+          currency: shared.currency,
+          category: split.category,
+          description: shared.description,
+          date: shared.date,
+          isAiScanned: shared.isAiScanned ?? false,
+          receiptGroupId,
+        },
+      })
+    )
+  );
+
+  await invalidateAggregationForTransactionDates(userId, [shared.date]);
+
+  return transactions.map(toTransactionDto);
 }
 
 export async function updateTransaction(

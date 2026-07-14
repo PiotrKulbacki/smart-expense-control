@@ -65,7 +65,8 @@
     "success": {
       "created": "Transaction saved successfully",
       "updated": "Transaction updated successfully",
-      "deleted": "Transaction deleted successfully"
+      "deleted": "Transaction deleted successfully",
+      "batchCreated": "Split expenses saved successfully"
     },
     "errors": {
       "invalidAmount": "Please enter a valid positive amount",
@@ -73,7 +74,9 @@
       "invalidDate": "Please enter a valid date",
       "invalidDescription": "Description is too long",
       "notFound": "Transaction not found",
-      "forbidden": "You do not have permission to modify this transaction"
+      "forbidden": "You do not have permission to modify this transaction",
+      "splitSumMismatch": "Split amounts must add up to the receipt total",
+      "tooManySplits": "You can split into at most 5 categories"
     }
   },
   "recurring": {
@@ -122,6 +125,19 @@
       "monthlyLimitReached": "Monthly scan limit reached. Try again next month",
       "aiFailed": "Receipt analysis failed. Please try again",
       "parseFailed": "Could not parse receipt data. Please enter details manually"
+    },
+    "split": {
+      "toggleOn": "Split expense",
+      "toggleOff": "Save without splitting",
+      "addCategory": "Add category",
+      "removeCategory": "Remove category",
+      "sumLabel": "Split total",
+      "sumValid": "Matches receipt total",
+      "sumInvalid": "Split amounts must match the receipt total",
+      "aiSuggested": "AI grouped this receipt by category — review before saving",
+      "expandItems": "Show items",
+      "collapseItems": "Hide items",
+      "moreItems": "+{{count}} more"
     }
   },
   "currency": {

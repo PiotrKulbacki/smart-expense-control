@@ -65,7 +65,8 @@
     "success": {
       "created": "Transakcja zapisana pomyślnie",
       "updated": "Transakcja zaktualizowana",
-      "deleted": "Transakcja usunięta"
+      "deleted": "Transakcja usunięta",
+      "batchCreated": "Podzielone wydatki zapisane pomyślnie"
     },
     "errors": {
       "invalidAmount": "Podaj prawidłową dodatnią kwotę",
@@ -73,7 +74,9 @@
       "invalidDate": "Podaj prawidłową datę",
       "invalidDescription": "Opis jest zbyt długi",
       "notFound": "Nie znaleziono transakcji",
-      "forbidden": "Nie masz uprawnień do modyfikacji tej transakcji"
+      "forbidden": "Nie masz uprawnień do modyfikacji tej transakcji",
+      "splitSumMismatch": "Kwoty w podziale muszą sumować się do kwoty paragonu",
+      "tooManySplits": "Możesz podzielić wydatek maksymalnie na 5 kategorii"
     }
   },
   "recurring": {
@@ -122,6 +125,19 @@
       "monthlyLimitReached": "Osiągnięto miesięczny limit skanów. Spróbuj ponownie w przyszłym miesiącu",
       "aiFailed": "Analiza paragonu nie powiodła się. Spróbuj ponownie",
       "parseFailed": "Nie udało się przetworzyć danych z paragonu. Wprowadź je ręcznie"
+    },
+    "split": {
+      "toggleOn": "Rozbij wydatek",
+      "toggleOff": "Zapisz bez rozbicia",
+      "addCategory": "Dodaj kategorię",
+      "removeCategory": "Usuń kategorię",
+      "sumLabel": "Suma podziału",
+      "sumValid": "Zgadza się z kwotą paragonu",
+      "sumInvalid": "Kwoty w podziale muszą równać się kwocie paragonu",
+      "aiSuggested": "AI pogrupowało ten paragon według kategorii — sprawdź przed zapisem",
+      "expandItems": "Pokaż pozycje",
+      "collapseItems": "Ukryj pozycje",
+      "moreItems": "+{{count}} więcej"
     }
   },
   "currency": {

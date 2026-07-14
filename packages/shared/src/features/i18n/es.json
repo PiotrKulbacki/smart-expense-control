@@ -65,7 +65,8 @@
     "success": {
       "created": "Transacción guardada correctamente",
       "updated": "Transacción actualizada",
-      "deleted": "Transacción eliminada"
+      "deleted": "Transacción eliminada",
+      "batchCreated": "Gastos divididos guardados correctamente"
     },
     "errors": {
       "invalidAmount": "Introduce un importe positivo válido",
@@ -73,7 +74,9 @@
       "invalidDate": "Introduce una fecha válida",
       "invalidDescription": "La descripción es demasiado larga",
       "notFound": "Transacción no encontrada",
-      "forbidden": "No tienes permiso para modificar esta transacción"
+      "forbidden": "No tienes permiso para modificar esta transacción",
+      "splitSumMismatch": "Los importes divididos deben sumar el total del recibo",
+      "tooManySplits": "Puedes dividir como máximo en 5 categorías"
     }
   },
   "recurring": {
@@ -122,6 +125,19 @@
       "monthlyLimitReached": "Límite mensual de escaneos alcanzado. Inténtalo de nuevo el próximo mes",
       "aiFailed": "El análisis del recibo falló. Inténtalo de nuevo",
       "parseFailed": "No se pudieron procesar los datos del recibo. Introdúcelos manualmente"
+    },
+    "split": {
+      "toggleOn": "Dividir gasto",
+      "toggleOff": "Guardar sin dividir",
+      "addCategory": "Añadir categoría",
+      "removeCategory": "Eliminar categoría",
+      "sumLabel": "Total dividido",
+      "sumValid": "Coincide con el total del recibo",
+      "sumInvalid": "Los importes divididos deben coincidir con el total del recibo",
+      "aiSuggested": "La IA agrupó este recibo por categorías — revísalo antes de guardar",
+      "expandItems": "Mostrar artículos",
+      "collapseItems": "Ocultar artículos",
+      "moreItems": "+{{count}} más"
     }
   },
   "currency": {
