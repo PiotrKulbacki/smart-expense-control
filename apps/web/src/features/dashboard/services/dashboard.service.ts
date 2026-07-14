@@ -18,6 +18,7 @@ export type DashboardTransaction = {
   description: string | null;
   date: string;
   isAiScanned: boolean;
+  receiptGroupId: string | null;
 };
 
 export type DashboardChartTransaction = {
@@ -195,6 +196,7 @@ export async function getDashboardData(
         description: true,
         date: true,
         isAiScanned: true,
+        receiptGroupId: true,
       },
     }),
     usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
@@ -270,6 +272,26 @@ export async function getDashboardData(
     });
   }
 
+  const mappedRecentTransactions = recentTransactions.map((transaction) => {
+    const amount = transaction.amount.toNumber();
+    return {
+      id: transaction.id,
+      amount,
+      currency: transaction.currency,
+      convertedAmount: convertAmount(
+        amount,
+        transaction.currency as CurrencyCode,
+        primaryCurrency,
+        rateMap
+      ),
+      category: transaction.category,
+      description: transaction.description,
+      date: transaction.date.toISOString(),
+      isAiScanned: transaction.isAiScanned,
+      receiptGroupId: transaction.receiptGroupId,
+    };
+  });
+
   return {
     summary: {
       primaryCurrency,
@@ -284,24 +306,7 @@ export async function getDashboardData(
       currentMonthBudget: user.currentMonthBudget,
       defaultMonthlyBudget: user.defaultMonthlyBudget,
     },
-    recentTransactions: recentTransactions.map((transaction) => {
-      const amount = transaction.amount.toNumber();
-      return {
-        id: transaction.id,
-        amount,
-        currency: transaction.currency,
-        convertedAmount: convertAmount(
-          amount,
-          transaction.currency as CurrencyCode,
-          primaryCurrency,
-          rateMap
-        ),
-        category: transaction.category,
-        description: transaction.description,
-        date: transaction.date.toISOString(),
-        isAiScanned: transaction.isAiScanned,
-      };
-    }),
+    recentTransactions: mappedRecentTransactions,
     chartTransactions,
   };
 }

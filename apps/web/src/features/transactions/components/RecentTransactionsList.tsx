@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@web/components/ui/dropdown-menu';
-import { ScrollArea } from '@web/components/ui/scroll-area';
 import { cn } from '@web/lib/utils';
 import { useT } from '@web/features/i18n/LocaleProvider';
 import {
@@ -382,8 +381,8 @@ export function RecentTransactionsList({
           )}
         </div>
       ) : (
-        <ScrollArea className="relative z-10 mt-4 max-h-[350px]">
-          <div className="divide-y divide-[var(--border)] pr-2">
+        <div className="recent-transactions-scroll relative z-10 mt-4 max-h-[350px] overflow-y-auto pr-2">
+          <div className="divide-y divide-[var(--border)]">
             {displayEntries
               ? displayEntries.map((entry) =>
                   entry.kind === 'split' ? (
@@ -422,7 +421,7 @@ export function RecentTransactionsList({
                   />
                 ))}
           </div>
-        </ScrollArea>
+        </div>
       )}
     </section>
   );
