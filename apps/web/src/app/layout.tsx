@@ -2,6 +2,7 @@ import { JetBrains_Mono, Outfit } from 'next/font/google';
 import { MeshBackground } from '@web/components/MeshBackground';
 import { PostHogProvider } from '@web/features/analytics/components/PostHogProvider';
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
+import { CategoriesProvider } from '@web/features/categories/components/CategoriesProvider';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
 import type { Metadata } from 'next';
 import './globals.css';
@@ -37,10 +38,12 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <MeshBackground />
         <LocaleProvider>
-          <PostHogProvider>
-            {children}
-            <ToastProvider />
-          </PostHogProvider>
+          <CategoriesProvider>
+            <PostHogProvider>
+              {children}
+              <ToastProvider />
+            </PostHogProvider>
+          </CategoriesProvider>
         </LocaleProvider>
       </body>
     </html>

@@ -81,6 +81,28 @@ const splitAmountSchema = z
   .positive(TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
   .max(999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT);
 
+export const receiptSplitItemSchema = z.object({
+  name: z.string().max(200),
+  amount: splitAmountSchema,
+});
+
+const receiptSplitItemInputSchema = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    return { name: value, amount: 0 };
+  }
+
+  return value;
+}, receiptSplitItemSchema);
+
+export const receiptLineItemSchema = z.object({
+  name: z.string().max(200),
+  amount: splitAmountSchema,
+  category: z
+    .string()
+    .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)
+    .max(100, TRANSACTION_ERROR_CODES.INVALID_CATEGORY),
+});
+
 export const transactionSplitLineSchema = z.object({
   category: z
     .string()
@@ -95,7 +117,7 @@ export const receiptSplitSuggestionSchema = z.object({
     .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)
     .max(100, TRANSACTION_ERROR_CODES.INVALID_CATEGORY),
   amount: splitAmountSchema,
-  items: z.array(z.string().max(200)).max(20).optional(),
+  items: z.array(receiptSplitItemInputSchema).max(30).optional(),
 });
 
 export function sumSplitAmounts(splits: Array<{ amount: number }>): number {
@@ -149,6 +171,7 @@ export const receiptScanResultSchema = z.object({
   ),
   needsManualReview: z.boolean().default(false),
   hasMultipleCategories: z.boolean().default(false),
+  lineItems: z.array(receiptLineItemSchema).max(100).optional(),
   suggestedSplits: z.array(receiptSplitSuggestionSchema).max(8).optional(),
 });
 
@@ -182,6 +205,8 @@ export type TransactionFormInput = z.infer<typeof transactionFormSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
 export type CreateTransactionBatchInput = z.infer<typeof createTransactionBatchSchema>;
 export type TransactionSplitLine = z.infer<typeof transactionSplitLineSchema>;
+export type ReceiptSplitItem = z.infer<typeof receiptSplitItemSchema>;
+export type ReceiptLineItem = z.infer<typeof receiptLineItemSchema>;
 export type ReceiptSplitSuggestion = z.infer<typeof receiptSplitSuggestionSchema>;
 export type ReceiptScanResult = z.infer<typeof receiptScanResultSchema>;
 export type CreateRecurringExpenseInput = z.infer<typeof createRecurringExpenseSchema>;

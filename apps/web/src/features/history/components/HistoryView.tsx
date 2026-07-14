@@ -15,10 +15,13 @@ import { Button } from '@web/components/ui/button';
 import { useCategories } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { DeleteTransactionDialog } from '@web/features/transactions/components/DeleteTransactionDialog';
+import { DeleteTransactionGroupDialog } from '@web/features/transactions/components/DeleteTransactionGroupDialog';
+import { EditTransactionGroupDialog } from '@web/features/transactions/components/EditTransactionGroupDialog';
 import {
   RecentTransactionsList,
   type RecentTransaction,
 } from '@web/features/transactions/components/RecentTransactionsList';
+import type { SplitTransactionGroup } from '@web/features/transactions/lib/transaction-groups';
 import { TransactionFormModal } from '@web/features/transactions/components/TransactionFormModal';
 import type { TransactionFormInitialValues } from '@web/features/transactions/components/TransactionForm';
 
@@ -55,6 +58,10 @@ export function HistoryView() {
   const [editingTransaction, setEditingTransaction] = useState<RecentTransaction | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletingGroupId, setDeletingGroupId] = useState<string | null>(null);
+  const [isDeleteGroupDialogOpen, setIsDeleteGroupDialogOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<SplitTransactionGroup | null>(null);
+  const [isEditGroupDialogOpen, setIsEditGroupDialogOpen] = useState(false);
 
   const loadTransactions = useCallback(
     async (options: { start: Date; end: Date; silent?: boolean }) => {
@@ -168,6 +175,30 @@ export function HistoryView() {
     }
   }
 
+  function openDeleteGroupDialog(receiptGroupId: string) {
+    setDeletingGroupId(receiptGroupId);
+    setIsDeleteGroupDialogOpen(true);
+  }
+
+  function handleDeleteGroupDialogOpenChange(open: boolean) {
+    setIsDeleteGroupDialogOpen(open);
+    if (!open) {
+      setDeletingGroupId(null);
+    }
+  }
+
+  function openEditGroupDialog(group: SplitTransactionGroup) {
+    setEditingGroup(group);
+    setIsEditGroupDialogOpen(true);
+  }
+
+  function handleEditGroupDialogOpenChange(open: boolean) {
+    setIsEditGroupDialogOpen(open);
+    if (!open) {
+      setEditingGroup(null);
+    }
+  }
+
   function reloadCurrentPeriod() {
     if (!periodStart) {
       return;
@@ -231,8 +262,11 @@ export function HistoryView() {
         locale={locale}
         categoryDisplayContext={categoryDisplayContext}
         isRefreshing={isRefreshing}
+        groupReceiptSplits
         onEdit={openEditForm}
         onDelete={openDeleteDialog}
+        onEditGroup={openEditGroupDialog}
+        onDeleteGroup={openDeleteGroupDialog}
         onAddFirst={() => undefined}
         emptyTitleKey="history.emptyTitle"
         emptyDescriptionKey="history.empty"
@@ -253,6 +287,22 @@ export function HistoryView() {
         transactionId={deletingTransactionId}
         open={isDeleteDialogOpen}
         onOpenChange={handleDeleteDialogOpenChange}
+        onSuccess={reloadCurrentPeriod}
+      />
+
+      <DeleteTransactionGroupDialog
+        receiptGroupId={deletingGroupId}
+        open={isDeleteGroupDialogOpen}
+        onOpenChange={handleDeleteGroupDialogOpenChange}
+        onSuccess={reloadCurrentPeriod}
+      />
+
+      <EditTransactionGroupDialog
+        receiptGroupId={editingGroup?.receiptGroupId ?? null}
+        initialDescription={editingGroup?.description ?? ''}
+        initialDate={editingGroup?.date ?? new Date().toISOString()}
+        open={isEditGroupDialogOpen}
+        onOpenChange={handleEditGroupDialogOpenChange}
         onSuccess={reloadCurrentPeriod}
       />
     </div>

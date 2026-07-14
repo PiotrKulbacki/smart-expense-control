@@ -78,8 +78,15 @@ describe('receiptScanResultSchema', () => {
       needsManualReview: false,
       hasMultipleCategories: true,
       suggestedSplits: [
-        { category: 'Groceries', amount: 5.69, items: ['Croissant', 'Toast'] },
-        { category: 'Household', amount: 2.58, items: ['Persil'] },
+        {
+          category: 'Groceries',
+          amount: 5.69,
+          items: [
+            { name: 'Croissant', amount: 3.11 },
+            { name: 'Toast', amount: 2.58 },
+          ],
+        },
+        { category: 'Household', amount: 2.58, items: [{ name: 'Persil', amount: 2.58 }] },
       ],
     });
 

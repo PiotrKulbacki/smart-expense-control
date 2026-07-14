@@ -137,7 +137,10 @@
       "aiSuggested": "La IA agrupó este recibo por categorías — revísalo antes de guardar",
       "expandItems": "Mostrar artículos",
       "collapseItems": "Ocultar artículos",
-      "moreItems": "+{{count}} más"
+      "moreItems": "+{{count}} más",
+      "createCategory": "+ Crear nueva categoría",
+      "createCategoryPlaceholder": "Nombre de la categoría",
+      "createCategorySubmit": "Crear"
     }
   },
   "currency": {
@@ -335,7 +338,22 @@
     "nextMonth": "Siguiente ciclo de facturación",
     "transactionsTitle": "Transacciones",
     "emptyTitle": "Sin transacciones en este ciclo",
-    "empty": "No hay gastos registrados para el periodo de facturación seleccionado."
+    "empty": "No hay gastos registrados para el periodo de facturación seleccionado.",
+    "split": {
+      "badge": "Dividido",
+      "total": "Total: {{amount}}",
+      "expand": "Mostrar detalles del split",
+      "collapse": "Ocultar detalles del split",
+      "untitledReceipt": "Recibo dividido",
+      "editGroupAction": "Editar split completo",
+      "deleteGroupAction": "Eliminar split completo",
+      "editGroupTitle": "Editar recibo dividido",
+      "editGroupDescription": "Actualiza la descripción y fecha compartidas para todas las transacciones de este split.",
+      "editGroupSuccess": "Recibo dividido actualizado",
+      "deleteGroupTitle": "¿Eliminar recibo dividido?",
+      "deleteGroupDescription": "Esto eliminará permanentemente todas las transacciones vinculadas a este split.",
+      "deleteGroupSuccess": "Recibo dividido eliminado"
+    }
   },
   "settings": {
     "title": "Ajustes",
@@ -353,7 +371,11 @@
     },
     "categories": {
       "title": "Categorías",
-      "subtitle": "Gestiona categorías integradas y personalizadas",
+      "subtitle": "Añade y gestiona tus propias categorías de gastos",
+      "systemTitle": "Categorías integradas",
+      "systemHint": "Estas categorías predeterminadas siempre están disponibles al registrar gastos.",
+      "customTitle": "Tus categorías",
+      "customEmpty": "Aún no has añadido ninguna categoría personalizada.",
       "add": "Añadir categoría",
       "addTitle": "Añadir categoría",
       "editTitle": "Editar categoría",
