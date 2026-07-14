@@ -1,5 +1,4 @@
-const DEBUG_INGEST_URL =
-  'http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c';
+const DEBUG_INGEST_URL = 'http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c';
 const DEBUG_SESSION_ID = 'ecd1ac';
 
 export function debugIngest(
