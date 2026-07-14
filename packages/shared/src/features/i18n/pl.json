@@ -137,7 +137,10 @@
       "aiSuggested": "AI pogrupowało ten paragon według kategorii — sprawdź przed zapisem",
       "expandItems": "Pokaż pozycje",
       "collapseItems": "Ukryj pozycje",
-      "moreItems": "+{{count}} więcej"
+      "moreItems": "+{{count}} więcej",
+      "createCategory": "+ Utwórz nową kategorię",
+      "createCategoryPlaceholder": "Nazwa kategorii",
+      "createCategorySubmit": "Utwórz"
     }
   },
   "currency": {
@@ -335,7 +338,22 @@
     "nextMonth": "Następny cykl rozliczeniowy",
     "transactionsTitle": "Transakcje",
     "emptyTitle": "Brak transakcji w tym cyklu",
-    "empty": "Brak zarejestrowanych wydatków w wybranym okresie rozliczeniowym."
+    "empty": "Brak zarejestrowanych wydatków w wybranym okresie rozliczeniowym.",
+    "split": {
+      "badge": "Rozbity",
+      "total": "Łącznie: {{amount}}",
+      "expand": "Rozwiń szczegóły podziału",
+      "collapse": "Zwiń szczegóły podziału",
+      "untitledReceipt": "Rozbity paragon",
+      "editGroupAction": "Edytuj cały podział",
+      "deleteGroupAction": "Usuń cały podział",
+      "editGroupTitle": "Edytuj rozbity paragon",
+      "editGroupDescription": "Zaktualizuj wspólny opis i datę dla wszystkich transakcji w tym podziale.",
+      "editGroupSuccess": "Rozbity paragon zaktualizowany",
+      "deleteGroupTitle": "Usunąć rozbity paragon?",
+      "deleteGroupDescription": "To trwale usunie wszystkie transakcje powiązane z tym podziałem paragonu.",
+      "deleteGroupSuccess": "Rozbity paragon usunięty"
+    }
   },
   "settings": {
     "title": "Ustawienia",
@@ -353,7 +371,11 @@
     },
     "categories": {
       "title": "Kategorie",
-      "subtitle": "Zarządzaj wbudowanymi i własnymi kategoriami wydatków",
+      "subtitle": "Dodawaj i zarządzaj własnymi kategoriami wydatków",
+      "systemTitle": "Kategorie wbudowane",
+      "systemHint": "Te domyślne kategorie są zawsze dostępne przy zapisywaniu wydatków.",
+      "customTitle": "Twoje kategorie",
+      "customEmpty": "Nie dodałeś jeszcze żadnych własnych kategorii.",
       "add": "Dodaj kategorię",
       "addTitle": "Dodaj kategorię",
       "editTitle": "Edytuj kategorię",

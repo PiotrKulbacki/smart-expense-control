@@ -137,7 +137,10 @@
       "aiSuggested": "AI grouped this receipt by category — review before saving",
       "expandItems": "Show items",
       "collapseItems": "Hide items",
-      "moreItems": "+{{count}} more"
+      "moreItems": "+{{count}} more",
+      "createCategory": "+ Create new category",
+      "createCategoryPlaceholder": "Category name",
+      "createCategorySubmit": "Create"
     }
   },
   "currency": {
@@ -335,7 +338,22 @@
     "nextMonth": "Next billing cycle",
     "transactionsTitle": "Transactions",
     "emptyTitle": "No transactions in this cycle",
-    "empty": "There are no recorded expenses for the selected billing period."
+    "empty": "There are no recorded expenses for the selected billing period.",
+    "split": {
+      "badge": "Split",
+      "total": "Total: {{amount}}",
+      "expand": "Expand split details",
+      "collapse": "Collapse split details",
+      "untitledReceipt": "Split receipt",
+      "editGroupAction": "Edit entire split",
+      "deleteGroupAction": "Delete entire split",
+      "editGroupTitle": "Edit split receipt",
+      "editGroupDescription": "Update the shared description and date for all transactions in this split.",
+      "editGroupSuccess": "Split receipt updated",
+      "deleteGroupTitle": "Delete split receipt?",
+      "deleteGroupDescription": "This will permanently delete all transactions linked to this receipt split.",
+      "deleteGroupSuccess": "Split receipt deleted"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -353,7 +371,11 @@
     },
     "categories": {
       "title": "Categories",
-      "subtitle": "Manage built-in and custom expense categories",
+      "subtitle": "Add and manage your own expense categories",
+      "systemTitle": "Built-in categories",
+      "systemHint": "These default categories are always available when logging expenses.",
+      "customTitle": "Your categories",
+      "customEmpty": "You haven't added any custom categories yet.",
       "add": "Add category",
       "addTitle": "Add category",
       "editTitle": "Edit category",

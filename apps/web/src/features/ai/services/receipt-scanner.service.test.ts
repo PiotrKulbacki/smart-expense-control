@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { receiptScanResultSchema } from '@shared/features/transactions/schemas';
-import { normalizeReceiptSuggestedSplits } from '@web/features/ai/services/receipt-scan-splits';
+import {
+  normalizeReceiptSuggestedSplits,
+  resolveReceiptSplitDraft,
+} from '@web/features/ai/services/receipt-scan-splits';
 
-const ALLOWED_CATEGORIES = new Set(['Groceries', 'Household', 'Cosmetics', 'CoffeeShop', 'Other']);
+const ALLOWED_CATEGORIES = new Set([
+  'Groceries',
+  'Household',
+  'Cosmetics',
+  'CoffeeShop',
+  'Alcohol',
+  'Other',
+]);
 
 const KAUFLAND_AI_JSON = {
   amount: 8.27,
@@ -13,8 +23,15 @@ const KAUFLAND_AI_JSON = {
   needsManualReview: false,
   hasMultipleCategories: true,
   suggestedSplits: [
-    { category: 'Groceries', amount: 5.69, items: ['Croissant', 'Toast'] },
-    { category: 'Household', amount: 2.58, items: ['Persil'] },
+    {
+      category: 'Groceries',
+      amount: 5.69,
+      items: [
+        { name: 'Croissant', amount: 3.11 },
+        { name: 'Toast', amount: 2.58 },
+      ],
+    },
+    { category: 'Household', amount: 2.58, items: [{ name: 'Persil', amount: 2.58 }] },
   ],
 };
 
@@ -123,5 +140,25 @@ describe('receipt scan AI JSON pipeline', () => {
     );
 
     expect(normalized).toBeUndefined();
+  });
+});
+
+describe('resolveReceiptSplitDraft', () => {
+  it('prefers normalized line items over suggested splits', () => {
+    const result = resolveReceiptSplitDraft(
+      {
+        amount: 8.27,
+        lineItems: [
+          { name: 'Rosa Spritz', amount: 2.58, category: 'Alcohol' },
+          { name: 'Croissant', amount: 5.69, category: 'Groceries' },
+        ],
+        suggestedSplits: [{ category: 'Groceries', amount: 8.27 }],
+      },
+      ALLOWED_CATEGORIES
+    );
+
+    expect(result.lineItems).toHaveLength(2);
+    expect(result.suggestedSplits).toHaveLength(2);
+    expect(result.suggestedSplits?.[0]?.category).toBe('Alcohol');
   });
 });

@@ -13,7 +13,10 @@ import {
   type ReceiptScanResult,
 } from '@shared/features/transactions/schemas';
 import { env } from '@web/env';
-import { normalizeReceiptSuggestedSplits } from '@web/features/ai/services/receipt-scan-splits';
+import {
+  normalizeReceiptSuggestedSplits,
+  resolveReceiptSplitDraft,
+} from '@web/features/ai/services/receipt-scan-splits';
 import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import { captureServerException } from '@web/lib/sentry-server';
@@ -32,6 +35,16 @@ export { getAiScanQuotaStatus };
 
 function buildSystemPrompt(categoryKeys: string[]): string {
   const categories = categoryKeys.join(', ');
+  const hasAlcohol = categoryKeys.includes('Alcohol');
+  const alcoholRule = hasAlcohol
+    ? `
+- ALCOHOL (CRITICAL): Any alcoholic beverage MUST use category "Alcohol". Never put alcohol in Groceries or Other.
+  Alcohol signals: "% Vol.", "Vol.", "vol", "ABV", "Spritz", "Bier", "Beer", "Wein", "Wine", "Sekt", "Cidre", "Alkohol",
+  "Prosecco", "Vodka", "Rum", "Whisky", "Gin", "Lager", "Ale", "Cider", "Champagne", "Likör", "Liqueur".
+  Example: "Rosa Spritz" with alcohol content → Alcohol, NOT Groceries.`
+    : `
+- ALCOHOLIC BEVERAGES: If "Alcohol" is not in the allowed list, still never use "Other" for alcoholic drinks — use the closest allowed category.`;
+
   return `You are a document OCR assistant for expenses (receipts, invoices, bills). Extract expense data from images.
 Return ONLY valid JSON with these fields:
 - amount (number, positive, total paid)
@@ -41,13 +54,19 @@ Return ONLY valid JSON with these fields:
 - description (short string, e.g. store or vendor name)
 - needsManualReview (boolean — true if any field is uncertain or unreadable)
 - hasMultipleCategories (boolean — true if the receipt clearly contains items from multiple spending categories)
-- suggestedSplits (optional array; include only when hasMultipleCategories is true):
-  - Each element: { "category": one of the allowed categories, "amount": number, "items": optional array of short product name strings }
-  - Use 2-5 groups maximum; group similar items together instead of returning every line item separately
-  - Map cleaning/household products to Household, cosmetics to Cosmetics, food to Groceries, alcohol to Alcohol, fuel to Fuel, etc.
-  - The sum of suggestedSplits[].amount must equal amount within 0.01
+- lineItems (optional array — REQUIRED when the receipt has multiple categories or many distinct products):
+  - Each element: { "name": string, "amount": number, "category": one of the allowed categories }
+  - Include every meaningful product line with its individual price from the receipt
+  - Deposit/refund lines (Pfand, Kaucja, deposit, bottle deposit) → use the same category as the main basket or the product they belong to, never "Other"
+  - Non-alcoholic drinks and mixers (Tonic, Cola, Wasser, Water, Juice, Saft, Sirup) → Groceries (or closest food/drink category), never "Other" unless truly uncategorizable
+${alcoholRule}
+- suggestedSplits (optional array; include when hasMultipleCategories is true):
+  - Each element: { "category": one of the allowed categories, "amount": number, "items": optional array of { "name": string, "amount": number } }
+  - Use 2-5 groups maximum; group similar items together
+  - Map cleaning/household products to Household, cosmetics to Cosmetics, food to Groceries, alcohol to Alcohol, fuel to Fuel
+  - The sum of suggestedSplits[].amount AND lineItems[].amount must each equal amount within 0.01
 
-If the image is not a financial document or is completely unreadable, set needsManualReview to true and use your best guess for other fields. Omit suggestedSplits or return an empty array when the receipt is single-category or unreadable.`;
+If the image is not a financial document or is completely unreadable, set needsManualReview to true and use your best guess for other fields. Omit lineItems/suggestedSplits when the receipt is single-category.`;
 }
 
 function validateImageFile(file: File): string | null {
@@ -209,19 +228,21 @@ export async function scanReceiptFromFile(
       return { error: RECEIPT_SCAN_ERROR_CODES.PARSE_FAILED };
     }
 
-    const normalizedSuggestedSplits = normalizeReceiptSuggestedSplits(
-      validated.data.suggestedSplits,
-      allowedCategories,
-      validated.data.amount
+    const splitDraft = resolveReceiptSplitDraft(
+      {
+        lineItems: validated.data.lineItems,
+        suggestedSplits: validated.data.suggestedSplits,
+        amount: validated.data.amount,
+      },
+      allowedCategories
     );
 
     const result: ReceiptScanResult = {
       ...validated.data,
       category: normalizedCategory,
-      hasMultipleCategories: normalizedSuggestedSplits
-        ? true
-        : validated.data.hasMultipleCategories,
-      suggestedSplits: normalizedSuggestedSplits,
+      hasMultipleCategories: Boolean(splitDraft.suggestedSplits?.length),
+      lineItems: splitDraft.lineItems,
+      suggestedSplits: splitDraft.suggestedSplits,
     };
 
     if (result.needsManualReview && result.amount <= 0) {

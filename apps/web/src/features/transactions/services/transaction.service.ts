@@ -210,3 +210,66 @@ export async function deleteTransaction(userId: string, transactionId: string): 
   await invalidateAggregationForTransactionDates(userId, [existing.date]);
   return true;
 }
+
+export async function deleteTransactionGroup(
+  userId: string,
+  receiptGroupId: string
+): Promise<boolean> {
+  const transactions = await prisma.transaction.findMany({
+    where: { userId, receiptGroupId },
+  });
+
+  if (!transactions.length) {
+    return false;
+  }
+
+  await prisma.$transaction(
+    transactions.map((transaction) => prisma.transaction.delete({ where: { id: transaction.id } }))
+  );
+
+  await invalidateAggregationForTransactionDates(
+    userId,
+    transactions.map((transaction) => transaction.date)
+  );
+
+  return true;
+}
+
+export async function updateTransactionGroupShared(
+  userId: string,
+  receiptGroupId: string,
+  input: Pick<UpdateTransactionInput, 'description' | 'date'>
+): Promise<TransactionDto[]> {
+  const transactions = await prisma.transaction.findMany({
+    where: { userId, receiptGroupId },
+  });
+
+  if (!transactions.length) {
+    return [];
+  }
+
+  if (transactions.some((transaction) => transaction.userId !== userId)) {
+    throw new Error(TRANSACTION_ERROR_CODES.FORBIDDEN);
+  }
+
+  const updated = await prisma.$transaction(
+    transactions.map((transaction) =>
+      prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          ...(input.description !== undefined && { description: input.description }),
+          ...(input.date !== undefined && { date: input.date }),
+        },
+      })
+    )
+  );
+
+  const affectedDates = transactions.map((transaction) => transaction.date);
+  if (input.date !== undefined) {
+    affectedDates.push(input.date);
+  }
+
+  await invalidateAggregationForTransactionDates(userId, affectedDates);
+
+  return updated.map(toTransactionDto);
+}

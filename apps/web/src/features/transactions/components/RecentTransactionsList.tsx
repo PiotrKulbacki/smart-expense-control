@@ -1,6 +1,7 @@
 'use client';
 
-import { MoreHorizontal, Receipt } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, ChevronRight, MoreHorizontal, Receipt } from 'lucide-react';
 import { Button } from '@web/components/ui/button';
 import {
   DropdownMenu,
@@ -10,7 +11,12 @@ import {
   DropdownMenuTrigger,
 } from '@web/components/ui/dropdown-menu';
 import { ScrollArea } from '@web/components/ui/scroll-area';
+import { cn } from '@web/lib/utils';
 import { useT } from '@web/features/i18n/LocaleProvider';
+import {
+  groupTransactionsForDisplay,
+  type SplitTransactionGroup,
+} from '@web/features/transactions/lib/transaction-groups';
 import {
   getCategoryIcon,
   getCategoryIconStyles,
@@ -26,6 +32,7 @@ export type RecentTransaction = {
   category: string;
   description: string | null;
   date: string;
+  receiptGroupId?: string | null;
 };
 
 type RecentTransactionsListProps = {
@@ -34,8 +41,11 @@ type RecentTransactionsListProps = {
   locale: string;
   categoryDisplayContext?: CategoryDisplayContext;
   isRefreshing?: boolean;
+  groupReceiptSplits?: boolean;
   onEdit: (transaction: RecentTransaction) => void;
   onDelete: (transactionId: string) => void;
+  onEditGroup?: (group: SplitTransactionGroup) => void;
+  onDeleteGroup?: (receiptGroupId: string) => void;
   onAddFirst: () => void;
   titleKey?: string;
   emptyTitleKey?: string;
@@ -66,14 +76,274 @@ function TransactionRowSkeleton() {
   );
 }
 
+function SingleTransactionRow({
+  transaction,
+  primaryCurrency,
+  locale,
+  categoryDisplayContext,
+  onEdit,
+  onDelete,
+}: {
+  transaction: RecentTransaction;
+  primaryCurrency: string;
+  locale: string;
+  categoryDisplayContext?: CategoryDisplayContext;
+  onEdit: (transaction: RecentTransaction) => void;
+  onDelete: (transactionId: string) => void;
+  nested?: boolean;
+}) {
+  const t = useT();
+  const Icon = getCategoryIcon(transaction.category);
+  const iconStyles = getCategoryIconStyles(transaction.category);
+  const showOriginal = transaction.currency !== primaryCurrency;
+
+  return (
+    <article className="flex items-start justify-between gap-3 py-4 first:pt-0 last:pb-0">
+      <div className="flex min-w-0 items-start gap-3">
+        <span
+          className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconStyles.bg} ${iconStyles.text}`}
+        >
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-[var(--text)]">
+            {resolveCategoryLabel(transaction.category, t, categoryDisplayContext)}
+          </p>
+          {transaction.description && (
+            <p className="text-muted mt-0.5 truncate text-sm">{transaction.description}</p>
+          )}
+          <p className="text-muted mt-1 text-xs">
+            {new Date(transaction.date).toLocaleDateString(locale, {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex shrink-0 items-start gap-1">
+        <div className="text-right">
+          <p className="text-sm font-bold text-[var(--text)]">
+            {formatMoney(transaction.convertedAmount, primaryCurrency, locale)}
+          </p>
+          {showOriginal && (
+            <p className="text-muted text-xs">
+              {formatMoney(transaction.amount, transaction.currency, locale)}
+            </p>
+          )}
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-muted h-8 w-8"
+              aria-label={t('dashboard.recent.actions')}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(transaction)}>
+              {t('transactions.labels.editTransaction')}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-glow focus:bg-glow/10 focus:text-glow"
+              onClick={() => onDelete(transaction.id)}
+            >
+              {t('transactions.labels.deleteTransaction')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </article>
+  );
+}
+
+function SplitGroupRow({
+  group,
+  primaryCurrency,
+  locale,
+  categoryDisplayContext,
+  onEdit,
+  onDelete,
+  onEditGroup,
+  onDeleteGroup,
+}: {
+  group: SplitTransactionGroup;
+  primaryCurrency: string;
+  locale: string;
+  categoryDisplayContext?: CategoryDisplayContext;
+  onEdit: (transaction: RecentTransaction) => void;
+  onDelete: (transactionId: string) => void;
+  onEditGroup?: (group: SplitTransactionGroup) => void;
+  onDeleteGroup?: (receiptGroupId: string) => void;
+}) {
+  const t = useT();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const showOriginal = group.currency !== primaryCurrency;
+  const title = group.description ?? t('history.split.untitledReceipt');
+
+  return (
+    <article className="py-4 first:pt-0 last:pb-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <button
+            type="button"
+            onClick={() => setIsExpanded((current) => !current)}
+            className="text-muted mt-2 shrink-0"
+            aria-label={isExpanded ? t('history.split.collapse') : t('history.split.expand')}
+          >
+            {isExpanded ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </button>
+          <span className="bg-cool/10 text-cool mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+            <Receipt className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate text-sm font-semibold text-[var(--text)]">{title}</p>
+              <span className="chip chip-ready">{t('history.split.badge')}</span>
+            </div>
+            <p className="text-muted mt-0.5 text-sm">
+              {t('history.split.total', {
+                amount: formatMoney(group.totalConvertedAmount, primaryCurrency, locale),
+              })}
+            </p>
+            <p className="text-muted mt-1 text-xs">
+              {new Date(group.date).toLocaleDateString(locale, {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-start gap-1">
+          <div className="text-right">
+            <p className="text-sm font-bold text-[var(--text)]">
+              {formatMoney(group.totalConvertedAmount, primaryCurrency, locale)}
+            </p>
+            {showOriginal && (
+              <p className="text-muted text-xs">
+                {formatMoney(group.totalOriginalAmount, group.currency, locale)}
+              </p>
+            )}
+          </div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-muted h-8 w-8"
+                aria-label={t('dashboard.recent.actions')}
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {onEditGroup && (
+                <DropdownMenuItem onClick={() => onEditGroup(group)}>
+                  {t('history.split.editGroupAction')}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator />
+              {onDeleteGroup && (
+                <DropdownMenuItem
+                  className="text-glow focus:bg-glow/10 focus:text-glow"
+                  onClick={() => onDeleteGroup(group.receiptGroupId)}
+                >
+                  {t('history.split.deleteGroupAction')}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-in-out',
+          isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="border-[var(--border)]/60 ml-14 mt-3 space-y-1 border-l pl-4">
+            {group.transactions.map((transaction) => {
+              const Icon = getCategoryIcon(transaction.category);
+              const iconStyles = getCategoryIconStyles(transaction.category);
+
+              return (
+                <div
+                  key={transaction.id}
+                  className="flex items-center justify-between gap-3 rounded-lg py-2"
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconStyles.bg} ${iconStyles.text}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <p className="truncate text-sm text-[var(--text)]">
+                      {resolveCategoryLabel(transaction.category, t, categoryDisplayContext)}:{' '}
+                      {formatMoney(transaction.convertedAmount, primaryCurrency, locale)}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted h-7 w-7"
+                      >
+                        <MoreHorizontal className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => onEdit(transaction)}>
+                        {t('transactions.labels.editTransaction')}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-glow focus:bg-glow/10 focus:text-glow"
+                        onClick={() => onDelete(transaction.id)}
+                      >
+                        {t('transactions.labels.deleteTransaction')}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function RecentTransactionsList({
   transactions,
   primaryCurrency,
   locale,
   categoryDisplayContext,
   isRefreshing = false,
+  groupReceiptSplits = false,
   onEdit,
   onDelete,
+  onEditGroup,
+  onDeleteGroup,
   onAddFirst,
   titleKey = 'dashboard.recent.title',
   emptyTitleKey = 'dashboard.recent.emptyTitle',
@@ -81,6 +351,10 @@ export function RecentTransactionsList({
   hideEmptyCta = false,
 }: RecentTransactionsListProps) {
   const t = useT();
+  const displayEntries = useMemo(
+    () => (groupReceiptSplits ? groupTransactionsForDisplay(transactions) : null),
+    [groupReceiptSplits, transactions]
+  );
 
   return (
     <section className="panel relative z-10 p-6">
@@ -108,84 +382,45 @@ export function RecentTransactionsList({
           )}
         </div>
       ) : (
-        <ScrollArea className="relative z-10 mt-4 max-h-[28rem]">
-          <div className="divide-y divide-[var(--border)] pr-3">
-            {transactions.map((transaction) => {
-              const Icon = getCategoryIcon(transaction.category);
-              const iconStyles = getCategoryIconStyles(transaction.category);
-              const showOriginal = transaction.currency !== primaryCurrency;
-
-              return (
-                <article
-                  key={transaction.id}
-                  className="flex items-start justify-between gap-3 py-4 first:pt-0 last:pb-0"
-                >
-                  <div className="flex min-w-0 items-start gap-3">
-                    <span
-                      className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconStyles.bg} ${iconStyles.text}`}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-[var(--text)]">
-                        {resolveCategoryLabel(transaction.category, t, categoryDisplayContext)}
-                      </p>
-                      {transaction.description && (
-                        <p className="text-muted mt-0.5 truncate text-sm">
-                          {transaction.description}
-                        </p>
-                      )}
-                      <p className="text-muted mt-1 text-xs">
-                        {new Date(transaction.date).toLocaleDateString(locale, {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex shrink-0 items-start gap-1">
-                    <div className="text-right">
-                      <p className="text-sm font-bold text-[var(--text)]">
-                        {formatMoney(transaction.convertedAmount, primaryCurrency, locale)}
-                      </p>
-                      {showOriginal && (
-                        <p className="text-muted text-xs">
-                          {formatMoney(transaction.amount, transaction.currency, locale)}
-                        </p>
-                      )}
-                    </div>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="text-muted h-8 w-8"
-                          aria-label={t('dashboard.recent.actions')}
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit(transaction)}>
-                          {t('transactions.labels.editTransaction')}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-glow focus:bg-glow/10 focus:text-glow"
-                          onClick={() => onDelete(transaction.id)}
-                        >
-                          {t('transactions.labels.deleteTransaction')}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </article>
-              );
-            })}
+        <ScrollArea className="relative z-10 mt-4 max-h-[350px]">
+          <div className="divide-y divide-[var(--border)] pr-2">
+            {displayEntries
+              ? displayEntries.map((entry) =>
+                  entry.kind === 'split' ? (
+                    <SplitGroupRow
+                      key={entry.receiptGroupId}
+                      group={entry}
+                      primaryCurrency={primaryCurrency}
+                      locale={locale}
+                      categoryDisplayContext={categoryDisplayContext}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      onEditGroup={onEditGroup}
+                      onDeleteGroup={onDeleteGroup}
+                    />
+                  ) : (
+                    <SingleTransactionRow
+                      key={entry.transaction.id}
+                      transaction={entry.transaction}
+                      primaryCurrency={primaryCurrency}
+                      locale={locale}
+                      categoryDisplayContext={categoryDisplayContext}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                    />
+                  )
+                )
+              : transactions.map((transaction) => (
+                  <SingleTransactionRow
+                    key={transaction.id}
+                    transaction={transaction}
+                    primaryCurrency={primaryCurrency}
+                    locale={locale}
+                    categoryDisplayContext={categoryDisplayContext}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                  />
+                ))}
           </div>
         </ScrollArea>
       )}

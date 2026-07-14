@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import {
+  flattenSplitsToLineItems,
+  groupLineItemsToSplits,
+  moveLineItemCategory,
+  type ReceiptLineItem,
+} from '@shared/features/transactions/receipt-split-state';
 import {
   MAX_TRANSACTION_SPLITS,
   splitAmountsMatchTotal,
@@ -10,11 +16,12 @@ import {
   toCalendarDateInputValue,
   type ReceiptSplitSuggestion,
 } from '@shared/features/transactions/schemas';
+import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { CategorySelectWithCreate } from '@web/features/scanner/components/CategorySelectWithCreate';
 import {
   getCategoryOptionLabel,
   useCategories,
 } from '@web/features/categories/hooks/useCategories';
-import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 type ScanQuota = {
   limit: number;
@@ -35,10 +42,9 @@ type ReceiptDraft = {
   needsManualReview: boolean;
   isAiScanned: boolean;
   hasMultipleCategories?: boolean;
+  lineItems?: ReceiptLineItem[];
   suggestedSplits?: SplitLine[];
 };
-
-const VISIBLE_SPLIT_ITEMS = 5;
 
 function createDefaultSplitLine(draft: ReceiptDraft): SplitLine {
   return {
@@ -47,25 +53,45 @@ function createDefaultSplitLine(draft: ReceiptDraft): SplitLine {
   };
 }
 
-function initializeSplitState(draft: ReceiptDraft): {
+function initializeDraftState(draft: ReceiptDraft): {
   isSplitMode: boolean;
-  splitLines: SplitLine[];
+  lineItems: ReceiptLineItem[] | null;
+  manualSplitLines: SplitLine[];
   hasAiSuggestion: boolean;
 } {
+  if (draft.lineItems?.length) {
+    return {
+      isSplitMode: true,
+      lineItems: draft.lineItems.map((item) => ({ ...item })),
+      manualSplitLines: [],
+      hasAiSuggestion: true,
+    };
+  }
+
   const suggestedSplits = draft.suggestedSplits;
   if (suggestedSplits && suggestedSplits.length > 1) {
     return {
       isSplitMode: true,
-      splitLines: suggestedSplits.map((split) => ({ ...split })),
+      lineItems: flattenSplitsToLineItems(suggestedSplits),
+      manualSplitLines: [],
       hasAiSuggestion: true,
     };
   }
 
   return {
     isSplitMode: false,
-    splitLines: [createDefaultSplitLine(draft)],
+    lineItems: null,
+    manualSplitLines: [createDefaultSplitLine(draft)],
     hasAiSuggestion: false,
   };
+}
+
+function formatItemMoney(amount: number, currency: string, locale: string): string {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 export function ReceiptScanner() {
@@ -78,9 +104,18 @@ export function ReceiptScanner() {
   const [isSaving, setIsSaving] = useState(false);
   const [draft, setDraft] = useState<ReceiptDraft | null>(null);
   const [isSplitMode, setIsSplitMode] = useState(false);
-  const [splitLines, setSplitLines] = useState<SplitLine[]>([]);
+  const [lineItems, setLineItems] = useState<ReceiptLineItem[] | null>(null);
+  const [manualSplitLines, setManualSplitLines] = useState<SplitLine[]>([]);
   const [hasAiSuggestion, setHasAiSuggestion] = useState(false);
-  const [expandedSplitIndexes, setExpandedSplitIndexes] = useState<Record<number, boolean>>({});
+  const [expandedCategoryKeys, setExpandedCategoryKeys] = useState<Record<string, boolean>>({});
+
+  const splitLines = useMemo(() => {
+    if (lineItems?.length) {
+      return groupLineItemsToSplits(lineItems);
+    }
+
+    return manualSplitLines;
+  }, [lineItems, manualSplitLines]);
 
   useEffect(() => {
     async function loadQuota() {
@@ -103,20 +138,22 @@ export function ReceiptScanner() {
   }, [locale, t]);
 
   function applyDraft(nextDraft: ReceiptDraft) {
-    const splitState = initializeSplitState(nextDraft);
+    const splitState = initializeDraftState(nextDraft);
     setDraft(nextDraft);
     setIsSplitMode(splitState.isSplitMode);
-    setSplitLines(splitState.splitLines);
+    setLineItems(splitState.lineItems);
+    setManualSplitLines(splitState.manualSplitLines);
     setHasAiSuggestion(splitState.hasAiSuggestion);
-    setExpandedSplitIndexes({});
+    setExpandedCategoryKeys({});
   }
 
   function resetDraftState() {
     setDraft(null);
     setIsSplitMode(false);
-    setSplitLines([]);
+    setLineItems(null);
+    setManualSplitLines([]);
     setHasAiSuggestion(false);
-    setExpandedSplitIndexes({});
+    setExpandedCategoryKeys({});
   }
 
   function enableSplitMode() {
@@ -126,13 +163,12 @@ export function ReceiptScanner() {
 
     setIsSplitMode(true);
     setHasAiSuggestion(false);
-    setSplitLines((current) => {
-      if (current.length > 0) {
-        return current;
-      }
 
-      return [createDefaultSplitLine(draft)];
-    });
+    if (!lineItems?.length) {
+      setManualSplitLines((current) =>
+        current.length > 0 ? current : [createDefaultSplitLine(draft)]
+      );
+    }
   }
 
   function disableSplitMode() {
@@ -142,22 +178,23 @@ export function ReceiptScanner() {
 
     setIsSplitMode(false);
     setHasAiSuggestion(false);
-    setExpandedSplitIndexes({});
-    setSplitLines([createDefaultSplitLine(draft)]);
+    setLineItems(null);
+    setExpandedCategoryKeys({});
+    setManualSplitLines([createDefaultSplitLine(draft)]);
   }
 
-  function updateSplitLine(index: number, patch: Partial<SplitLine>) {
-    setSplitLines((current) =>
+  function updateManualSplitLine(index: number, patch: Partial<SplitLine>) {
+    setManualSplitLines((current) =>
       current.map((line, lineIndex) => (lineIndex === index ? { ...line, ...patch } : line))
     );
   }
 
-  function addSplitLine() {
-    if (!draft || splitLines.length >= MAX_TRANSACTION_SPLITS) {
+  function addManualSplitLine() {
+    if (!draft || manualSplitLines.length >= MAX_TRANSACTION_SPLITS) {
       return;
     }
 
-    setSplitLines((current) => [
+    setManualSplitLines((current) => [
       ...current,
       {
         category: draft.category,
@@ -166,26 +203,22 @@ export function ReceiptScanner() {
     ]);
   }
 
-  function removeSplitLine(index: number) {
-    setSplitLines((current) => {
+  function removeManualSplitLine(index: number) {
+    setManualSplitLines((current) => {
       if (current.length <= 1) {
         return current;
       }
 
       return current.filter((_, lineIndex) => lineIndex !== index);
     });
-    setExpandedSplitIndexes((current) => {
-      const next: Record<number, boolean> = {};
-      Object.entries(current).forEach(([key, value]) => {
-        const lineIndex = Number(key);
-        if (lineIndex < index) {
-          next[lineIndex] = value;
-        } else if (lineIndex > index) {
-          next[lineIndex - 1] = value;
-        }
-      });
-      return next;
-    });
+  }
+
+  function handleMoveLineItem(index: number, newCategory: string) {
+    if (!lineItems) {
+      return;
+    }
+
+    setLineItems(moveLineItemCategory(lineItems, index, newCategory));
   }
 
   async function handleScan(file: File) {
@@ -232,6 +265,11 @@ export function ReceiptScanner() {
 
   async function handleSave() {
     if (!draft) {
+      return;
+    }
+
+    if (isSplitMode && splitLines.length > MAX_TRANSACTION_SPLITS) {
+      toast.error(t('transactions.errors.tooManySplits'));
       return;
     }
 
@@ -292,6 +330,7 @@ export function ReceiptScanner() {
     !isSplitMode ||
     splitLines.length <= 1 ||
     (splitLines.every((line) => line.amount > 0) && splitMatchesTotal);
+  const hasInteractiveItems = Boolean(lineItems?.length);
 
   return (
     <div className="space-y-6">
@@ -354,7 +393,7 @@ export function ReceiptScanner() {
                 type="number"
                 step="0.01"
                 value={draft.amount}
-                disabled={isSaving}
+                disabled={isSaving || isSplitMode}
                 onChange={(event) => {
                   const amount = Number(event.target.value);
                   setDraft({ ...draft, amount });
@@ -386,18 +425,11 @@ export function ReceiptScanner() {
             {!isSplitMode && (
               <label className="block text-sm">
                 <span className="auth-label">{t('dashboard.form.category')}</span>
-                <select
+                <CategorySelectWithCreate
                   value={draft.category}
                   disabled={isSaving}
-                  onChange={(event) => setDraft({ ...draft, category: event.target.value })}
-                  className="auth-input"
-                >
-                  {categories.map((category) => (
-                    <option key={category.key} value={category.key}>
-                      {getCategoryOptionLabel(category, t)}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(category) => setDraft({ ...draft, category })}
+                />
               </label>
             )}
 
@@ -436,104 +468,139 @@ export function ReceiptScanner() {
 
           {isSplitMode && (
             <div className="relative z-10 mt-4 space-y-3">
-              {splitLines.map((line, index) => {
-                const visibleItems = line.items?.slice(0, VISIBLE_SPLIT_ITEMS) ?? [];
-                const hiddenItemCount = Math.max(
-                  (line.items?.length ?? 0) - VISIBLE_SPLIT_ITEMS,
-                  0
-                );
-                const isExpanded = expandedSplitIndexes[index] ?? false;
-
-                return (
-                  <div
-                    key={`split-${index}`}
-                    className="bg-elevated/60 rounded-xl border border-[var(--border-cool)] p-4"
-                  >
-                    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end">
-                      <label className="block text-sm">
-                        <span className="auth-label">{t('dashboard.form.category')}</span>
-                        <select
-                          value={line.category}
-                          disabled={isSaving}
-                          onChange={(event) =>
-                            updateSplitLine(index, { category: event.target.value })
-                          }
-                          className="auth-input"
-                        >
-                          {categories.map((category) => (
-                            <option key={category.key} value={category.key}>
-                              {getCategoryOptionLabel(category, t)}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="block text-sm">
-                        <span className="auth-label">{t('dashboard.form.amount')}</span>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={line.amount}
-                          disabled={isSaving}
-                          onChange={(event) =>
-                            updateSplitLine(index, { amount: Number(event.target.value) })
-                          }
-                          className="auth-input"
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        disabled={isSaving || splitLines.length <= 1}
-                        onClick={() => removeSplitLine(index)}
-                        className="btn-ghost h-10 disabled:cursor-not-allowed disabled:opacity-50"
-                        aria-label={t('scanner.split.removeCategory')}
+              {hasInteractiveItems ? (
+                <>
+                  <div className="space-y-2">
+                    {lineItems?.map((item, index) => (
+                      <div
+                        key={`${item.name}-${index}`}
+                        className="bg-elevated/60 flex flex-col gap-3 rounded-xl border border-[var(--border-cool)] p-4 sm:flex-row sm:items-center"
                       >
-                        ×
-                      </button>
-                    </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-[var(--text)]">
+                            {item.name}
+                          </p>
+                          <p className="text-muted mt-0.5 text-xs">
+                            {formatItemMoney(item.amount, draft.currency, locale)}
+                          </p>
+                        </div>
+                        <div className="w-full sm:w-56">
+                          <CategorySelectWithCreate
+                            value={item.category}
+                            disabled={isSaving}
+                            onChange={(category) => handleMoveLineItem(index, category)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-                    {line.items && line.items.length > 0 && (
-                      <div className="mt-3">
+                  <div className="space-y-2">
+                    {splitLines.map((line) => {
+                      const isExpanded = expandedCategoryKeys[line.category] ?? false;
+                      const categoryLabel =
+                        categories.find((category) => category.key === line.category) ??
+                        categories[0];
+
+                      return (
+                        <div
+                          key={line.category}
+                          className="bg-elevated/40 rounded-xl border border-[var(--border)] p-3"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-[var(--text)]">
+                              {categoryLabel
+                                ? getCategoryOptionLabel(categoryLabel, t)
+                                : line.category}
+                              : {formatItemMoney(line.amount, draft.currency, locale)}
+                            </p>
+                            {line.items && line.items.length > 0 && (
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() =>
+                                  setExpandedCategoryKeys((current) => ({
+                                    ...current,
+                                    [line.category]: !isExpanded,
+                                  }))
+                                }
+                                className="text-muted text-xs hover:underline"
+                              >
+                                {isExpanded
+                                  ? t('scanner.split.collapseItems')
+                                  : t('scanner.split.expandItems')}
+                              </button>
+                            )}
+                          </div>
+                          {isExpanded && line.items && (
+                            <ul className="text-muted mt-2 list-disc space-y-1 pl-5 text-xs">
+                              {line.items.map((item) => (
+                                <li key={`${line.category}-${item.name}`}>
+                                  {item.name} —{' '}
+                                  {formatItemMoney(item.amount, draft.currency, locale)}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {manualSplitLines.map((line, index) => (
+                    <div
+                      key={`split-${index}`}
+                      className="bg-elevated/60 rounded-xl border border-[var(--border-cool)] p-4"
+                    >
+                      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_140px_auto] sm:items-end">
+                        <label className="block text-sm">
+                          <span className="auth-label">{t('dashboard.form.category')}</span>
+                          <CategorySelectWithCreate
+                            value={line.category}
+                            disabled={isSaving}
+                            onChange={(category) => updateManualSplitLine(index, { category })}
+                          />
+                        </label>
+                        <label className="block text-sm">
+                          <span className="auth-label">{t('dashboard.form.amount')}</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={line.amount}
+                            disabled={isSaving}
+                            onChange={(event) =>
+                              updateManualSplitLine(index, { amount: Number(event.target.value) })
+                            }
+                            className="auth-input"
+                          />
+                        </label>
                         <button
                           type="button"
-                          disabled={isSaving}
-                          onClick={() =>
-                            setExpandedSplitIndexes((current) => ({
-                              ...current,
-                              [index]: !isExpanded,
-                            }))
-                          }
-                          className="text-muted text-xs hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled={isSaving || manualSplitLines.length <= 1}
+                          onClick={() => removeManualSplitLine(index)}
+                          className="btn-ghost h-10 disabled:cursor-not-allowed disabled:opacity-50"
+                          aria-label={t('scanner.split.removeCategory')}
                         >
-                          {isExpanded
-                            ? t('scanner.split.collapseItems')
-                            : t('scanner.split.expandItems')}
+                          ×
                         </button>
-                        {isExpanded && (
-                          <ul className="text-muted mt-2 list-disc space-y-1 pl-5 text-xs">
-                            {visibleItems.map((item) => (
-                              <li key={item}>{item}</li>
-                            ))}
-                            {hiddenItemCount > 0 && (
-                              <li>{t('scanner.split.moreItems', { count: hiddenItemCount })}</li>
-                            )}
-                          </ul>
-                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </div>
+                  ))}
 
-              {splitLines.length < MAX_TRANSACTION_SPLITS && (
-                <button
-                  type="button"
-                  disabled={isSaving}
-                  onClick={addSplitLine}
-                  className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {t('scanner.split.addCategory')}
-                </button>
+                  {manualSplitLines.length < MAX_TRANSACTION_SPLITS && (
+                    <button
+                      type="button"
+                      disabled={isSaving}
+                      onClick={addManualSplitLine}
+                      className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {t('scanner.split.addCategory')}
+                    </button>
+                  )}
+                </>
               )}
 
               <p

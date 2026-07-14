@@ -182,6 +182,15 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
     return <div className="bg-elevated h-48 animate-pulse rounded-2xl" />;
   }
 
+  const customCategories = useMemo(
+    () => categories.filter((category) => category.isCustom),
+    [categories]
+  );
+  const systemCategories = useMemo(
+    () => categories.filter((category) => !category.isCustom),
+    [categories]
+  );
+
   const migrationOptions = categories.filter((item) => item.key !== deleteTarget?.key);
 
   return (
@@ -206,44 +215,72 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
           </Button>
         </div>
 
-        <ul className="relative z-10 mt-4 space-y-2">
-          {categories.map((category) => (
-            <li
-              key={category.key}
-              className="hover:bg-elevated/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2"
-            >
-              <div className="flex min-w-0 items-center gap-2">
+        <div className="relative z-10 mt-5">
+          <p className="text-muted text-xs font-medium uppercase tracking-wide">
+            {t('settings.categories.systemTitle')}
+          </p>
+          <p className="text-muted mt-1 text-sm">{t('settings.categories.systemHint')}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {systemCategories.map((category) => (
+              <span
+                key={category.key}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] px-2.5 py-1 text-xs text-[var(--text)]"
+              >
                 <span
-                  className="h-3 w-3 shrink-0 rounded-full"
+                  className="h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: getCategoryColor(category.key, displayContext) }}
                 />
-                <span className="truncate text-sm text-[var(--text)]">
-                  {resolveCategoryLabel(category.key, t, displayContext)}
-                </span>
-              </div>
-              {category.isCustom && (
-                <div className="flex shrink-0 items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => openEditForm(category)}
-                    className="text-muted hover:text-warm rounded p-1 transition"
-                    aria-label={t('settings.categories.edit')}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => startDelete(category)}
-                    className="text-muted hover:text-glow rounded p-1 transition"
-                    aria-label={t('settings.categories.delete')}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
+                {resolveCategoryLabel(category.key, t, displayContext)}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 mt-6">
+          <p className="text-muted text-xs font-medium uppercase tracking-wide">
+            {t('settings.categories.customTitle')}
+          </p>
+          {customCategories.length === 0 ? (
+            <p className="text-muted mt-2 text-sm">{t('settings.categories.customEmpty')}</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {customCategories.map((category) => (
+                <li
+                  key={category.key}
+                  className="hover:bg-elevated/50 flex items-center justify-between gap-3 rounded-lg px-2 py-2"
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: getCategoryColor(category.key, displayContext) }}
+                    />
+                    <span className="truncate text-sm text-[var(--text)]">
+                      {resolveCategoryLabel(category.key, t, displayContext)}
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditForm(category)}
+                      className="text-muted hover:text-warm rounded p-1 transition"
+                      aria-label={t('settings.categories.edit')}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => startDelete(category)}
+                      className="text-muted hover:text-glow rounded p-1 transition"
+                      aria-label={t('settings.categories.delete')}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
 
       <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>

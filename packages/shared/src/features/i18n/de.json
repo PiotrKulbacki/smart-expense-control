@@ -137,7 +137,10 @@
       "aiSuggested": "KI hat diesen Beleg nach Kategorien gruppiert — bitte vor dem Speichern prüfen",
       "expandItems": "Artikel anzeigen",
       "collapseItems": "Artikel ausblenden",
-      "moreItems": "+{{count}} weitere"
+      "moreItems": "+{{count}} weitere",
+      "createCategory": "+ Neue Kategorie erstellen",
+      "createCategoryPlaceholder": "Kategoriename",
+      "createCategorySubmit": "Erstellen"
     }
   },
   "currency": {
@@ -335,7 +338,22 @@
     "nextMonth": "Nächster Abrechnungszyklus",
     "transactionsTitle": "Transaktionen",
     "emptyTitle": "Keine Transaktionen in diesem Zyklus",
-    "empty": "Für den gewählten Abrechnungszeitraum sind keine Ausgaben erfasst."
+    "empty": "Für den gewählten Abrechnungszeitraum sind keine Ausgaben erfasst.",
+    "split": {
+      "badge": "Aufgeteilt",
+      "total": "Gesamt: {{amount}}",
+      "expand": "Aufteilung anzeigen",
+      "collapse": "Aufteilung ausblenden",
+      "untitledReceipt": "Aufgeteilter Beleg",
+      "editGroupAction": "Gesamte Aufteilung bearbeiten",
+      "deleteGroupAction": "Gesamte Aufteilung löschen",
+      "editGroupTitle": "Aufgeteilten Beleg bearbeiten",
+      "editGroupDescription": "Aktualisiere die gemeinsame Beschreibung und das Datum für alle Transaktionen in dieser Aufteilung.",
+      "editGroupSuccess": "Aufgeteilter Beleg aktualisiert",
+      "deleteGroupTitle": "Aufgeteilten Beleg löschen?",
+      "deleteGroupDescription": "Dadurch werden alle mit dieser Belegaufteilung verknüpften Transaktionen dauerhaft gelöscht.",
+      "deleteGroupSuccess": "Aufgeteilter Beleg gelöscht"
+    }
   },
   "settings": {
     "title": "Einstellungen",
@@ -353,7 +371,11 @@
     },
     "categories": {
       "title": "Kategorien",
-      "subtitle": "Integrierte und eigene Ausgabenkategorien verwalten",
+      "subtitle": "Eigene Ausgabenkategorien hinzufügen und verwalten",
+      "systemTitle": "Integrierte Kategorien",
+      "systemHint": "Diese Standardkategorien sind beim Erfassen von Ausgaben immer verfügbar.",
+      "customTitle": "Deine Kategorien",
+      "customEmpty": "Du hast noch keine eigenen Kategorien hinzugefügt.",
       "add": "Kategorie hinzufügen",
       "addTitle": "Kategorie hinzufügen",
       "editTitle": "Kategorie bearbeiten",
