@@ -64,7 +64,7 @@ function initializeDraftState(draft: ReceiptDraft): {
   manualSplitLines: SplitLine[];
   hasAiSuggestion: boolean;
 } {
-  if (draft.lineItems?.length) {
+  if (draft.lineItems?.length && draft.lineItems.length >= 2) {
     return {
       isSplitMode: true,
       lineItems: draft.lineItems.map((item) => ({ ...item })),
@@ -75,10 +75,11 @@ function initializeDraftState(draft: ReceiptDraft): {
 
   const suggestedSplits = draft.suggestedSplits;
   if (suggestedSplits && suggestedSplits.length > 1) {
+    const flattened = flattenSplitsToLineItems(suggestedSplits);
     return {
       isSplitMode: true,
-      lineItems: flattenSplitsToLineItems(suggestedSplits),
-      manualSplitLines: [],
+      lineItems: flattened.length >= 2 ? flattened : null,
+      manualSplitLines: flattened.length >= 2 ? [] : suggestedSplits.map((split) => ({ ...split })),
       hasAiSuggestion: true,
     };
   }

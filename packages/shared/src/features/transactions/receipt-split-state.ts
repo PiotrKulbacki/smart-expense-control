@@ -1,5 +1,5 @@
 import { normalizeLegacyCategory } from './categories';
-import { splitAmountsMatchTotal, type ReceiptSplitSuggestion } from './schemas';
+import { SPLIT_AMOUNT_TOLERANCE, type ReceiptSplitSuggestion } from './schemas';
 
 export type ReceiptSplitItem = {
   name: string;
@@ -12,8 +12,45 @@ export type ReceiptLineItem = {
   category: string;
 };
 
+/** Slightly wider tolerance when accepting AI OCR line items before user review. */
+export const RECEIPT_LINE_ITEM_SUM_TOLERANCE = 0.05;
+
 export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100;
+}
+
+export function sumLineItemAmounts(items: Array<{ amount: number }>): number {
+  return roundMoney(items.reduce((total, item) => total + item.amount, 0));
+}
+
+export function rebalanceAmountsToTotal<T extends { amount: number }>(
+  items: T[],
+  totalAmount: number
+): T[] {
+  if (items.length === 0) {
+    return items;
+  }
+
+  const cloned = items.map((item) => ({ ...item, amount: roundMoney(item.amount) }));
+  const currentTotal = sumLineItemAmounts(cloned);
+  const difference = roundMoney(totalAmount - currentTotal);
+
+  if (Math.abs(difference) <= SPLIT_AMOUNT_TOLERANCE) {
+    return cloned;
+  }
+
+  const lastIndex = cloned.length - 1;
+  const lastItem = cloned[lastIndex];
+  if (!lastItem) {
+    return cloned;
+  }
+
+  const adjustedAmount = roundMoney(lastItem.amount + difference);
+  if (adjustedAmount > 0) {
+    cloned[lastIndex] = { ...lastItem, amount: adjustedAmount };
+  }
+
+  return cloned;
 }
 
 export function groupLineItemsToSplits(lineItems: ReceiptLineItem[]): ReceiptSplitSuggestion[] {
@@ -26,11 +63,13 @@ export function groupLineItemsToSplits(lineItems: ReceiptLineItem[]): ReceiptSpl
     buckets.set(item.category, bucket);
   }
 
-  return Array.from(buckets.entries()).map(([category, bucket]) => ({
+  const splits = Array.from(buckets.entries()).map(([category, bucket]) => ({
     category,
     amount: roundMoney(bucket.amount),
     items: bucket.items,
   }));
+
+  return rebalanceAmountsToTotal(splits, sumLineItemAmounts(lineItems));
 }
 
 export function flattenSplitsToLineItems(splits: ReceiptSplitSuggestion[]): ReceiptLineItem[] {
@@ -38,10 +77,33 @@ export function flattenSplitsToLineItems(splits: ReceiptSplitSuggestion[]): Rece
 
   for (const split of splits) {
     if (split.items?.length) {
-      for (const item of split.items) {
+      const pricedItems = split.items.filter((item) => item.amount > 0);
+
+      if (pricedItems.length === 0 && split.amount > 0) {
+        const evenAmount = roundMoney(split.amount / split.items.length);
+        let allocated = 0;
+
+        split.items.forEach((item, index) => {
+          const amount =
+            index === split.items!.length - 1 ? roundMoney(split.amount - allocated) : evenAmount;
+          allocated = roundMoney(allocated + amount);
+          lineItems.push({
+            name: item.name,
+            amount,
+            category: split.category,
+          });
+        });
+        continue;
+      }
+
+      for (const item of pricedItems.length > 0 ? pricedItems : split.items) {
+        if (item.amount <= 0) {
+          continue;
+        }
+
         lineItems.push({
           name: item.name,
-          amount: item.amount > 0 ? item.amount : 0,
+          amount: item.amount,
           category: split.category,
         });
       }
@@ -88,9 +150,9 @@ export function normalizeReceiptLineItems(
     return undefined;
   }
 
-  if (!splitAmountsMatchTotal(normalized, totalAmount)) {
-    return undefined;
-  }
+  return rebalanceAmountsToTotal(normalized, totalAmount);
+}
 
-  return normalized;
+export function countDistinctCategories(lineItems: ReceiptLineItem[]): number {
+  return new Set(lineItems.map((item) => item.category)).size;
 }

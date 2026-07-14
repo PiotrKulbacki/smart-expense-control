@@ -3,6 +3,8 @@ import {
   flattenSplitsToLineItems,
   groupLineItemsToSplits,
   moveLineItemCategory,
+  normalizeReceiptLineItems,
+  sumLineItemAmounts,
 } from './receipt-split-state';
 
 describe('receipt-split-state', () => {
@@ -54,5 +56,40 @@ describe('receipt-split-state', () => {
       amount: 2.58,
       category: 'Alcohol',
     });
+  });
+
+  it('flattens split items without prices by distributing group amount', () => {
+    const flattened = flattenSplitsToLineItems([
+      {
+        category: 'Groceries',
+        amount: 5.69,
+        items: [
+          { name: 'Croissant', amount: 0 },
+          { name: 'Toast', amount: 0 },
+        ],
+      },
+      {
+        category: 'Alcohol',
+        amount: 2.58,
+        items: [{ name: 'Rosa Spritz', amount: 0 }],
+      },
+    ]);
+
+    expect(flattened).toHaveLength(3);
+    expect(sumLineItemAmounts(flattened)).toBe(8.27);
+  });
+
+  it('rebalances line items when OCR sum is slightly off', () => {
+    const normalized = normalizeReceiptLineItems(
+      [
+        { name: 'Rosa Spritz', amount: 2.58, category: 'Alcohol' },
+        { name: 'Croissant', amount: 5.66, category: 'Groceries' },
+      ],
+      new Set(['Groceries', 'Alcohol']),
+      8.27
+    );
+
+    expect(normalized).toBeDefined();
+    expect(sumLineItemAmounts(normalized!)).toBe(8.27);
   });
 });

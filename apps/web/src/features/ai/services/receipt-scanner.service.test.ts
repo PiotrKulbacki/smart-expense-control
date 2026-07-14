@@ -161,4 +161,33 @@ describe('resolveReceiptSplitDraft', () => {
     expect(result.suggestedSplits).toHaveLength(2);
     expect(result.suggestedSplits?.[0]?.category).toBe('Alcohol');
   });
+
+  it('recovers split when line item sum is slightly off but categories differ', () => {
+    const result = resolveReceiptSplitDraft(
+      {
+        amount: 8.27,
+        lineItems: [
+          { name: 'Rosa Spritz', amount: 2.58, category: 'Alcohol' },
+          { name: 'Croissant', amount: 5.66, category: 'Groceries' },
+        ],
+      },
+      ALLOWED_CATEGORIES
+    );
+
+    expect(result.lineItems).toHaveLength(2);
+    expect(result.suggestedSplits?.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('recovers split from suggestedSplits when lineItems are missing', () => {
+    const result = resolveReceiptSplitDraft(
+      {
+        amount: 8.27,
+        suggestedSplits: KAUFLAND_AI_JSON.suggestedSplits,
+      },
+      ALLOWED_CATEGORIES
+    );
+
+    expect(result.suggestedSplits).toHaveLength(2);
+    expect(result.lineItems?.length).toBeGreaterThanOrEqual(2);
+  });
 });

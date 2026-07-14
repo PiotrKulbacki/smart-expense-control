@@ -41,23 +41,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
 
     if (asChild) {
-      // #region agent log
-      const childCount = Array.isArray(children) ? children.length : children ? 1 : 0;
-      fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'ecd1ac' },
-        body: JSON.stringify({
-          sessionId: 'ecd1ac',
-          runId: 'hydration-fix',
-          hypothesisId: 'H6',
-          location: 'button.tsx:asChild',
-          message: 'Button asChild render',
-          data: { childCount, loading },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-
       return (
         <Comp
           className={cn(buttonVariants({ variant, size, className }))}

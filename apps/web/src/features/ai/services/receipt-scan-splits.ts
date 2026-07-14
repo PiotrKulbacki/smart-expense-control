@@ -1,6 +1,9 @@
 import { normalizeLegacyCategory } from '@shared/features/transactions/categories';
 import {
+  countDistinctCategories,
+  flattenSplitsToLineItems,
   groupLineItemsToSplits,
+  normalizeReceiptLineItems,
   type ReceiptLineItem,
 } from '@shared/features/transactions/receipt-split-state';
 import {
@@ -26,7 +29,7 @@ export function normalizeReceiptSuggestedSplits(
         amount: item.amount,
       })),
     }))
-    .filter((split) => allowedCategories.has(split.category));
+    .filter((split) => allowedCategories.has(split.category) && split.amount > 0);
 
   if (normalized.length <= 1) {
     return undefined;
@@ -37,6 +40,68 @@ export function normalizeReceiptSuggestedSplits(
   }
 
   return normalized;
+}
+
+function buildSplitDraftFromLineItems(
+  lineItems: ReceiptLineItem[],
+  allowedCategories: Set<string>,
+  totalAmount: number
+): {
+  lineItems: ReceiptLineItem[];
+  suggestedSplits: ReceiptSplitSuggestion[];
+} | null {
+  if (lineItems.length < 2) {
+    return null;
+  }
+
+  const splitsFromLines = groupLineItemsToSplits(lineItems);
+  const normalizedSplits = normalizeReceiptSuggestedSplits(
+    splitsFromLines,
+    allowedCategories,
+    totalAmount
+  );
+
+  if (normalizedSplits) {
+    return {
+      lineItems,
+      suggestedSplits: normalizedSplits,
+    };
+  }
+
+  if (countDistinctCategories(lineItems) >= 2) {
+    return {
+      lineItems,
+      suggestedSplits: splitsFromLines,
+    };
+  }
+
+  return null;
+}
+
+function buildSplitDraftFromSuggestedSplits(
+  suggestedSplits: ReceiptSplitSuggestion[],
+  allowedCategories: Set<string>,
+  totalAmount: number
+): {
+  lineItems?: ReceiptLineItem[];
+  suggestedSplits: ReceiptSplitSuggestion[];
+} | null {
+  const normalizedSplits = normalizeReceiptSuggestedSplits(
+    suggestedSplits,
+    allowedCategories,
+    totalAmount
+  );
+
+  if (!normalizedSplits) {
+    return null;
+  }
+
+  const lineItems = flattenSplitsToLineItems(normalizedSplits);
+
+  return {
+    lineItems: lineItems.length >= 2 ? lineItems : undefined,
+    suggestedSplits: normalizedSplits,
+  };
 }
 
 export function resolveReceiptSplitDraft(
@@ -50,38 +115,43 @@ export function resolveReceiptSplitDraft(
   lineItems?: ReceiptLineItem[];
   suggestedSplits?: ReceiptSplitSuggestion[];
 } {
-  const normalizedLineItems = input.lineItems
-    ?.map((item) => ({
-      ...item,
-      category: normalizeLegacyCategory(item.category),
-    }))
-    .filter((item) => allowedCategories.has(item.category) && item.amount > 0);
-
-  if (normalizedLineItems?.length && splitAmountsMatchTotal(normalizedLineItems, input.amount)) {
-    const splitsFromLines = groupLineItemsToSplits(normalizedLineItems);
-    const normalizedSplits = normalizeReceiptSuggestedSplits(
-      splitsFromLines,
-      allowedCategories,
-      input.amount
-    );
-
-    if (normalizedSplits) {
-      return {
-        lineItems: normalizedLineItems,
-        suggestedSplits: normalizedSplits,
-      };
-    }
-  }
-
-  const normalizedSplits = normalizeReceiptSuggestedSplits(
-    input.suggestedSplits,
+  const normalizedLineItems = normalizeReceiptLineItems(
+    input.lineItems,
     allowedCategories,
     input.amount
   );
 
-  if (!normalizedSplits) {
-    return {};
+  if (normalizedLineItems?.length) {
+    const fromLineItems = buildSplitDraftFromLineItems(
+      normalizedLineItems,
+      allowedCategories,
+      input.amount
+    );
+    if (fromLineItems) {
+      return fromLineItems;
+    }
   }
 
-  return { suggestedSplits: normalizedSplits };
+  if (input.suggestedSplits?.length) {
+    const fromSuggested = buildSplitDraftFromSuggestedSplits(
+      input.suggestedSplits,
+      allowedCategories,
+      input.amount
+    );
+    if (fromSuggested) {
+      return fromSuggested;
+    }
+  }
+
+  if (normalizedLineItems && normalizedLineItems.length >= 2) {
+    const splitsFromLines = groupLineItemsToSplits(normalizedLineItems);
+    if (splitsFromLines.length >= 2) {
+      return {
+        lineItems: normalizedLineItems,
+        suggestedSplits: splitsFromLines,
+      };
+    }
+  }
+
+  return {};
 }
