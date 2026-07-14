@@ -7,6 +7,8 @@ import {
 } from '@web/features/ai/services/receipt-scanner.service';
 import { checkAiRateLimit } from '@web/lib/rate-limit';
 import { requireAiEnabled } from '@web/lib/require-ai-enabled';
+import { isSupabaseStorageConfigured } from '@web/lib/supabase-server';
+import { debugIngest } from '@web/lib/debug-ingest';
 
 const RATE_LIMIT_ERROR = 'api.errors.rateLimitExceeded';
 
@@ -43,9 +45,30 @@ export async function POST(request: Request) {
       return jsonError('scanner.errors.invalidFile', 400);
     }
 
+    // #region agent log
+    debugIngest(
+      'scan-receipt/route.ts:POST',
+      'Scan receipt request env snapshot',
+      {
+        storageConfigured: isSupabaseStorageConfigured(),
+        vercel: Boolean(process.env.VERCEL),
+        vercelEnv: process.env.VERCEL_ENV ?? null,
+      },
+      'H1'
+    );
+    // #endregion
+
     const result = await scanReceiptFromFile(user.id, file);
 
     if ('error' in result) {
+      // #region agent log
+      debugIngest(
+        'scan-receipt/route.ts:POST',
+        'Scan receipt failed',
+        { errorCode: result.error },
+        result.error === 'scanner.errors.storageNotConfigured' ? 'H1' : 'H5'
+      );
+      // #endregion
       const isQuotaError =
         result.error === 'scanner.errors.quotaExceeded' ||
         result.error === 'scanner.errors.monthlyLimitReached';
