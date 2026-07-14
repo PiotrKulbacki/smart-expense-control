@@ -84,6 +84,34 @@ export function getDaysRemainingInCycle(
   return Math.max(0, differenceInCalendarDays(periodEnd, reference));
 }
 
+/** Days until the next cycle start (same metric as dashboard `daysUntilPayday`). */
+export function getDaysUntilNextCycle(
+  financialMonthStartDay: number,
+  reference: Date = new Date()
+): number {
+  const periodStart = getQuotaPeriodStart(financialMonthStartDay, reference);
+  const nextCycleStart = new Date(periodStart);
+  nextCycleStart.setUTCMonth(nextCycleStart.getUTCMonth() + 1);
+  return differenceInCalendarDays(nextCycleStart, reference);
+}
+
+export function getBillingPeriodDayMetrics(
+  financialMonthStartDay: number,
+  reference: Date = new Date()
+): {
+  daysElapsed: number;
+  daysUntilPayday: number;
+  daysRemainingInCycle: number;
+} {
+  const periodStart = getQuotaPeriodStart(financialMonthStartDay, reference);
+
+  return {
+    daysElapsed: Math.max(1, differenceInCalendarDays(reference, periodStart) + 1),
+    daysUntilPayday: getDaysUntilNextCycle(financialMonthStartDay, reference),
+    daysRemainingInCycle: getDaysRemainingInCycle(financialMonthStartDay, reference),
+  };
+}
+
 export function getPreviousQuotaPeriodStart(
   financialMonthStartDay: number,
   reference: Date = new Date()

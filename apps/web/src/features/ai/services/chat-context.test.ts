@@ -2,8 +2,26 @@ import { describe, expect, it } from 'vitest';
 import {
   aggregateFinancialContext,
   buildChatSystemPrompt,
+  buildDashboardBudgetSummary,
+  financialContextFromPeriodSnapshot,
   resolveActiveMonthlyBudget,
 } from '@web/features/ai/services/chat-context';
+import { FIXED_COSTS_CATEGORY } from '@shared/features/transactions/fixed-costs';
+
+const sampleSnapshot = {
+  periodStart: '2026-07-12T00:00:00.000Z',
+  periodEnd: '2026-08-11T23:59:59.999Z',
+  primaryCurrency: 'EUR',
+  totalSpentPrimary: 143.45,
+  totalSpentRaw: 143.45,
+  fixedCostsTotal: 985,
+  transactionCount: 12,
+  categoryTotalsPrimary: [
+    { category: FIXED_COSTS_CATEGORY, amount: 985 },
+    { category: 'Groceries', amount: 80 },
+  ],
+  categoryTotalsRaw: [{ category: 'Groceries', total: 80, currency: 'EUR' }],
+};
 
 describe('chat-context', () => {
   it('aggregates category totals per currency', () => {
@@ -85,7 +103,7 @@ describe('chat-context', () => {
 
     expect(prompt).toContain('"category": "Groceries"');
     expect(prompt).toContain('"total": 30');
-    expect(prompt).toContain('Current cycle label: 2026-07');
+    expect(prompt).toContain('Current cycle: 2026-07-12 to 2026-08-11');
   });
 
   describe('resolveActiveMonthlyBudget', () => {
@@ -196,8 +214,90 @@ describe('chat-context', () => {
     expect(prompt).toContain('Do NOT use fixed values such as 30 or 31 days');
   });
 
-  it('warns AI not to divide by zero on the last cycle day', () => {
-    const context = aggregateFinancialContext('2026-07-12 to 2026-08-11', [], []);
+  describe('dashboard budget summary', () => {
+    it('builds summary matching dashboard total spent panel', () => {
+      const summary = buildDashboardBudgetSummary({
+        snapshot: sampleSnapshot,
+        currentMonthBudget: 2000,
+        daysElapsed: 3,
+        daysUntilPayday: 29,
+      });
+
+      expect(summary.totalSpentIncludingFixed).toBe(1128.45);
+      expect(summary.remainingBudget).toBe(871.55);
+      expect(summary.avgSpentPerDay).toBeCloseTo(376.15, 1);
+      expect(summary.avgRemainingPerDay).toBeCloseTo(30.05, 1);
+      expect(summary.fixedCostsTotal).toBe(985);
+    });
+
+    it('embeds dashboard summary with fixed costs and daysUntilPayday rules', () => {
+      const context = financialContextFromPeriodSnapshot(
+        '2026-07-12 to 2026-08-11',
+        sampleSnapshot,
+        [],
+        {
+          currentMonthBudget: 2000,
+          daysElapsed: 3,
+          daysUntilPayday: 29,
+        }
+      );
+
+      const prompt = buildChatSystemPrompt(context, 'pl', {
+        todayIso: '2026-07-14',
+        financialMonthStartDay: 12,
+        cycleStartIso: '2026-07-12',
+        cycleEndIso: '2026-08-11',
+        daysRemainingInCycle: 28,
+      });
+
+      expect(prompt).toContain('Dashboard budget summary');
+      expect(prompt).toContain('"totalSpentIncludingFixed": 1128.45');
+      expect(prompt).toContain('"fixedCostsTotal": 985');
+      expect(prompt).toContain('"remainingBudget": 871.55');
+      expect(prompt).toContain('"daysUntilPayday": 29');
+      expect(prompt).toContain('divide by daysUntilPayday');
+      expect(prompt).toContain('Do not add fixed costs again');
+    });
+
+    it('documents hypothetical purchase formula aligned with dashboard', () => {
+      const context = financialContextFromPeriodSnapshot(
+        '2026-07-12 to 2026-08-11',
+        sampleSnapshot,
+        [],
+        {
+          currentMonthBudget: 2000,
+          daysElapsed: 3,
+          daysUntilPayday: 29,
+        }
+      );
+
+      const prompt = buildChatSystemPrompt(context, 'pl', {
+        todayIso: '2026-07-14',
+        financialMonthStartDay: 12,
+        cycleStartIso: '2026-07-12',
+        cycleEndIso: '2026-08-11',
+        daysRemainingInCycle: 28,
+      });
+
+      const summary = context.budgetSummary!;
+      const afterShoes = (summary.remainingBudget! - 160) / summary.daysUntilPayday;
+
+      expect(prompt).toContain('newRemaining = remainingBudget - purchaseAmount');
+      expect(afterShoes).toBeCloseTo(24.54, 1);
+    });
+  });
+
+  it('warns AI not to divide by zero when cycle ended', () => {
+    const context = financialContextFromPeriodSnapshot(
+      '2026-07-12 to 2026-08-11',
+      sampleSnapshot,
+      [],
+      {
+        currentMonthBudget: 2000,
+        daysElapsed: 31,
+        daysUntilPayday: 0,
+      }
+    );
     const prompt = buildChatSystemPrompt(context, 'pl', {
       todayIso: '2026-08-11',
       financialMonthStartDay: 12,
@@ -208,6 +308,5 @@ describe('chat-context', () => {
 
     expect(prompt).toContain('Days remaining until the end of the current billing cycle: 0.');
     expect(prompt).toContain('do not divide by zero');
-    expect(prompt).toContain('last day of the billing cycle');
   });
 });

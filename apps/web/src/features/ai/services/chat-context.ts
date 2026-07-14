@@ -1,8 +1,24 @@
 import type { Locale } from '@shared/features/i18n';
 import type {
   PeriodAggregationSnapshot,
+  PeriodCategoryTotalPrimary,
   PeriodCategoryTotalRaw,
 } from '@shared/features/analytics/period-aggregation';
+import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
+
+export type DashboardBudgetSummary = {
+  primaryCurrency: string;
+  transactionsSpentPrimary: number;
+  fixedCostsTotal: number;
+  totalSpentIncludingFixed: number;
+  remainingBudget: number | null;
+  daysElapsed: number;
+  daysUntilPayday: number;
+  avgSpentPerDay: number;
+  avgRemainingPerDay: number | null;
+  cycleEnded: boolean;
+  categoryTotalsPrimary: PeriodCategoryTotalPrimary[];
+};
 
 export type FinancialContext = {
   currentCycleLabel: string;
@@ -15,6 +31,7 @@ export type FinancialContext = {
     category: string;
     description: string | null;
   }>;
+  budgetSummary: DashboardBudgetSummary | null;
 };
 
 export type FinancialCycleMeta = {
@@ -68,6 +85,42 @@ const LOCALE_NAMES: Record<Locale, string> = {
   es: 'Spanish',
 };
 
+export function buildDashboardBudgetSummary(params: {
+  snapshot: PeriodAggregationSnapshot;
+  currentMonthBudget: number | null;
+  daysElapsed: number;
+  daysUntilPayday: number;
+}): DashboardBudgetSummary {
+  const totalSpentIncludingFixed =
+    params.snapshot.totalSpentPrimary + params.snapshot.fixedCostsTotal;
+  const dailyStats = computeDailyBudgetStats({
+    visibleTotalSpent: totalSpentIncludingFixed,
+    hiddenTotalSpent: 0,
+    currentMonthBudget: params.currentMonthBudget,
+    daysElapsed: params.daysElapsed,
+    daysUntilPayday: params.daysUntilPayday,
+  });
+
+  const remainingBudget =
+    params.currentMonthBudget != null && params.currentMonthBudget > 0
+      ? Math.max(params.currentMonthBudget - totalSpentIncludingFixed, 0)
+      : null;
+
+  return {
+    primaryCurrency: params.snapshot.primaryCurrency,
+    transactionsSpentPrimary: params.snapshot.totalSpentPrimary,
+    fixedCostsTotal: params.snapshot.fixedCostsTotal,
+    totalSpentIncludingFixed,
+    remainingBudget,
+    daysElapsed: params.daysElapsed,
+    daysUntilPayday: params.daysUntilPayday,
+    avgSpentPerDay: dailyStats.avgSpentPerDay,
+    avgRemainingPerDay: dailyStats.avgRemainingPerDay,
+    cycleEnded: dailyStats.cycleEnded,
+    categoryTotalsPrimary: params.snapshot.categoryTotalsPrimary,
+  };
+}
+
 export function aggregateFinancialContext(
   cycleLabel: string,
   monthlyTransactions: MonthlyTransactionSnapshot[],
@@ -111,17 +164,23 @@ export function aggregateFinancialContext(
       category: transaction.category,
       description: transaction.description,
     })),
+    budgetSummary: null,
   };
 }
 
 export function financialContextFromPeriodSnapshot(
   cycleLabel: string,
-  snapshot: Pick<PeriodAggregationSnapshot, 'totalSpentRaw' | 'categoryTotalsRaw'>,
-  recentTransactions: RecentTransactionSnapshot[]
+  snapshot: PeriodAggregationSnapshot,
+  recentTransactions: RecentTransactionSnapshot[],
+  budgetParams: {
+    currentMonthBudget: number | null;
+    daysElapsed: number;
+    daysUntilPayday: number;
+  }
 ): FinancialContext {
   return {
     currentCycleLabel: cycleLabel,
-    totalSpentThisCycle: snapshot.totalSpentRaw,
+    totalSpentThisCycle: snapshot.totalSpentPrimary + snapshot.fixedCostsTotal,
     categoryTotals: snapshot.categoryTotalsRaw as PeriodCategoryTotalRaw[],
     recentTransactions: recentTransactions.map((transaction) => ({
       date: transaction.date.toISOString().slice(0, 10),
@@ -130,6 +189,12 @@ export function financialContextFromPeriodSnapshot(
       category: transaction.category,
       description: transaction.description,
     })),
+    budgetSummary: buildDashboardBudgetSummary({
+      snapshot,
+      currentMonthBudget: budgetParams.currentMonthBudget,
+      daysElapsed: budgetParams.daysElapsed,
+      daysUntilPayday: budgetParams.daysUntilPayday,
+    }),
   };
 }
 
@@ -144,11 +209,21 @@ function formatBudgetPromptLine(budget: ActiveMonthlyBudget): string {
 
 function formatCycleDaysPromptLine(daysRemainingInCycle: number): string {
   const lastDayNote =
-    daysRemainingInCycle === 0
-      ? ' Today is the last day of the billing cycle — do not divide by zero when computing daily budget limits; treat the full remaining budget as available for today only.'
-      : '';
+    daysRemainingInCycle === 0 ? ' Today is the last day of the billing cycle.' : '';
 
-  return `Days remaining until the end of the current billing cycle: ${daysRemainingInCycle}. Use this exact number for all "daily limit" or budget forecasting calculations. Do NOT use fixed values such as 30 or 31 days.${lastDayNote}`;
+  return `Days remaining until the end of the current billing cycle: ${daysRemainingInCycle}.${lastDayNote} Do NOT use fixed values such as 30 or 31 days when counting cycle length.`;
+}
+
+function formatDashboardBudgetSummarySection(summary: DashboardBudgetSummary): string {
+  return `Dashboard budget summary (authoritative — matches the "Total spent" panel):
+${JSON.stringify(summary, null, 2)}
+
+Budget calculation rules:
+- totalSpentIncludingFixed already includes transactions (transactionsSpentPrimary) AND recurring fixed costs (fixedCostsTotal). Do not add fixed costs again.
+- For "how much can I spend per day", "daily limit", or hypothetical purchases (e.g. "if I buy X"), use remainingBudget and divide by daysUntilPayday — this matches dashboard "average remaining per day".
+- daysUntilPayday is for daily budget forecasting; daysRemainingInCycle is only for "how many days are left in the cycle" questions.
+- If daysUntilPayday is 0, the cycle has ended — do not divide by zero; treat remaining budget as available today only.
+- For hypothetical spending: newRemaining = remainingBudget - purchaseAmount; newDaily = newRemaining / daysUntilPayday.`;
 }
 
 export function buildChatSystemPrompt(
@@ -159,6 +234,19 @@ export function buildChatSystemPrompt(
 ): string {
   const language = LOCALE_NAMES[locale];
   const budgetSection = activeBudget ? `${formatBudgetPromptLine(activeBudget)}\n\n` : '';
+  const dashboardSummarySection = context.budgetSummary
+    ? `${formatDashboardBudgetSummarySection(context.budgetSummary)}\n\n`
+    : '';
+
+  const spentLine = context.budgetSummary
+    ? `Total spent this cycle in ${context.budgetSummary.primaryCurrency} (transactions + fixed costs): ${context.budgetSummary.totalSpentIncludingFixed}`
+    : `Total spent this cycle (all currencies, not converted): ${context.totalSpentThisCycle}`;
+
+  const categorySection = context.budgetSummary
+    ? `Category totals this cycle (${context.budgetSummary.primaryCurrency}, includes fixed costs):
+${context.budgetSummary.categoryTotalsPrimary.length > 0 ? JSON.stringify(context.budgetSummary.categoryTotalsPrimary, null, 2) : 'No spending this cycle.'}`
+    : `Category totals this cycle:
+${context.categoryTotals.length > 0 ? JSON.stringify(context.categoryTotals, null, 2) : 'No transactions this month.'}`;
 
   return `You are a helpful personal finance assistant for Smart Expense Control.
 Always respond in ${language}.
@@ -171,11 +259,9 @@ Today is ${cycleMeta.todayIso}. User's financial cycle starts on day ${cycleMeta
 Current cycle: ${cycleMeta.cycleStartIso} to ${cycleMeta.cycleEndIso}. Use this range to calculate averages or statistics.
 ${formatCycleDaysPromptLine(cycleMeta.daysRemainingInCycle)}
 
-${budgetSection}Current cycle label: ${context.currentCycleLabel}
-Total spent this cycle (all currencies, not converted): ${context.totalSpentThisCycle}
+${budgetSection}${dashboardSummarySection}${spentLine}
 
-Category totals this cycle:
-${context.categoryTotals.length > 0 ? JSON.stringify(context.categoryTotals, null, 2) : 'No transactions this month.'}
+${categorySection}
 
 Recent transactions (newest first):
 ${context.recentTransactions.length > 0 ? JSON.stringify(context.recentTransactions, null, 2) : 'No transactions on record.'}`;

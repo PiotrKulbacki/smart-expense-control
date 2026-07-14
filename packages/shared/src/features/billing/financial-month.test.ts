@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampFinancialMonthDay,
+  getBillingPeriodDayMetrics,
   getDaysRemainingInCycle,
+  getDaysUntilNextCycle,
   getFinancialMonthStartDayFromDate,
   getQuotaPeriodEnd,
   getQuotaPeriodStart,
@@ -68,5 +70,16 @@ describe('financial-month', () => {
     const lastDay = new Date('2026-08-11T18:00:00Z');
 
     expect(getDaysRemainingInCycle(12, lastDay)).toBe(0);
+  });
+
+  it('exposes billing period day metrics aligned with dashboard', () => {
+    const reference = new Date('2026-07-14T12:00:00Z');
+
+    expect(getBillingPeriodDayMetrics(12, reference)).toEqual({
+      daysElapsed: 3,
+      daysUntilPayday: 29,
+      daysRemainingInCycle: 28,
+    });
+    expect(getDaysUntilNextCycle(12, reference)).toBe(29);
   });
 });

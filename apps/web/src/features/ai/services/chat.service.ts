@@ -24,7 +24,7 @@ import {
 import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
 import { captureServerException } from '@web/lib/sentry-server';
 import {
-  getDaysRemainingInCycle,
+  getBillingPeriodDayMetrics,
   getQuotaPeriodEnd,
   getQuotaPeriodStart,
 } from '@shared/features/billing/financial-month';
@@ -64,13 +64,14 @@ async function fetchFinancialContext(userId: string): Promise<{
   const cycleStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
   const cycleEnd = getQuotaPeriodEnd(cycleStart);
   const label = `${toIsoDate(cycleStart)} to ${toIsoDate(cycleEnd)}`;
+  const dayMetrics = getBillingPeriodDayMetrics(user.financialMonthStartDay, now);
 
   const cycleMeta: FinancialCycleMeta = {
     todayIso: toIsoDate(now),
     financialMonthStartDay: user.financialMonthStartDay,
     cycleStartIso: toIsoDate(cycleStart),
     cycleEndIso: toIsoDate(cycleEnd),
-    daysRemainingInCycle: getDaysRemainingInCycle(user.financialMonthStartDay, now),
+    daysRemainingInCycle: dayMetrics.daysRemainingInCycle,
   };
 
   const activeBudget = resolveActiveMonthlyBudget({
@@ -111,7 +112,12 @@ async function fetchFinancialContext(userId: string): Promise<{
       category: transaction.category,
       description: transaction.description,
       date: transaction.date,
-    }))
+    })),
+    {
+      currentMonthBudget: user.currentMonthBudget,
+      daysElapsed: dayMetrics.daysElapsed,
+      daysUntilPayday: dayMetrics.daysUntilPayday,
+    }
   );
 
   return { context, cycleMeta, activeBudget };
