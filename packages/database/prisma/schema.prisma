@@ -47,8 +47,9 @@ model User {
   refreshTokens     RefreshToken[]
   transactions      Transaction[]
   recurringExpenses RecurringExpense[]
-  chatMessages      ChatMessage[]
-  userCategories    UserCategory[]
+  chatMessages           ChatMessage[]
+  userCategories         UserCategory[]
+  periodAggregations     UserPeriodAggregation[]
 
   @@map("users")
 }
@@ -145,7 +146,32 @@ model ProcessedStripeEvent {
   createdAt   DateTime  @default(now())
   completedAt DateTime?
 
+  @@index([status])
   @@map("processed_stripe_events")
+}
+
+model UserPeriodAggregation {
+  id                    String   @id @default(cuid())
+  userId                String
+  periodStart           DateTime
+  periodEnd             DateTime
+  primaryCurrency       Currency
+  totalSpentPrimary     Decimal  @db.Decimal(14, 2)
+  totalSpentRaw         Decimal  @db.Decimal(14, 2)
+  fixedCostsTotal       Decimal  @db.Decimal(14, 2)
+  transactionCount      Int
+  categoryTotalsPrimary Json
+  categoryTotalsRaw     Json
+  isDirty               Boolean  @default(true)
+  computedAt            DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, periodStart])
+  @@index([userId, isDirty])
+  @@index([isDirty, computedAt])
+  @@map("user_period_aggregations")
 }
 
 model ExchangeRate {

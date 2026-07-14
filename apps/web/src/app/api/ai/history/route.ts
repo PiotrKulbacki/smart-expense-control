@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@smart-expense-control/database';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
+import { requireAiEnabled } from '@web/lib/require-ai-enabled';
 
 function parsePositiveInt(value: string | null, fallback: number): number {
   if (!value) {
@@ -17,6 +18,11 @@ function parsePositiveInt(value: string | null, fallback: number): number {
 }
 
 export async function GET(request: Request) {
+  const aiDisabled = requireAiEnabled();
+  if (aiDisabled) {
+    return aiDisabled;
+  }
+
   const user = await getAuthenticatedUser(request);
   if (!user) {
     return jsonError('auth.errors.unauthorized', 401);

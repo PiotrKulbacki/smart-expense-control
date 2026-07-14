@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
 import { getUserAiScanQuota } from '@web/features/ai/services/receipt-scanner.service';
+import { requireAiEnabled } from '@web/lib/require-ai-enabled';
 
 export async function GET(request: Request) {
   try {
+    const aiDisabled = requireAiEnabled();
+    if (aiDisabled) {
+      return aiDisabled;
+    }
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return jsonError('auth.errors.unauthorized', 401);

@@ -132,8 +132,14 @@
   },
   "api": {
     "errors": {
-      "rateLimitExceeded": "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie"
+      "rateLimitExceeded": "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie",
+      "aiDisabled": "Funkcje AI są tymczasowo niedostępne"
     }
+  },
+  "globalError": {
+    "title": "Coś poszło nie tak",
+    "message": "Wystąpił nieoczekiwany błąd.",
+    "retry": "Spróbuj ponownie"
   },
   "chat": {
     "labels": {
@@ -184,6 +190,10 @@
       "terms": "Regulamin",
       "privacy": "Polityka prywatności",
       "contact": "Kontakt"
+    },
+    "aria": {
+      "billingCurrency": "Waluta płatności",
+      "language": "Język"
     }
   },
   "landing": {

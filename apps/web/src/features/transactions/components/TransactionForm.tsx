@@ -52,7 +52,7 @@ export function TransactionForm({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<TransactionFormInput>({
     resolver: zodResolver(transactionFormSchema),
     defaultValues: {
@@ -107,7 +107,17 @@ export function TransactionForm({
   }
 
   return (
-    <form onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
+    <form
+      onSubmit={(event) =>
+        void handleSubmit(onSubmit, (invalidErrors) => {
+          const firstError = Object.values(invalidErrors)[0];
+          if (firstError?.message) {
+            toast.error(translateError(firstError.message, locale));
+          }
+        })(event)
+      }
+      className="space-y-4"
+    >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="amount">{t('dashboard.form.amount')}</Label>
@@ -119,11 +129,6 @@ export function TransactionForm({
             disabled={isSubmitting}
             {...register('amount', { valueAsNumber: true })}
           />
-          {errors.amount?.message && (
-            <p className="text-glow mt-1 text-xs">
-              {translateError(errors.amount.message, locale)}
-            </p>
-          )}
         </div>
 
         <div>
@@ -140,11 +145,6 @@ export function TransactionForm({
               </option>
             ))}
           </select>
-          {errors.currency?.message && (
-            <p className="text-glow mt-1 text-xs">
-              {translateError(errors.currency.message, locale)}
-            </p>
-          )}
         </div>
 
         <div>
@@ -161,19 +161,11 @@ export function TransactionForm({
               </option>
             ))}
           </select>
-          {errors.category?.message && (
-            <p className="text-glow mt-1 text-xs">
-              {translateError(errors.category.message, locale)}
-            </p>
-          )}
         </div>
 
         <div>
           <Label htmlFor="date">{t('dashboard.form.date')}</Label>
           <Input id="date" type="date" disabled={isSubmitting} {...register('date')} />
-          {errors.date?.message && (
-            <p className="text-glow mt-1 text-xs">{translateError(errors.date.message, locale)}</p>
-          )}
         </div>
       </div>
 
@@ -186,11 +178,6 @@ export function TransactionForm({
           placeholder={t('dashboard.form.descriptionPlaceholder')}
           {...register('description')}
         />
-        {errors.description?.message && (
-          <p className="text-glow mt-1 text-xs">
-            {translateError(errors.description.message, locale)}
-          </p>
-        )}
       </div>
 
       <div className="flex gap-3 pt-2">

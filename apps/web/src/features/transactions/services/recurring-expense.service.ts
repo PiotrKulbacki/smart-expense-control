@@ -4,6 +4,7 @@ import type {
   UpdateRecurringExpenseInput,
 } from '@shared/features/transactions/schemas';
 import { RECURRING_EXPENSE_ERROR_CODES } from '@shared/features/transactions/schemas';
+import { invalidateCurrentPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
 
 export type RecurringExpenseDto = {
   id: string;
@@ -69,6 +70,8 @@ export async function createRecurringExpense(
     },
   });
 
+  await invalidateCurrentPeriodAggregation(userId);
+
   return toRecurringExpenseDto(expense);
 }
 
@@ -101,6 +104,8 @@ export async function updateRecurringExpense(
     },
   });
 
+  await invalidateCurrentPeriodAggregation(userId);
+
   return toRecurringExpenseDto(expense);
 }
 
@@ -118,5 +123,6 @@ export async function deleteRecurringExpense(userId: string, expenseId: string):
   }
 
   await prisma.recurringExpense.delete({ where: { id: expenseId } });
+  await invalidateCurrentPeriodAggregation(userId);
   return true;
 }

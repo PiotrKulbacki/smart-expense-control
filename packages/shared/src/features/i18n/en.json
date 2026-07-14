@@ -132,8 +132,14 @@
   },
   "api": {
     "errors": {
-      "rateLimitExceeded": "Too many requests. Please wait a moment and try again"
+      "rateLimitExceeded": "Too many requests. Please wait a moment and try again",
+      "aiDisabled": "AI features are temporarily unavailable"
     }
+  },
+  "globalError": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred.",
+    "retry": "Try again"
   },
   "chat": {
     "labels": {
@@ -184,6 +190,10 @@
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "contact": "Contact"
+    },
+    "aria": {
+      "billingCurrency": "Billing currency",
+      "language": "Language"
     }
   },
   "landing": {

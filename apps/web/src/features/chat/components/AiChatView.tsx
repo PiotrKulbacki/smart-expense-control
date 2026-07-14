@@ -319,9 +319,6 @@ export function AiChatView() {
             {t('chat.status.messagesRemaining', { count: quota.remaining })}
           </p>
         )}
-        {isBlocked && (
-          <p className="text-warm mt-2 text-xs font-medium">{t('chat.errors.quotaExceeded')}</p>
-        )}
         <p className="text-muted mt-2 text-xs">{t('chat.page.disclaimer')}</p>
       </div>
 

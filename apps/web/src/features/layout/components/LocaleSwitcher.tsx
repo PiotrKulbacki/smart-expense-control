@@ -1,7 +1,7 @@
 'use client';
 
 import { SUPPORTED_LOCALES, type Locale } from '@shared/features/i18n';
-import { useLocale } from '@web/features/i18n/LocaleProvider';
+import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'EN',
@@ -16,6 +16,7 @@ type LocaleSwitcherProps = {
 
 export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
   const { locale, setLocale } = useLocale();
+  const t = useT();
 
   return (
     <select
@@ -25,7 +26,7 @@ export function LocaleSwitcher({ className }: LocaleSwitcherProps) {
         className ??
         'bg-elevated/50 focus:border-warm/30 focus:ring-warm/20 rounded-lg border border-[var(--border)] px-2 py-1.5 font-mono text-sm text-[var(--text)] focus:outline-none focus:ring-1'
       }
-      aria-label="Language"
+      aria-label={t('layout.aria.language')}
     >
       {SUPPORTED_LOCALES.map((supportedLocale) => (
         <option key={supportedLocale} value={supportedLocale}>

@@ -6,13 +6,14 @@ import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LocaleSwitcher } from '@web/features/layout/components/LocaleSwitcher';
+import { isAiEnabledOnClient } from '@web/lib/ai-feature';
 
 const NAV_ITEMS = [
-  { href: '/dashboard', key: 'layout.nav.dashboard' },
-  { href: '/history', key: 'layout.nav.history' },
-  { href: '/scanner', key: 'layout.nav.scanner' },
-  { href: '/chat', key: 'layout.nav.chat' },
-  { href: '/settings', key: 'layout.nav.settings' },
+  { href: '/dashboard', key: 'layout.nav.dashboard', requiresAi: false },
+  { href: '/history', key: 'layout.nav.history', requiresAi: false },
+  { href: '/scanner', key: 'layout.nav.scanner', requiresAi: true },
+  { href: '/chat', key: 'layout.nav.chat', requiresAi: true },
+  { href: '/settings', key: 'layout.nav.settings', requiresAi: false },
 ] as const;
 
 type AppSidebarProps = {
@@ -60,6 +61,8 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   }
 
   const initials = (userName ?? userEmail).slice(0, 2).toUpperCase();
+  const aiEnabled = isAiEnabledOnClient();
+  const visibleNavItems = NAV_ITEMS.filter((item) => !item.requiresAi || aiEnabled);
 
   return (
     <aside className="bg-surface/80 sticky top-0 flex h-screen w-full shrink-0 flex-col border-r border-[var(--border)] backdrop-blur-md md:w-64">
@@ -84,7 +87,7 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
-        {NAV_ITEMS.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link

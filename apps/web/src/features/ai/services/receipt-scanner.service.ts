@@ -15,6 +15,7 @@ import {
 import { env } from '@web/env';
 import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
+import { captureServerException } from '@web/lib/sentry-server';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MODEL = 'gpt-4o-mini';
@@ -222,6 +223,8 @@ export async function scanReceiptFromFile(
       },
     };
   } catch (error) {
+    captureServerException(error, { scope: 'ai.scan.receipt', userId });
+
     if (error instanceof SyntaxError) {
       return { error: RECEIPT_SCAN_ERROR_CODES.PARSE_FAILED };
     }

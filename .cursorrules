@@ -7,11 +7,12 @@
 3. **Błędy UI przez toast:** Błędy dla użytkownika (np. błędy autoryzacji czy logowania) muszą być zawsze obsługiwane za pomocą wyskakujących powiadomień typu `toast`. Nigdy nie renderuj błędów jako statycznego tekstu pod przyciskami lub inputami.
 4. **i18n bez hardkodu:** Zakaz hardkodowania tekstów w komponentach. Zawsze używaj funkcji tłumaczeń i plików JSON z pakietu `@shared/features/i18n`.
 5. **Zakaz autonomicznego rozszerzania zakresu:** Agentowi surowo zabrania się autonomicznego dodawania, planowania lub sugerowania nowych funkcji systemu w kolejnych fazach bez wcześniejszego, wyraźnego zapytania użytkownika i uzyskania jego jednoznacznej zgody. Każda nowa funkcja przed wpisaniem do kamieni milowych musi zostać zatwierdzona przez użytkownika.
+6. **Formatowanie Prettier — zawsze na koniec pracy:** Po zmianach w plikach objętych Prettierem uruchom `npx prettier --write .`, następnie zweryfikuj `npm run format`. Powtarzaj aż check przejdzie bez ostrzeżeń.
 
 ## Architektura Monorepo
 
 - **Struktura:** Turborepo z `/apps/web` (Next.js), `/apps/mobile` (Expo), `/packages/shared` (wspólny kod).
-- **Walidacja Zod:** Schematy formularzy w `/packages/shared/schemas` — współdzielone między web, mobile i backend.
+- **Walidacja Zod:** Schematy formularzy w `packages/shared/src/schemas/` oraz `packages/shared/src/features/*/schemas` — współdzielone między web, mobile i backend.
 - **Path Aliases:** `@shared/*`, `@web/*`, `@mobile/*` — nigdy `../../../../`.
 - **Zmienne środowiskowe:** Rozdziel publiczne (Expo/Next Frontend) od tajnych (Next Backend). Waliduj przez `t3-env`.
 - **Feature-Driven:** Kod domenowy w `features/` (auth, billing, ai). Każdy moduł ma własne routing, serwisy, walidację, typy i komponenty.
@@ -23,7 +24,7 @@
 - **Migracje plikowe:** Generuj `.sql` lokalnie, commituj do Git.
 - **Pipeline Vercel:** `npx [orm] migrate deploy && next build`.
 - **Indeksy:** Od dnia 1 dla kolumn `user_id`, `date`, `status`.
-- **Cache agregacji:** Tabela podręczna dla analityki, aktualizowana asynchronicznie (Cron).
+- **Cache agregacji:** Tabela `user_period_aggregations` — invalidacja przy mutacjach transakcji/kosztów stałych; odświeżanie przez cron `/api/cron/refresh-aggregations`.
 
 ## Środowisko IDE & Code Style
 
@@ -34,9 +35,9 @@
 
 - **Rate Limiting:** Na dedykowanych Route Handlers (Upstash Redis), nie globalne Middleware.
 - **Fallback walutowy:** Przy awarii API kursów — ostatnie znane dane z bazy.
-- **Sentry/Axiom:** Monitoring błędów od dnia 1 (webhooki Stripe, API AI).
+- **Sentry/Axiom:** Monitoring błędów od dnia 1 (webhooki Stripe, API AI) — `captureServerException` w serwisach.
 - **OAuth:** Ustal dostawców tożsamości przed implementacją auth.
-- **Feature Flags:** PostHog lub `.env` (`ENABLE_AI=true`).
+- **Feature Flags:** PostHog lub `.env` (`ENABLE_AI`, `NEXT_PUBLIC_ENABLE_AI`).
 - **Analityka:** PostHog z silnym typowaniem TypeScript.
 
 ## Optymalizacja Kosztów

@@ -2,6 +2,7 @@ import { prisma } from '@smart-expense-control/database';
 import { Prisma } from '@prisma/client';
 import type Stripe from 'stripe';
 import { handleStripeWebhookEvent } from '@web/features/billing/services/stripe-webhook.service';
+import { captureServerException } from '@web/lib/sentry-server';
 
 export type StripeWebhookProcessResult =
   { status: 'processed' } | { status: 'duplicate' } | { status: 'failed'; error: unknown };
@@ -51,6 +52,12 @@ export async function processStripeWebhookEvent(
 
     return { status: 'processed' };
   } catch (error) {
+    captureServerException(error, {
+      scope: 'stripe.webhook',
+      eventId: event.id,
+      eventType: event.type,
+    });
+
     await prisma.processedStripeEvent
       .delete({
         where: { eventId: event.id },

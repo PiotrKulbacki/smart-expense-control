@@ -3,11 +3,17 @@ import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
 import { scanReceiptFromFile } from '@web/features/ai/services/receipt-scanner.service';
 import { checkAiRateLimit } from '@web/lib/rate-limit';
+import { requireAiEnabled } from '@web/lib/require-ai-enabled';
 
 const RATE_LIMIT_ERROR = 'api.errors.rateLimitExceeded';
 
 export async function POST(request: Request) {
   try {
+    const aiDisabled = requireAiEnabled();
+    if (aiDisabled) {
+      return aiDisabled;
+    }
+
     const user = await getAuthenticatedUser(request);
     if (!user) {
       return jsonError('auth.errors.unauthorized', 401);

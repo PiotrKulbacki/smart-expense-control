@@ -132,8 +132,14 @@
   },
   "api": {
     "errors": {
-      "rateLimitExceeded": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut"
+      "rateLimitExceeded": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut",
+      "aiDisabled": "KI-Funktionen sind vorübergehend nicht verfügbar"
     }
+  },
+  "globalError": {
+    "title": "Etwas ist schiefgelaufen",
+    "message": "Ein unerwarteter Fehler ist aufgetreten.",
+    "retry": "Erneut versuchen"
   },
   "chat": {
     "labels": {
@@ -184,6 +190,10 @@
       "terms": "Nutzungsbedingungen",
       "privacy": "Datenschutz",
       "contact": "Kontakt"
+    },
+    "aria": {
+      "billingCurrency": "Abrechnungswährung",
+      "language": "Sprache"
     }
   },
   "landing": {

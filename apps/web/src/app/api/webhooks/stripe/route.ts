@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { env } from '@web/env';
 import { processStripeWebhookEvent } from '@web/features/billing/services/stripe-webhook-idempotency';
 import { shutdownPostHog } from '@web/features/analytics/posthog-server';
+import { captureServerException } from '@web/lib/sentry-server';
 
 export const runtime = 'nodejs';
 
@@ -30,6 +31,11 @@ export async function POST(request: Request) {
   await shutdownPostHog();
 
   if (result.status === 'failed') {
+    captureServerException(result.error, {
+      scope: 'stripe.webhook.route',
+      eventId: event.id,
+      eventType: event.type,
+    });
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 

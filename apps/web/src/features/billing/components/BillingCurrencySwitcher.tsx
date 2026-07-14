@@ -1,6 +1,7 @@
 'use client';
 
 import { BILLING_CURRENCIES, type BillingCurrency } from '@shared/features/billing';
+import { useT } from '@web/features/i18n/LocaleProvider';
 
 const BILLING_CURRENCY_STORAGE_KEY = 'sec_billing_currency';
 
@@ -38,6 +39,8 @@ export function BillingCurrencySwitcher({
   persist = true,
   className,
 }: BillingCurrencySwitcherProps) {
+  const t = useT();
+
   function handleSelect(currency: BillingCurrency) {
     onChange(currency);
     if (persist) {
@@ -52,7 +55,7 @@ export function BillingCurrencySwitcher({
         'bg-elevated/50 inline-flex rounded-xl border border-[var(--border)] p-1 font-mono text-sm font-medium'
       }
       role="group"
-      aria-label="Billing currency"
+      aria-label={t('layout.aria.billingCurrency')}
     >
       {BILLING_CURRENCIES.map((currency) => {
         const isActive = value === currency;

@@ -7,6 +7,7 @@ import { FIXED_COSTS_CATEGORY } from '@shared/features/transactions/fixed-costs'
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
 import { getChartDataFetchStart } from '@web/features/transactions/lib/chart-date-filter';
+import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
 
 export type DashboardTransaction = {
   id: string;
@@ -146,25 +147,28 @@ export async function getDashboardData(
   const chartDataStart = getChartDataFetchStart(periodStart, periodEnd);
   const primaryCurrency = user.primaryCurrency as CurrencyCode;
   const rateMap = await getExchangeRates();
+  const usesDefaultPeriod = !dateRange.from && !dateRange.to;
 
   const [
     periodTransactions,
     chartSourceTransactions,
     recentTransactions,
     fixedCostsTotal,
-    billingPeriodTransactions,
+    cachedPeriodAggregation,
   ] = await Promise.all([
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: periodStart, lte: periodEnd },
-      },
-      select: {
-        amount: true,
-        currency: true,
-        category: true,
-      },
-    }),
+    usesDefaultPeriod
+      ? Promise.resolve([])
+      : prisma.transaction.findMany({
+          where: {
+            userId,
+            date: { gte: periodStart, lte: periodEnd },
+          },
+          select: {
+            amount: true,
+            currency: true,
+            category: true,
+          },
+        }),
     prisma.transaction.findMany({
       where: {
         userId,
@@ -193,53 +197,54 @@ export async function getDashboardData(
         isAiScanned: true,
       },
     }),
-    getFixedCostsTotal(userId, primaryCurrency, rateMap),
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: defaultPeriodStart, lte: periodEnd },
-      },
-      select: {
-        amount: true,
-        currency: true,
-      },
-    }),
+    usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
+    getOrRefreshPeriodAggregation(userId, now),
   ]);
+
+  const billingPeriodTotalSpent =
+    cachedPeriodAggregation != null
+      ? cachedPeriodAggregation.totalSpentPrimary + cachedPeriodAggregation.fixedCostsTotal
+      : fixedCostsTotal;
 
   const categoryMap = new Map<string, number>();
   let totalSpent = 0;
+  let transactionCount = 0;
+  let categoryTotals: Array<{ category: string; amount: number }>;
+  const resolvedFixedCostsTotal =
+    usesDefaultPeriod && cachedPeriodAggregation
+      ? cachedPeriodAggregation.fixedCostsTotal
+      : fixedCostsTotal;
 
-  for (const transaction of periodTransactions) {
-    const amount = transaction.amount.toNumber();
-    const converted = convertAmount(
-      amount,
-      transaction.currency as CurrencyCode,
-      primaryCurrency,
-      rateMap
+  if (usesDefaultPeriod && cachedPeriodAggregation) {
+    totalSpent = billingPeriodTotalSpent;
+    transactionCount = cachedPeriodAggregation.transactionCount;
+    categoryTotals = cachedPeriodAggregation.categoryTotalsPrimary;
+  } else {
+    for (const transaction of periodTransactions) {
+      const amount = transaction.amount.toNumber();
+      const converted = convertAmount(
+        amount,
+        transaction.currency as CurrencyCode,
+        primaryCurrency,
+        rateMap
+      );
+      totalSpent += converted;
+      categoryMap.set(
+        transaction.category,
+        (categoryMap.get(transaction.category) ?? 0) + converted
+      );
+    }
+
+    categoryTotals = appendFixedCostsCategory(
+      Array.from(categoryMap.entries())
+        .map(([category, amount]) => ({ category, amount: Math.round(amount * 100) / 100 }))
+        .sort((a, b) => b.amount - a.amount),
+      resolvedFixedCostsTotal
     );
-    totalSpent += converted;
-    categoryMap.set(transaction.category, (categoryMap.get(transaction.category) ?? 0) + converted);
+
+    totalSpent += resolvedFixedCostsTotal;
+    transactionCount = periodTransactions.length;
   }
-
-  const categoryTotals = appendFixedCostsCategory(
-    Array.from(categoryMap.entries())
-      .map(([category, amount]) => ({ category, amount: Math.round(amount * 100) / 100 }))
-      .sort((a, b) => b.amount - a.amount),
-    fixedCostsTotal
-  );
-
-  let billingPeriodTotalSpent = fixedCostsTotal;
-
-  for (const transaction of billingPeriodTransactions) {
-    billingPeriodTotalSpent += convertAmount(
-      transaction.amount.toNumber(),
-      transaction.currency as CurrencyCode,
-      primaryCurrency,
-      rateMap
-    );
-  }
-
-  totalSpent += fixedCostsTotal;
 
   const chartTransactions: DashboardChartTransaction[] = chartSourceTransactions.map(
     (transaction) => {
@@ -257,11 +262,11 @@ export async function getDashboardData(
     }
   );
 
-  if (fixedCostsTotal > 0) {
+  if (resolvedFixedCostsTotal > 0) {
     chartTransactions.push({
       date: periodStart.toISOString(),
       category: FIXED_COSTS_CATEGORY,
-      convertedAmount: fixedCostsTotal,
+      convertedAmount: resolvedFixedCostsTotal,
     });
   }
 
@@ -273,8 +278,8 @@ export async function getDashboardData(
       periodEnd: periodEnd.toISOString(),
       totalSpent: Math.round(totalSpent * 100) / 100,
       billingPeriodTotalSpent: Math.round(billingPeriodTotalSpent * 100) / 100,
-      fixedCostsTotal: Math.round(fixedCostsTotal * 100) / 100,
-      transactionCount: periodTransactions.length,
+      fixedCostsTotal: Math.round(resolvedFixedCostsTotal * 100) / 100,
+      transactionCount,
       categoryTotals,
       currentMonthBudget: user.currentMonthBudget,
       defaultMonthlyBudget: user.defaultMonthlyBudget,

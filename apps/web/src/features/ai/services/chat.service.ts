@@ -1,6 +1,4 @@
 import { prisma } from '@smart-expense-control/database';
-import type { Currency } from '@smart-expense-control/database';
-import type { Decimal } from '@prisma/client/runtime/library';
 import {
   getAiChatLimit,
   getAiChatQuotaStatus,
@@ -17,12 +15,14 @@ import { env } from '@web/env';
 import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import {
-  aggregateFinancialContext,
   buildChatSystemPrompt,
+  financialContextFromPeriodSnapshot,
   resolveActiveMonthlyBudget,
   type ActiveMonthlyBudget,
   type FinancialCycleMeta,
 } from '@web/features/ai/services/chat-context';
+import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
+import { captureServerException } from '@web/lib/sentry-server';
 import {
   getDaysRemainingInCycle,
   getQuotaPeriodEnd,
@@ -34,17 +34,6 @@ const MODEL = 'gpt-4o-mini';
 const RECENT_TRANSACTIONS_LIMIT = 15;
 const CHAT_HISTORY_LIMIT = 20;
 
-type MonthlyTransactionRow = {
-  amount: Decimal;
-  currency: Currency;
-  category: string;
-};
-
-type RecentTransactionRow = MonthlyTransactionRow & {
-  description: string | null;
-  date: Date;
-};
-
 export type { QuotaStatus };
 export { getAiChatQuotaStatus };
 
@@ -53,7 +42,7 @@ function toIsoDate(date: Date): string {
 }
 
 async function fetchFinancialContext(userId: string): Promise<{
-  context: Awaited<ReturnType<typeof aggregateFinancialContext>>;
+  context: ReturnType<typeof financialContextFromPeriodSnapshot>;
   cycleMeta: FinancialCycleMeta;
   activeBudget: ActiveMonthlyBudget | null;
 }> {
@@ -90,21 +79,8 @@ async function fetchFinancialContext(userId: string): Promise<{
     primaryCurrency: user.primaryCurrency,
   });
 
-  const [monthlyTransactions, recentTransactions]: [
-    MonthlyTransactionRow[],
-    RecentTransactionRow[],
-  ] = await Promise.all([
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: cycleStart, lte: cycleEnd },
-      },
-      select: {
-        amount: true,
-        currency: true,
-        category: true,
-      },
-    }),
+  const [periodSnapshot, recentTransactions] = await Promise.all([
+    getOrRefreshPeriodAggregation(userId, now),
     prisma.transaction.findMany({
       where: {
         userId,
@@ -122,13 +98,13 @@ async function fetchFinancialContext(userId: string): Promise<{
     }),
   ]);
 
-  const context = aggregateFinancialContext(
+  if (!periodSnapshot) {
+    throw new Error(CHAT_ERROR_CODES.AI_FAILED);
+  }
+
+  const context = financialContextFromPeriodSnapshot(
     label,
-    monthlyTransactions.map((transaction) => ({
-      amount: transaction.amount.toNumber(),
-      currency: transaction.currency,
-      category: transaction.category,
-    })),
+    periodSnapshot,
     recentTransactions.map((transaction) => ({
       amount: transaction.amount.toNumber(),
       currency: transaction.currency,
@@ -288,6 +264,8 @@ export async function sendChatMessage(
 
     return { reply };
   } catch (error) {
+    captureServerException(error, { scope: 'ai.chat.sendMessage', userId });
+
     if (error instanceof SyntaxError) {
       return { error: CHAT_ERROR_CODES.AI_FAILED };
     }

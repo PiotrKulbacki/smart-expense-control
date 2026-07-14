@@ -7,6 +7,7 @@ import type {
 } from '@shared/features/transactions/schemas';
 import { TRANSACTION_ERROR_CODES } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
+import { invalidateAggregationForTransactionDates } from '@web/features/analytics/services/period-aggregation-cache.service';
 
 export type TransactionDto = {
   id: string;
@@ -116,6 +117,8 @@ export async function createTransaction(
     },
   });
 
+  await invalidateAggregationForTransactionDates(userId, [input.date]);
+
   return toTransactionDto(transaction);
 }
 
@@ -148,6 +151,13 @@ export async function updateTransaction(
     },
   });
 
+  const affectedDates = [existing.date];
+  if (input.date !== undefined) {
+    affectedDates.push(input.date);
+  }
+
+  await invalidateAggregationForTransactionDates(userId, affectedDates);
+
   return toTransactionDto(transaction);
 }
 
@@ -165,5 +175,6 @@ export async function deleteTransaction(userId: string, transactionId: string): 
   }
 
   await prisma.transaction.delete({ where: { id: transactionId } });
+  await invalidateAggregationForTransactionDates(userId, [existing.date]);
   return true;
 }

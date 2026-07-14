@@ -1,4 +1,8 @@
 import type { Locale } from '@shared/features/i18n';
+import type {
+  PeriodAggregationSnapshot,
+  PeriodCategoryTotalRaw,
+} from '@shared/features/analytics/period-aggregation';
 
 export type FinancialContext = {
   currentCycleLabel: string;
@@ -100,6 +104,25 @@ export function aggregateFinancialContext(
     currentCycleLabel: cycleLabel,
     totalSpentThisCycle: Math.round(totalSpentThisCycle * 100) / 100,
     categoryTotals,
+    recentTransactions: recentTransactions.map((transaction) => ({
+      date: transaction.date.toISOString().slice(0, 10),
+      amount: transaction.amount,
+      currency: transaction.currency,
+      category: transaction.category,
+      description: transaction.description,
+    })),
+  };
+}
+
+export function financialContextFromPeriodSnapshot(
+  cycleLabel: string,
+  snapshot: Pick<PeriodAggregationSnapshot, 'totalSpentRaw' | 'categoryTotalsRaw'>,
+  recentTransactions: RecentTransactionSnapshot[]
+): FinancialContext {
+  return {
+    currentCycleLabel: cycleLabel,
+    totalSpentThisCycle: snapshot.totalSpentRaw,
+    categoryTotals: snapshot.categoryTotalsRaw as PeriodCategoryTotalRaw[],
     recentTransactions: recentTransactions.map((transaction) => ({
       date: transaction.date.toISOString().slice(0, 10),
       amount: transaction.amount,

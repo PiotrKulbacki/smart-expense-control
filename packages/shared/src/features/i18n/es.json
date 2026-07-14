@@ -132,8 +132,14 @@
   },
   "api": {
     "errors": {
-      "rateLimitExceeded": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo"
+      "rateLimitExceeded": "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo",
+      "aiDisabled": "Las funciones de IA no están disponibles temporalmente"
     }
+  },
+  "globalError": {
+    "title": "Algo salió mal",
+    "message": "Ocurrió un error inesperado.",
+    "retry": "Intentar de nuevo"
   },
   "chat": {
     "labels": {
@@ -184,6 +190,10 @@
       "terms": "Términos de servicio",
       "privacy": "Política de privacidad",
       "contact": "Contacto"
+    },
+    "aria": {
+      "billingCurrency": "Moneda de pago",
+      "language": "Idioma"
     }
   },
   "landing": {

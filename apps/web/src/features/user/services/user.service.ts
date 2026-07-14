@@ -1,11 +1,12 @@
 import { prisma } from '@smart-expense-control/database';
 import type { UpdateUserInput } from '@shared/features/user/schemas';
 import { toSafeUser, type SafeUser } from '@web/features/auth/types';
+import { clearUserPeriodAggregations } from '@web/features/analytics/services/period-aggregation-cache.service';
 
 export async function updateUser(userId: string, input: UpdateUserInput): Promise<SafeUser> {
   const existing = await prisma.user.findUnique({
     where: { id: userId },
-    select: { defaultMonthlyBudget: true },
+    select: { defaultMonthlyBudget: true, primaryCurrency: true, financialMonthStartDay: true },
   });
 
   const isFirstBudgetSet =
@@ -32,6 +33,17 @@ export async function updateUser(userId: string, input: UpdateUserInput): Promis
       }),
     },
   });
+
+  if (input.primaryCurrency !== undefined && input.primaryCurrency !== existing?.primaryCurrency) {
+    await clearUserPeriodAggregations(userId);
+  }
+
+  if (
+    input.financialMonthStartDay !== undefined &&
+    existing?.financialMonthStartDay !== input.financialMonthStartDay
+  ) {
+    await clearUserPeriodAggregations(userId);
+  }
 
   return toSafeUser(user);
 }
