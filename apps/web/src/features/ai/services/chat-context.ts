@@ -18,6 +18,7 @@ export type FinancialCycleMeta = {
   financialMonthStartDay: number;
   cycleStartIso: string;
   cycleEndIso: string;
+  daysRemainingInCycle: number;
 };
 
 export type ActiveMonthlyBudget = {
@@ -118,6 +119,15 @@ function formatBudgetPromptLine(budget: ActiveMonthlyBudget): string {
   return `User's active monthly budget for the current billing cycle: ${budget.amount} ${budget.currency}. This amount is binding for the current period. ${priorityNote}`;
 }
 
+function formatCycleDaysPromptLine(daysRemainingInCycle: number): string {
+  const lastDayNote =
+    daysRemainingInCycle === 0
+      ? ' Today is the last day of the billing cycle — do not divide by zero when computing daily budget limits; treat the full remaining budget as available for today only.'
+      : '';
+
+  return `Days remaining until the end of the current billing cycle: ${daysRemainingInCycle}. Use this exact number for all "daily limit" or budget forecasting calculations. Do NOT use fixed values such as 30 or 31 days.${lastDayNote}`;
+}
+
 export function buildChatSystemPrompt(
   context: FinancialContext,
   locale: Locale,
@@ -136,6 +146,7 @@ Keep answers concise, practical, and friendly.
 
 Today is ${cycleMeta.todayIso}. User's financial cycle starts on day ${cycleMeta.financialMonthStartDay}.
 Current cycle: ${cycleMeta.cycleStartIso} to ${cycleMeta.cycleEndIso}. Use this range to calculate averages or statistics.
+${formatCycleDaysPromptLine(cycleMeta.daysRemainingInCycle)}
 
 ${budgetSection}Current cycle label: ${context.currentCycleLabel}
 Total spent this cycle (all currencies, not converted): ${context.totalSpentThisCycle}

@@ -23,7 +23,11 @@ import {
   type ActiveMonthlyBudget,
   type FinancialCycleMeta,
 } from '@web/features/ai/services/chat-context';
-import { getQuotaPeriodEnd, getQuotaPeriodStart } from '@shared/features/billing/financial-month';
+import {
+  getDaysRemainingInCycle,
+  getQuotaPeriodEnd,
+  getQuotaPeriodStart,
+} from '@shared/features/billing/financial-month';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MODEL = 'gpt-4o-mini';
@@ -77,6 +81,7 @@ async function fetchFinancialContext(userId: string): Promise<{
     financialMonthStartDay: user.financialMonthStartDay,
     cycleStartIso: toIsoDate(cycleStart),
     cycleEndIso: toIsoDate(cycleEnd),
+    daysRemainingInCycle: getDaysRemainingInCycle(user.financialMonthStartDay, now),
   };
 
   const activeBudget = resolveActiveMonthlyBudget({

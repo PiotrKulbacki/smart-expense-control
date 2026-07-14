@@ -63,6 +63,27 @@ export function getQuotaPeriodEnd(periodStart: Date): Date {
   return end;
 }
 
+function toUtcCalendarDay(date: Date): Date {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+}
+
+function differenceInCalendarDays(laterDate: Date, earlierDate: Date): number {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round(
+    (toUtcCalendarDay(laterDate).getTime() - toUtcCalendarDay(earlierDate).getTime()) / msPerDay
+  );
+}
+
+/** Full calendar days from reference date until cycle end (inclusive of end date as 0). */
+export function getDaysRemainingInCycle(
+  financialMonthStartDay: number,
+  reference: Date = new Date()
+): number {
+  const periodStart = getQuotaPeriodStart(financialMonthStartDay, reference);
+  const periodEnd = getQuotaPeriodEnd(periodStart);
+  return Math.max(0, differenceInCalendarDays(periodEnd, reference));
+}
+
 export function getPreviousQuotaPeriodStart(
   financialMonthStartDay: number,
   reference: Date = new Date()

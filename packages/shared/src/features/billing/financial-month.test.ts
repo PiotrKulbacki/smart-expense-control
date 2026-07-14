@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampFinancialMonthDay,
+  getDaysRemainingInCycle,
   getFinancialMonthStartDayFromDate,
+  getQuotaPeriodEnd,
   getQuotaPeriodStart,
   isPastDueGraceExpired,
   PAST_DUE_GRACE_MS,
@@ -50,5 +52,21 @@ describe('financial-month', () => {
     expect(isPastDueGraceExpired(started, now)).toBe(true);
     expect(isPastDueGraceExpired(new Date(now.getTime() - 1000), now)).toBe(false);
     expect(isPastDueGraceExpired(null, now)).toBe(false);
+  });
+
+  it('calculates days remaining until cycle end', () => {
+    const reference = new Date('2026-07-14T12:00:00Z');
+    const periodStart = getQuotaPeriodStart(12, reference);
+    const periodEnd = getQuotaPeriodEnd(periodStart);
+
+    expect(periodStart.toISOString()).toBe('2026-07-12T00:00:00.000Z');
+    expect(periodEnd.toISOString()).toBe('2026-08-11T23:59:59.999Z');
+    expect(getDaysRemainingInCycle(12, reference)).toBe(28);
+  });
+
+  it('returns 0 on the last day of the billing cycle', () => {
+    const lastDay = new Date('2026-08-11T18:00:00Z');
+
+    expect(getDaysRemainingInCycle(12, lastDay)).toBe(0);
   });
 });

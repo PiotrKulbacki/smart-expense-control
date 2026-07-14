@@ -58,7 +58,8 @@ describe('chat-context', () => {
       todayIso: '2026-07-13',
       financialMonthStartDay: 12,
       cycleStartIso: '2026-07-12',
-      cycleEndIso: '2026-08-12',
+      cycleEndIso: '2026-08-11',
+      daysRemainingInCycle: 29,
     });
 
     expect(context.totalSpentThisCycle).toBe(0);
@@ -78,7 +79,8 @@ describe('chat-context', () => {
       todayIso: '2026-07-13',
       financialMonthStartDay: 12,
       cycleStartIso: '2026-07-12',
-      cycleEndIso: '2026-08-12',
+      cycleEndIso: '2026-08-11',
+      daysRemainingInCycle: 29,
     });
 
     expect(prompt).toContain('"category": "Groceries"');
@@ -135,7 +137,8 @@ describe('chat-context', () => {
         todayIso: '2026-07-13',
         financialMonthStartDay: 12,
         cycleStartIso: '2026-07-12',
-        cycleEndIso: '2026-08-12',
+        cycleEndIso: '2026-08-11',
+        daysRemainingInCycle: 29,
       },
       {
         amount: 2500,
@@ -165,6 +168,7 @@ describe('chat-context', () => {
         financialMonthStartDay: 1,
         cycleStartIso: '2026-07-01',
         cycleEndIso: '2026-07-31',
+        daysRemainingInCycle: 17,
       },
       resolveActiveMonthlyBudget({
         currentMonthBudget: 1800,
@@ -176,5 +180,34 @@ describe('chat-context', () => {
     expect(afterDashboardEdit).toContain('1800 EUR');
     expect(afterDashboardEdit).not.toContain('3000 EUR');
     expect(afterDashboardEdit).toContain('takes priority over general default settings');
+  });
+
+  it('embeds daysRemainingInCycle and forbids fixed 30/31-day assumptions', () => {
+    const context = aggregateFinancialContext('2026-07-12 to 2026-08-11', [], []);
+    const prompt = buildChatSystemPrompt(context, 'pl', {
+      todayIso: '2026-07-14',
+      financialMonthStartDay: 12,
+      cycleStartIso: '2026-07-12',
+      cycleEndIso: '2026-08-11',
+      daysRemainingInCycle: 28,
+    });
+
+    expect(prompt).toContain('Days remaining until the end of the current billing cycle: 28.');
+    expect(prompt).toContain('Do NOT use fixed values such as 30 or 31 days');
+  });
+
+  it('warns AI not to divide by zero on the last cycle day', () => {
+    const context = aggregateFinancialContext('2026-07-12 to 2026-08-11', [], []);
+    const prompt = buildChatSystemPrompt(context, 'pl', {
+      todayIso: '2026-08-11',
+      financialMonthStartDay: 12,
+      cycleStartIso: '2026-07-12',
+      cycleEndIso: '2026-08-11',
+      daysRemainingInCycle: 0,
+    });
+
+    expect(prompt).toContain('Days remaining until the end of the current billing cycle: 0.');
+    expect(prompt).toContain('do not divide by zero');
+    expect(prompt).toContain('last day of the billing cycle');
   });
 });
