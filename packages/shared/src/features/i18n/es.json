@@ -1,4 +1,7 @@
 {
+  "common": {
+    "loading": "Cargando..."
+  },
   "auth": {
     "labels": {
       "email": "Correo electrónico",
@@ -270,6 +273,7 @@
         "pricePln": "0 PLN / mes",
         "priceEur": "0 € / mes",
         "priceGbp": "0 £ / mes",
+        "priceUsd": "0 $ / mes",
         "feature1": "5 escaneos de recibos al mes",
         "feature2": "10 mensajes de chat IA al mes",
         "feature3": "Panel de gastos completo",
@@ -277,6 +281,7 @@
       },
       "pro": {
         "discount": "{{percent}}% de descuento",
+        "promoCodeBadge": "Usa el código {{code}} en el pago para obtener {{percent}}% de descuento!",
         "feature1": "150 escaneos de recibos al mes",
         "feature2": "Chat IA ilimitado",
         "feature3": "Soporte prioritario",

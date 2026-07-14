@@ -7,6 +7,7 @@ import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
 import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { AuthDivider, OAuthGoogleButton } from '@web/features/auth/components/OAuthGoogleButton';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 type AuthFormProps = {
   mode: 'login' | 'register';
@@ -150,8 +151,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         <button
           type="submit"
           disabled={isLoading}
-          className="btn-primary relative z-10 w-full disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+          className="btn-primary relative z-10 inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
         >
+          {isLoading && <LoadingSpinner />}
           {t(mode === 'login' ? 'auth.labels.login' : 'auth.labels.register')}
         </button>
       </form>

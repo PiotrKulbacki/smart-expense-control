@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import type { ChatMessage } from '@shared/features/ai/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 const HISTORY_PAGE_SIZE = 30;
 
@@ -459,9 +460,9 @@ export function AiChatView() {
             <button
               type="submit"
               disabled={isSending || isBlocked || !input.trim()}
-              className="btn-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
-              <Send className="h-4 w-4" aria-hidden />
+              {isSending ? <LoadingSpinner /> : <Send className="h-4 w-4" aria-hidden />}
               {t('chat.labels.sendMessage')}
             </button>
           </div>

@@ -1,4 +1,7 @@
 {
+  "common": {
+    "loading": "Wird geladen..."
+  },
   "auth": {
     "labels": {
       "email": "E-Mail",
@@ -270,6 +273,7 @@
         "pricePln": "0 PLN / Monat",
         "priceEur": "0 € / Monat",
         "priceGbp": "0 £ / Monat",
+        "priceUsd": "0 $ / Monat",
         "feature1": "5 Belegscans pro Monat",
         "feature2": "10 KI-Chat-Nachrichten pro Monat",
         "feature3": "Vollständiges Ausgaben-Dashboard",
@@ -277,6 +281,7 @@
       },
       "pro": {
         "discount": "{{percent}}% Rabatt",
+        "promoCodeBadge": "Code {{code}} an der Kasse eingeben für {{percent}}% Rabatt!",
         "feature1": "150 Belegscans pro Monat",
         "feature2": "Unbegrenzter KI-Chat",
         "feature3": "Prioritäts-Support",

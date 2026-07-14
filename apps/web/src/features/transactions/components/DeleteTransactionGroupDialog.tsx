@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@web/components/ui/alert-dialog';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 type DeleteTransactionGroupDialogProps = {
   receiptGroupId: string | null;
@@ -74,12 +75,13 @@ export function DeleteTransactionGroupDialog({
           <AlertDialogCancel disabled={isDeleting}>{t('dashboard.form.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700 focus-visible:ring-red-500"
+            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 focus-visible:ring-red-500"
             onClick={(event) => {
               event.preventDefault();
               void handleDelete();
             }}
           >
+            {isDeleting && <LoadingSpinner />}
             {t('transactions.labels.deleteTransaction')}
           </AlertDialogAction>
         </AlertDialogFooter>

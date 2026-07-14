@@ -24,6 +24,7 @@ import {
   useCategories,
 } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import {
   getCategoryColor,
   resolveCategoryLabel,
@@ -324,6 +325,7 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
             <Button
               type="button"
               className="w-full"
+              loading={isSaving}
               disabled={isSaving}
               onClick={() => void handleSaveCategory()}
             >
@@ -378,11 +380,13 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isDeleting || (deleteTransactionCount > 0 && !migrateToCategory)}
+              className="inline-flex items-center gap-2"
               onClick={(event) => {
                 event.preventDefault();
                 void handleDeleteCategory();
               }}
             >
+              {isDeleting && <LoadingSpinner />}
               {t('settings.categories.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>

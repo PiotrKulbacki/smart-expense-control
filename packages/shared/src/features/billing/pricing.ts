@@ -1,24 +1,20 @@
 import type { BillingCurrency } from './checkout';
 
-export const FEATURE_FLAG_PRO_PROMO_PRICING = 'pro-promo-pricing';
+export const PRO_PROMO_CODE = 'PROMO50';
+export const PRO_PROMO_DISCOUNT_PERCENT = 50;
 
 export const PRO_SUBSCRIPTION_PRICES = {
   regular: {
-    PLN: 25,
-    EUR: 6,
-    GBP: 4.5,
+    PLN: 34,
+    EUR: 8,
+    GBP: 6.5,
+    USD: 9,
   },
-  promo: {
-    PLN: 12,
-    EUR: 4,
-    GBP: 3,
-  },
-} as const satisfies Record<'regular' | 'promo', Record<BillingCurrency, number>>;
+} as const satisfies Record<'regular', Record<BillingCurrency, number>>;
 
-export function getProDiscountPercent(currency: BillingCurrency): number {
+export function getProPromoPrice(currency: BillingCurrency): number {
   const regular = PRO_SUBSCRIPTION_PRICES.regular[currency];
-  const promo = PRO_SUBSCRIPTION_PRICES.promo[currency];
-  return Math.round(((regular - promo) / regular) * 100);
+  return Math.round(regular * (1 - PRO_PROMO_DISCOUNT_PERCENT / 100) * 100) / 100;
 }
 
 export function formatProSubscriptionPrice(

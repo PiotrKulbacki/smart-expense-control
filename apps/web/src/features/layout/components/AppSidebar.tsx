@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LocaleSwitcher } from '@web/features/layout/components/LocaleSwitcher';
 import { isAiEnabledOnClient } from '@web/lib/ai-feature';
@@ -27,8 +29,12 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   const router = useRouter();
   const t = useT();
   const { locale } = useLocale();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
 
   async function handleLogout() {
+    setIsLoggingOut(true);
+
     try {
       const response = await fetch('/api/auth/logout', { method: 'POST' });
       if (!response.ok) {
@@ -41,10 +47,14 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
       router.refresh();
     } catch {
       toast.error(t('auth.errors.networkError'));
+    } finally {
+      setIsLoggingOut(false);
     }
   }
 
   async function handleManageSubscription() {
+    setIsPortalLoading(true);
+
     try {
       const response = await fetch('/api/billing/portal', { method: 'POST' });
       const data = (await response.json()) as { url?: string; error?: string };
@@ -57,6 +67,8 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
       window.location.href = data.url;
     } catch {
       toast.error(t('auth.errors.networkError'));
+    } finally {
+      setIsPortalLoading(false);
     }
   }
 
@@ -125,18 +137,22 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
         {userPlan === 'PRO' && (
           <button
             type="button"
-            onClick={handleManageSubscription}
-            className="btn-ghost mb-2 w-full"
+            disabled={isPortalLoading || isLoggingOut}
+            onClick={() => void handleManageSubscription()}
+            className="btn-ghost mb-2 inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
+            {isPortalLoading && <LoadingSpinner />}
             {t('billing.labels.manageSubscription')}
           </button>
         )}
 
         <button
           type="button"
-          onClick={handleLogout}
-          className="text-glow hover:bg-glow/10 w-full rounded-lg px-3 py-2 font-mono text-sm transition"
+          disabled={isLoggingOut || isPortalLoading}
+          onClick={() => void handleLogout()}
+          className="text-glow hover:bg-glow/10 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 font-mono text-sm transition disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {isLoggingOut && <LoadingSpinner />}
           {t('auth.labels.logout')}
         </button>
       </div>

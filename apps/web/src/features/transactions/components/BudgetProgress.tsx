@@ -137,6 +137,7 @@ export function BudgetProgress({
               type="button"
               size="default"
               className="mt-3 w-full"
+              loading={isSaving}
               disabled={isSaving}
               onClick={() => void handleSave()}
             >

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const BILLING_CURRENCIES = ['PLN', 'EUR', 'GBP'] as const;
+export const BILLING_CURRENCIES = ['PLN', 'EUR', 'GBP', 'USD'] as const;
 
 export type BillingCurrency = (typeof BILLING_CURRENCIES)[number];
 

@@ -14,6 +14,7 @@ const FREE_PRICE_KEYS: Record<BillingCurrency, string> = {
   PLN: 'landing.pricing.free.pricePln',
   EUR: 'landing.pricing.free.priceEur',
   GBP: 'landing.pricing.free.priceGbp',
+  USD: 'landing.pricing.free.priceUsd',
 };
 
 export function LandingPage() {

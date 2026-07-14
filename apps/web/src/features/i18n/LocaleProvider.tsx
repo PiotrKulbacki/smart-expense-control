@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_LOCALE, isLocale, t as translate, type Locale } from '@shared/features/i18n';
 
 const LOCALE_COOKIE = 'sec_locale';
@@ -41,11 +33,7 @@ function writeLocaleCookie(locale: Locale): void {
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
-
-  useEffect(() => {
-    setLocaleState(readLocaleCookie());
-  }, []);
+  const [locale, setLocaleState] = useState<Locale>(() => readLocaleCookie());
 
   const setLocale = useCallback((nextLocale: Locale) => {
     setLocaleState(nextLocale);

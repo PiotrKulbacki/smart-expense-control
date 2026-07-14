@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
@@ -15,6 +15,7 @@ import {
   readStoredBillingCurrency,
 } from '@web/features/billing/components/BillingCurrencySwitcher';
 import { ProPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { RecurringExpensesSection } from '@web/features/settings/components/RecurringExpensesSection';
 import { CategoriesSection } from '@web/features/settings/components/CategoriesSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
@@ -35,15 +36,24 @@ export function SettingsView() {
   const [isBillingLoading, setIsBillingLoading] = useState(false);
   const [checkoutCurrency, setCheckoutCurrency] = useState<BillingCurrency>('PLN');
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const checkoutToastShown = useRef(false);
 
   useEffect(() => {
     const checkout = searchParams.get('checkout');
+    if (!checkout || checkoutToastShown.current) {
+      return;
+    }
+
+    checkoutToastShown.current = true;
+
     if (checkout === 'success') {
       toast.success(t('billing.success.upgraded'));
     } else if (checkout === 'cancel') {
       toast.error(t('billing.errors.checkoutCancelled'));
     }
-  }, [searchParams, t]);
+
+    router.replace('/settings', { scroll: false });
+  }, [searchParams, t, router]);
 
   useEffect(() => {
     async function loadUser() {
@@ -273,8 +283,9 @@ export function SettingsView() {
           <button
             type="submit"
             disabled={isSaving}
-            className="btn-primary relative z-10 mt-6 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            className="btn-primary relative z-10 mt-6 inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
           >
+            {isSaving && <LoadingSpinner />}
             {t('settings.labels.saveChanges')}
           </button>
         </section>
@@ -310,8 +321,9 @@ export function SettingsView() {
               type="button"
               disabled={isBillingLoading}
               onClick={() => void handleUpgrade()}
-              className="btn-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
+              {isBillingLoading && <LoadingSpinner />}
               {t('billing.labels.upgradeToPro')}
             </button>
           ) : (
@@ -319,8 +331,9 @@ export function SettingsView() {
               type="button"
               disabled={isBillingLoading}
               onClick={() => void handleManageSubscription()}
-              className="btn-ghost disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-ghost inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {isBillingLoading && <LoadingSpinner />}
               {t('billing.labels.manageSubscription')}
             </button>
           )}
@@ -348,8 +361,9 @@ export function SettingsView() {
           type="button"
           disabled={isDeleting}
           onClick={() => void handleDeleteAccount()}
-          className="bg-glow text-void hover:bg-glow/90 relative z-10 mt-4 rounded-xl px-4 py-2.5 font-mono text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-glow text-void hover:bg-glow/90 relative z-10 mt-4 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-mono text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {isDeleting && <LoadingSpinner />}
           {t('settings.danger.deleteAccount')}
         </button>
       </section>

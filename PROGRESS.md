@@ -23,6 +23,7 @@
 19. **Faza 9.1: interaktywny split, klasyfikacja AI, grupowanie w Historii** — [✅ Zrobione]
 20. **Faza 9.2: dynamiczne kategorie, ustawienia, scroll pulpitu, grupowanie historii** — [✅ Zrobione]
 21. **Faza 9.3: persystencja zdjęć (Supabase Storage) i archiwum dokumentów** — [✅ Zrobione]
+22. **Faza 9.4: cennik PRO, waluta USD, kampania PROMO50 (Stripe)** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -49,6 +50,22 @@ Każdy agent AI **musi** wykonać poniższe kroki przed zakończeniem sesji, je�
 **Nie pomijaj tego kroku.** Brak formatowania powoduje fail joba `format` w GitHub Actions (`prettier --check .`).
 
 ## Latest Handoff Log
+
+**2026-07-14 — Faza 9.4 zamknięta: nowy cennik PRO, waluta USD, integracja kodu promocyjnego PROMO50 (Stripe).**
+
+### Faza 9.4 — Cennik PRO, USD, kampania PROMO50
+
+- **Cennik UI:** bazowe ceny PRO — 34 PLN, 8 EUR, 6.5 GBP, 9 USD; podgląd ceny promocyjnej (−50%) z badge „Użyj kodu PROMO50 przy kasie".
+- **Waluta USD:** dodana do `BILLING_CURRENCIES`, switchera walut płatności, mapowania Stripe Price ID (`STRIPE_PRO_PRICE_USD`).
+- **Stripe Checkout:** `allow_promotion_codes: true` — użytkownik wpisuje `PROMO50` na stronie Stripe; ceny bazowe w Stripe = ceny regularne w UI.
+- **Strategia rabatu:** natywne Stripe Coupons + Promotion Codes (nie osobne Price ID promocyjne) — jeden kupon procentowy 50% na wszystkie waluty.
+- **Env:** `STRIPE_PRO_PRICE_USD` w `.env.example`, `apps/web/src/env.ts`, `turbo.json`.
+- **i18n:** `landing.pricing.free.priceUsd`, `landing.pricing.pro.promoCodeBadge` (en/pl/de/es).
+- **Testy:** `pricing.test.ts` — weryfikacja cen bazowych i obliczeń promo 50%.
+
+**Deploy Stripe (Test mode):** utwórz 4 ceny bazowe (PLN/EUR/GBP/USD) → kupon 50% off → promotion code `PROMO50` → skopiuj Price ID do env.
+
+---
 
 **2026-07-14 — Faza 9.3 zamknięta: Supabase Storage dla paragonów, archiwum dokumentów w Skanerze, garbage collector.**
 

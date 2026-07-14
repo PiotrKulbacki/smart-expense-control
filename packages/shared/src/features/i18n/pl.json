@@ -1,4 +1,7 @@
 {
+  "common": {
+    "loading": "Ładowanie..."
+  },
   "auth": {
     "labels": {
       "email": "E-mail",
@@ -272,6 +275,7 @@
         "pricePln": "0 zł / miesiąc",
         "priceEur": "0 € / miesiąc",
         "priceGbp": "0 £ / miesiąc",
+        "priceUsd": "0 $ / miesiąc",
         "feature1": "5 skanów paragonów miesięcznie",
         "feature2": "10 wiadomości czatu AI miesięcznie",
         "feature3": "Pełny dashboard wydatków",
@@ -279,6 +283,7 @@
       },
       "pro": {
         "discount": "{{percent}}% taniej",
+        "promoCodeBadge": "Użyj kodu {{code}} przy kasie, aby zyskać {{percent}}% zniżki!",
         "feature1": "150 skanów paragonów miesięcznie",
         "feature2": "Nielimitowany czat AI",
         "feature3": "Priorytetowe wsparcie",

@@ -21,6 +21,7 @@ import {
   SheetTitle,
 } from '@web/components/ui/sheet';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { useMediaQuery } from '@web/features/transactions/hooks/useMediaQuery';
 
 type EditTransactionGroupDialogProps = {
@@ -86,8 +87,9 @@ function EditGroupForm({
           type="button"
           disabled={isSaving}
           onClick={onSave}
-          className="btn-primary disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {isSaving && <LoadingSpinner />}
           {t('transactions.labels.saveTransaction')}
         </button>
       </div>

@@ -17,6 +17,7 @@ import {
   type ReceiptSplitSuggestion,
 } from '@shared/features/transactions/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { CategorySelectWithCreate } from '@web/features/scanner/components/CategorySelectWithCreate';
 import { ReceiptArchive } from '@web/features/scanner/components/ReceiptArchive';
 import { compressReceiptImage } from '@web/features/scanner/lib/compress-receipt-image';
@@ -438,8 +439,9 @@ export function ReceiptScanner() {
                 type="button"
                 disabled={isScanning || isBlocked}
                 onClick={() => fileInputRef.current?.click()}
-                className="btn-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
               >
+                {isScanning && <LoadingSpinner />}
                 {isScanning ? t('scanner.status.analyzing') : t('scanner.labels.chooseFile')}
               </button>
               {isBlocked && (
@@ -699,8 +701,9 @@ export function ReceiptScanner() {
               type="button"
               disabled={isSaving || !canSaveSplit}
               onClick={() => void handleSave()}
-              className="btn-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
+              {isSaving && <LoadingSpinner />}
               {t('transactions.labels.saveTransaction')}
             </button>
             <button

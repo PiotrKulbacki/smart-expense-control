@@ -1,4 +1,7 @@
 {
+  "common": {
+    "loading": "Loading..."
+  },
   "auth": {
     "labels": {
       "email": "Email",
@@ -270,6 +273,7 @@
         "pricePln": "0 PLN / month",
         "priceEur": "€0 / month",
         "priceGbp": "£0 / month",
+        "priceUsd": "$0 / month",
         "feature1": "5 receipt scans per month",
         "feature2": "10 AI chat messages per month",
         "feature3": "Full expense dashboard",
@@ -277,6 +281,7 @@
       },
       "pro": {
         "discount": "{{percent}}% off",
+        "promoCodeBadge": "Use code {{code}} at checkout for {{percent}}% off!",
         "feature1": "150 receipt scans per month",
         "feature2": "Unlimited AI chat",
         "feature3": "Priority support",

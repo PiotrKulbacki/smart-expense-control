@@ -16,6 +16,7 @@ import {
 } from '@web/components/ui/dropdown-menu';
 import { Input } from '@web/components/ui/input';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 type RecurringExpenseItem = {
   id: string;
@@ -43,6 +44,7 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
   const [rateMap, setRateMap] = useState<ExchangeRateMap>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState<CurrencyCode>(primaryCurrency);
@@ -157,6 +159,8 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
   }
 
   async function handleDelete(expenseId: string) {
+    setDeletingId(expenseId);
+
     try {
       const response = await fetch(`/api/recurring-expenses/${expenseId}`, {
         method: 'DELETE',
@@ -173,6 +177,8 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
       await loadExpenses();
     } catch {
       toast.error(t('auth.errors.networkError'));
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -230,7 +236,12 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
             </option>
           ))}
         </select>
-        <Button type="submit" disabled={isSaving} className="sm:col-span-4 sm:w-auto">
+        <Button
+          type="submit"
+          loading={isSaving}
+          disabled={isSaving}
+          className="sm:col-span-4 sm:w-auto"
+        >
           <Plus className="h-4 w-4" />
           {t('settings.recurring.add')}
         </Button>
@@ -267,9 +278,14 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
                     className="text-glow focus:bg-glow/10 focus:text-glow"
+                    disabled={deletingId === expense.id}
                     onClick={() => void handleDelete(expense.id)}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    {deletingId === expense.id ? (
+                      <LoadingSpinner className="mr-2 h-4 w-4" />
+                    ) : (
+                      <Trash2 className="mr-2 h-4 w-4" />
+                    )}
                     {t('transactions.labels.deleteTransaction')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>

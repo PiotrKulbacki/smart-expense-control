@@ -9,6 +9,7 @@ import {
   useCategories,
 } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 const CREATE_CATEGORY_VALUE = '__create_category__';
 
@@ -82,8 +83,9 @@ export function CategorySelectWithCreate({
           type="button"
           disabled={disabled || isSubmitting || !newCategoryName.trim()}
           onClick={() => void handleCreateCategory()}
-          className="btn-primary px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn-primary inline-flex items-center justify-center gap-2 px-3 py-2 text-xs disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {isSubmitting && <LoadingSpinner className="h-3.5 w-3.5" />}
           {t('scanner.split.createCategorySubmit')}
         </button>
         <button

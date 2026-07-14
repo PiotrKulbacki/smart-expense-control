@@ -19,6 +19,7 @@ function getConfiguredStripeProPrices(): Record<BillingCurrency, string | undefi
     PLN: env.STRIPE_PRO_PRICE_PLN,
     EUR: env.STRIPE_PRO_PRICE_EUR,
     GBP: env.STRIPE_PRO_PRICE_GBP,
+    USD: env.STRIPE_PRO_PRICE_USD,
   };
 }
 
@@ -41,6 +42,7 @@ export async function createCheckoutSession(params: {
       ? { customer: params.stripeCustomerId }
       : { customer_email: params.email }),
     line_items: [{ price: priceId, quantity: 1 }],
+    allow_promotion_codes: true,
     success_url: `${env.NEXT_PUBLIC_APP_URL}/settings?checkout=success`,
     cancel_url: `${env.NEXT_PUBLIC_APP_URL}/settings?checkout=cancel`,
     metadata: { userId: params.userId, checkoutCurrency: params.currency },
