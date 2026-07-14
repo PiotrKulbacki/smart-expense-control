@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { translateError } from '@shared/features/i18n';
 import {
   transactionFormSchema,
-  toCalendarDateInputValue,
   toLocalDateInputValue,
   type CurrencyCode,
   type TransactionFormInput,
@@ -31,10 +30,6 @@ type TransactionFormProps = {
   onSuccess: () => void;
   onCancel: () => void;
 };
-
-function toDateInputValue(date: Date): string {
-  return toCalendarDateInputValue(date);
-}
 
 export function TransactionForm({
   primaryCurrency,

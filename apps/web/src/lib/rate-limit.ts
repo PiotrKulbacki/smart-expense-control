@@ -10,7 +10,7 @@ const AI_RATE_LIMIT_MAX: Record<AiRateLimitScope, number> = {
   chat: 30,
 };
 
-function shouldFailOpenWithoutRedis(_scope: AiRateLimitScope): boolean {
+function shouldFailOpenWithoutRedis(): boolean {
   return true;
 }
 
@@ -110,7 +110,7 @@ export async function checkAiRateLimit(
   const limiter = getAiRateLimiter(scope);
 
   if (!limiter) {
-    const failOpen = shouldFailOpenWithoutRedis(scope);
+    const failOpen = shouldFailOpenWithoutRedis();
 
     if (isStrictProduction() && !failOpen) {
       console.log(
@@ -138,7 +138,7 @@ export async function checkAiRateLimit(
       key,
     };
   } catch {
-    const failOpen = shouldFailOpenWithoutRedis(scope);
+    const failOpen = shouldFailOpenWithoutRedis();
 
     if (isStrictProduction() && !failOpen) {
       console.log(

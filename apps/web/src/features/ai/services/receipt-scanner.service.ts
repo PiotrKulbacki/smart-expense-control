@@ -13,10 +13,7 @@ import {
   type ReceiptScanResult,
 } from '@shared/features/transactions/schemas';
 import { env } from '@web/env';
-import {
-  normalizeReceiptSuggestedSplits,
-  resolveReceiptSplitDraft,
-} from '@web/features/ai/services/receipt-scan-splits';
+import { resolveReceiptSplitDraft } from '@web/features/ai/services/receipt-scan-splits';
 import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import { captureServerException } from '@web/lib/sentry-server';

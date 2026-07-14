@@ -67,6 +67,17 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
     [colorMap, nameMap]
   );
 
+  const customCategories = useMemo(
+    () => categories.filter((category) => category.isCustom),
+    [categories]
+  );
+  const systemCategories = useMemo(
+    () => categories.filter((category) => !category.isCustom),
+    [categories]
+  );
+
+  const migrationOptions = categories.filter((item) => item.key !== deleteTarget?.key);
+
   function openCreateForm() {
     setEditingCategory(null);
     setName('');
@@ -181,17 +192,6 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
   if (isLoading) {
     return <div className="bg-elevated h-48 animate-pulse rounded-2xl" />;
   }
-
-  const customCategories = useMemo(
-    () => categories.filter((category) => category.isCustom),
-    [categories]
-  );
-  const systemCategories = useMemo(
-    () => categories.filter((category) => !category.isCustom),
-    [categories]
-  );
-
-  const migrationOptions = categories.filter((item) => item.key !== deleteTarget?.key);
 
   return (
     <>
