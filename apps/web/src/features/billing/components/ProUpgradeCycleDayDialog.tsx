@@ -77,10 +77,7 @@ export function ProUpgradeCycleDayDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
-        onEscapeKeyDown={(event) => event.preventDefault()}
-        onPointerDownOutside={(event) => event.preventDefault()}
-      >
+      <AlertDialogContent onEscapeKeyDown={(event) => event.preventDefault()}>
         <AlertDialogHeader>
           <AlertDialogTitle>{t('billing.cycleDayModal.title')}</AlertDialogTitle>
           <AlertDialogDescription>
