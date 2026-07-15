@@ -26,4 +26,5 @@ export type {
   Plan,
   Currency,
   Frequency,
+  AiInsight,
 } from '@prisma/client';

@@ -30,3 +30,17 @@ export const chatResponseSchema = z.object({
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
+
+export const INSIGHT_ERROR_CODES = {
+  AI_FAILED: 'dashboard.insights.errors.aiFailed',
+  GENERATION_FAILED: 'dashboard.insights.errors.generationFailed',
+} as const;
+
+export const insightSchema = z.object({
+  type: z.enum(['success', 'warning', 'anomaly', 'tip']),
+  metric: z.string().min(1).max(120),
+  message: z.string().min(1).max(400),
+  actionableStep: z.string().max(240).optional(),
+});
+
+export type AiInsightContent = z.infer<typeof insightSchema>;

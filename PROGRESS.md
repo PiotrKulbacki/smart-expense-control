@@ -25,6 +25,7 @@
 21. **Faza 9.3: persystencja zdjęć (Supabase Storage) i archiwum dokumentów** — [✅ Zrobione]
 22. **Faza 9.4: cennik PRO, waluta USD, kampania PROMO50 (Stripe)** — [✅ Zrobione]
 23. **Faza 9.5: refaktoryzacja UI Archiwum, audyt modelu AI, poprawa dokładności skanera** — [✅ Zrobione]
+24. **Faza 9.6: metryka „Dni bez wydatków" i AI Insights na Dashboardzie** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -51,6 +52,20 @@ Każdy agent AI **musi** wykonać poniższe kroki przed zakończeniem sesji, je�
 **Nie pomijaj tego kroku.** Brak formatowania powoduje fail joba `format` w GitHub Actions (`prettier --check .`).
 
 ## Latest Handoff Log
+
+**2026-07-16 — Faza 9.6 zamknięta: metryka „Dni bez wydatków" oraz AI Insights na Dashboardzie.**
+
+### Faza 9.6 — No-Spend Days + AI Insights
+
+- **DB:** model `AiInsight` (cache spostrzeżeń per user, `content` JSON, TTL 24h po `updatedAt`); migracja `20260716000000_add_ai_insight`.
+- **No-Spend Days:** `computeNoSpendDays()` liczy dni bez transakcji w okresie rozliczeniowym (koszty stałe z `RecurringExpense` pomijane); wynik w `summary.noSpendDays` z `GET /api/dashboard` (format `X / Y`).
+- **API:** `GET /api/dashboard/insights?locale=&force=` — cache 24h, regeneracja przez OpenAI (`gpt-4o-mini`, `response_format: json_object`), walidacja Zod (`insightSchema`: type/metric/message/actionableStep); force-refresh z rate limitem.
+- **Kontekst AI:** wydatki wg kategorii, budżet/pozostało, no-spend days, 10 ostatnich transakcji + dynamiczna data serwera w prompcie.
+- **UI:** karta transakcji → układ 2-kolumnowy (`TransactionsInsightsCard`): lewa — licznik + no-spend; prawa — boks spostrzeżenia (kolory wg `type`) + przycisk odśwież; skeletony `animate-pulse`.
+- **i18n:** `dashboard.noSpendDays.*`, `dashboard.insights.*` (en/pl/de/es).
+- **Testy:** `no-spend-days.test.ts`.
+
+---
 
 **2026-07-15 — Faza 9.5 zamknięta: refaktoryzacja UI Archiwum, audyt modelu AI Vision, poprawa dokładności skanera (Lidl receipt bugfix).**
 

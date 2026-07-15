@@ -1,6 +1,6 @@
 import { endOfDay, startOfDay } from 'date-fns';
 import { prisma } from '@smart-expense-control/database';
-import { getQuotaPeriodStart } from '@shared/features/billing/financial-month';
+import { getQuotaPeriodEnd, getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
 import { getInclusiveTransactionPeriodEnd } from '@shared/features/transactions/calendar-date';
 import { FIXED_COSTS_CATEGORY } from '@shared/features/transactions/fixed-costs';
@@ -8,6 +8,10 @@ import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
 import { getChartDataFetchStart } from '@web/features/transactions/lib/chart-date-filter';
 import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
+import {
+  computeNoSpendDays,
+  type NoSpendDaysResult,
+} from '@web/features/dashboard/lib/no-spend-days';
 
 export type DashboardTransaction = {
   id: string;
@@ -39,6 +43,7 @@ export type DashboardSummary = {
   categoryTotals: Array<{ category: string; amount: number }>;
   currentMonthBudget: number | null;
   defaultMonthlyBudget: number | null;
+  noSpendDays: NoSpendDaysResult;
 };
 
 export type DashboardData = {
@@ -142,8 +147,9 @@ export async function getDashboardData(
   }
 
   const now = new Date();
-  const defaultPeriodStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
-  const periodStart = dateRange.from ? startOfDay(dateRange.from) : defaultPeriodStart;
+  const billingPeriodStart = getQuotaPeriodStart(user.financialMonthStartDay, now);
+  const billingPeriodEnd = getQuotaPeriodEnd(billingPeriodStart);
+  const periodStart = dateRange.from ? startOfDay(dateRange.from) : billingPeriodStart;
   const periodEnd = dateRange.to ? endOfDay(dateRange.to) : getInclusiveTransactionPeriodEnd(now);
   const chartDataStart = getChartDataFetchStart(periodStart, periodEnd);
   const primaryCurrency = user.primaryCurrency as CurrencyCode;
@@ -156,6 +162,7 @@ export async function getDashboardData(
     recentTransactions,
     fixedCostsTotal,
     cachedPeriodAggregation,
+    noSpendSourceTransactions,
   ] = await Promise.all([
     usesDefaultPeriod
       ? Promise.resolve([])
@@ -201,7 +208,22 @@ export async function getDashboardData(
     }),
     usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
     getOrRefreshPeriodAggregation(userId, now),
+    // Always scoped to the payday billing cycle from settings — never calendar month / chart filter.
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        date: { gte: billingPeriodStart, lte: billingPeriodEnd },
+      },
+      select: { date: true },
+    }),
   ]);
+
+  const noSpendDays = computeNoSpendDays({
+    periodStart: billingPeriodStart,
+    periodEnd: billingPeriodEnd,
+    transactionDates: noSpendSourceTransactions.map((transaction) => transaction.date),
+    now,
+  });
 
   const billingPeriodTotalSpent =
     cachedPeriodAggregation != null
@@ -305,6 +327,7 @@ export async function getDashboardData(
       categoryTotals,
       currentMonthBudget: user.currentMonthBudget,
       defaultMonthlyBudget: user.defaultMonthlyBudget,
+      noSpendDays,
     },
     recentTransactions: mappedRecentTransactions,
     chartTransactions,

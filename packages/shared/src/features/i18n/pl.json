@@ -304,6 +304,20 @@
       "totalSpent": "Suma wydatków",
       "transactions": "Transakcje"
     },
+    "noSpendDays": {
+      "title": "Dni bez wydatków",
+      "value": "{{noSpend}} / {{total}} dni"
+    },
+    "insights": {
+      "title": "Spostrzeżenia AI",
+      "refresh": "Odśwież spostrzeżenie",
+      "empty": "Spostrzeżenie jest chwilowo niedostępne. Spróbuj odświeżyć za chwilę.",
+      "actionablePrefix": "Wskazówka:",
+      "errors": {
+        "aiFailed": "Nie udało się wygenerować spostrzeżenia AI. Spróbuj ponownie",
+        "generationFailed": "Spostrzeżenie AI było niepełne. Odśwież i spróbuj ponownie"
+      }
+    },
     "categories": {
       "title": "Wydatki wg kategorii",
       "fixedCosts": "Koszty stałe"

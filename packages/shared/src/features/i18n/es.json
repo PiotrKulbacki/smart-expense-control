@@ -302,6 +302,20 @@
       "totalSpent": "Suma de gastos",
       "transactions": "Transacciones"
     },
+    "noSpendDays": {
+      "title": "Días sin gastos",
+      "value": "{{noSpend}} / {{total}} días"
+    },
+    "insights": {
+      "title": "Ideas de IA",
+      "refresh": "Actualizar idea",
+      "empty": "La idea no está disponible ahora. Intenta actualizar en un momento.",
+      "actionablePrefix": "Consejo:",
+      "errors": {
+        "aiFailed": "No se pudo generar la idea de IA. Inténtalo de nuevo",
+        "generationFailed": "La idea de IA estaba incompleta. Actualiza e inténtalo de nuevo"
+      }
+    },
     "categories": {
       "title": "Gastos por categoría",
       "fixedCosts": "Gastos fijos"

@@ -302,6 +302,20 @@
       "totalSpent": "Total spending",
       "transactions": "Transactions"
     },
+    "noSpendDays": {
+      "title": "No-spend days",
+      "value": "{{noSpend}} / {{total}} days"
+    },
+    "insights": {
+      "title": "AI insights",
+      "refresh": "Refresh insight",
+      "empty": "Insight unavailable right now. Try refreshing in a moment.",
+      "actionablePrefix": "Tip:",
+      "errors": {
+        "aiFailed": "Could not generate AI insight. Please try again",
+        "generationFailed": "AI insight was incomplete. Please refresh"
+      }
+    },
     "categories": {
       "title": "Spending by category",
       "fixedCosts": "Fixed costs"

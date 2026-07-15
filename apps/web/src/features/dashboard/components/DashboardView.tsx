@@ -30,6 +30,7 @@ import {
   type ChartTransaction,
 } from '@web/features/transactions/lib/chart-date-filter';
 import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
+import { TransactionsInsightsCard } from '@web/features/dashboard/components/TransactionsInsightsCard';
 
 type DashboardSummary = {
   primaryCurrency: CurrencyCode;
@@ -41,6 +42,11 @@ type DashboardSummary = {
   transactionCount: number;
   categoryTotals: Array<{ category: string; amount: number }>;
   currentMonthBudget: number | null;
+  noSpendDays?: {
+    noSpendDays: number;
+    totalDays: number;
+    ratio: string;
+  };
 };
 
 type ScanQuota = {
@@ -344,8 +350,8 @@ export function DashboardView() {
         <div className="bg-elevated h-10 w-48 animate-pulse rounded-lg" />
         <div className="bg-elevated h-10 w-72 animate-pulse rounded-lg" />
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="bg-elevated h-32 animate-pulse rounded-2xl" />
-          <div className="bg-elevated h-32 animate-pulse rounded-2xl" />
+          <div className="bg-elevated h-48 animate-pulse rounded-2xl" />
+          <div className="bg-elevated h-48 animate-pulse rounded-2xl" />
         </div>
         <div className="bg-elevated h-64 animate-pulse rounded-2xl" />
         <div className="bg-elevated h-72 animate-pulse rounded-2xl" />
@@ -369,8 +375,8 @@ export function DashboardView() {
         <DashboardCtas onAddManual={openCreateForm} scanQuota={scanQuota} plan={userPlan} />
       </div>
 
-      <section className="grid gap-4 sm:grid-cols-2">
-        <article className="panel relative z-10 p-6">
+      <section className="grid items-stretch gap-4 sm:grid-cols-2">
+        <article className="panel relative z-10 h-full p-6">
           <p className="text-muted relative z-10 text-sm font-medium">
             {t('dashboard.summary.totalSpent')}
           </p>
@@ -388,14 +394,10 @@ export function DashboardView() {
             />
           )}
         </article>
-        <article className="panel relative z-10 p-6">
-          <p className="text-muted relative z-10 text-sm font-medium">
-            {t('dashboard.summary.transactions')}
-          </p>
-          <p className="font-display relative z-10 mt-2 text-3xl font-bold text-[var(--text)]">
-            {displayedTransactionCount}
-          </p>
-        </article>
+        <TransactionsInsightsCard
+          transactionCount={displayedTransactionCount}
+          noSpendDays={summary.noSpendDays ?? null}
+        />
       </section>
 
       <CategoryDonutChart

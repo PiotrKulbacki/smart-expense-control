@@ -302,6 +302,20 @@
       "totalSpent": "Ausgabensumme",
       "transactions": "Transaktionen"
     },
+    "noSpendDays": {
+      "title": "Tage ohne Ausgaben",
+      "value": "{{noSpend}} / {{total}} Tage"
+    },
+    "insights": {
+      "title": "KI-Einblicke",
+      "refresh": "Einblick aktualisieren",
+      "empty": "Einblick derzeit nicht verfügbar. Bitte gleich erneut aktualisieren.",
+      "actionablePrefix": "Tipp:",
+      "errors": {
+        "aiFailed": "KI-Einblick konnte nicht erzeugt werden. Bitte erneut versuchen",
+        "generationFailed": "KI-Einblick war unvollständig. Bitte aktualisieren"
+      }
+    },
     "categories": {
       "title": "Ausgaben nach Kategorie",
       "fixedCosts": "Fixkosten"
