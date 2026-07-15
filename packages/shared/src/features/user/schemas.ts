@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { FINANCIAL_MONTH_DAY_MAX, FINANCIAL_MONTH_DAY_MIN } from '../billing/financial-month';
+import { CURRENCY_CODES } from '../transactions/schemas';
 
 export const USER_ERROR_CODES = {
   INVALID_NAME: 'settings.errors.invalidName',
@@ -10,7 +11,7 @@ export const USER_ERROR_CODES = {
   UPDATE_FAILED: 'settings.errors.updateFailed',
 } as const;
 
-const currencyEnum = z.enum(['PLN', 'EUR', 'GBP']);
+const currencyEnum = z.enum(CURRENCY_CODES);
 
 export const updateUserSchema = z
   .object({

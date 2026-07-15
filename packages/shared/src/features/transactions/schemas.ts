@@ -41,7 +41,9 @@ export const RECEIPT_SCAN_ERROR_CODES = {
   STORAGE_UPLOAD_FAILED: 'scanner.errors.storageUploadFailed',
 } as const;
 
-const currencyEnum = z.enum(['PLN', 'EUR', 'GBP']);
+export const CURRENCY_CODES = ['PLN', 'EUR', 'GBP', 'USD'] as const;
+
+const currencyEnum = z.enum(CURRENCY_CODES);
 
 const transactionBaseSchema = z.object({
   amount: z
@@ -85,9 +87,16 @@ const splitAmountSchema = z
   .positive(TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
   .max(999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT);
 
+/** Line-item amounts on receipts may be negative (discounts, Rabatt, Preisvorteil). */
+const receiptLineItemAmountSchema = z
+  .number({ invalid_type_error: TRANSACTION_ERROR_CODES.INVALID_AMOUNT })
+  .min(-999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
+  .max(999_999_999.99, TRANSACTION_ERROR_CODES.INVALID_AMOUNT)
+  .refine((value) => value !== 0, TRANSACTION_ERROR_CODES.INVALID_AMOUNT);
+
 export const receiptSplitItemSchema = z.object({
   name: z.string().max(200),
-  amount: splitAmountSchema,
+  amount: receiptLineItemAmountSchema,
 });
 
 const receiptSplitItemInputSchema = z.preprocess((value) => {
@@ -100,7 +109,7 @@ const receiptSplitItemInputSchema = z.preprocess((value) => {
 
 export const receiptLineItemSchema = z.object({
   name: z.string().max(200),
-  amount: splitAmountSchema,
+  amount: receiptLineItemAmountSchema,
   category: z
     .string()
     .min(1, TRANSACTION_ERROR_CODES.INVALID_CATEGORY)

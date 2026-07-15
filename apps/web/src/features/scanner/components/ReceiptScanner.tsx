@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import { SUPPORTED_CURRENCIES } from '@shared/features/currency';
 import {
   flattenSplitsToLineItems,
   groupLineItemsToSplits,
@@ -15,6 +16,7 @@ import {
   sumSplitAmounts,
   toCalendarDateInputValue,
   type ReceiptSplitSuggestion,
+  type CurrencyCode,
 } from '@shared/features/transactions/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
@@ -38,7 +40,7 @@ type SplitLine = ReceiptSplitSuggestion;
 
 type ReceiptDraft = {
   amount: number;
-  currency: 'PLN' | 'EUR' | 'GBP';
+  currency: CurrencyCode;
   category: string;
   description?: string;
   date: string;
@@ -498,7 +500,7 @@ export function ReceiptScanner() {
                 }
                 className="auth-input"
               >
-                {(['PLN', 'EUR', 'GBP'] as const).map((currency) => (
+                {SUPPORTED_CURRENCIES.map((currency) => (
                   <option key={currency} value={currency}>
                     {currency}
                   </option>

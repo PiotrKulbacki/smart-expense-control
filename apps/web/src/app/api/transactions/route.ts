@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createTransactionSchema } from '@shared/features/transactions/schemas';
+import { createTransactionSchema, type CurrencyCode } from '@shared/features/transactions/schemas';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
 import { prisma } from '@smart-expense-control/database';
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       from,
       to,
       receiptGroupId,
-      primaryCurrency: from || to ? (dbUser?.primaryCurrency as 'PLN' | 'EUR' | 'GBP') : undefined,
+      primaryCurrency: from || to ? (dbUser?.primaryCurrency as CurrencyCode) : undefined,
     });
 
     return NextResponse.json({ transactions });

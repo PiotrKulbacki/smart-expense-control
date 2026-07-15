@@ -15,6 +15,42 @@ export type ReceiptLineItem = {
 /** Slightly wider tolerance when accepting AI OCR line items before user review. */
 export const RECEIPT_LINE_ITEM_SUM_TOLERANCE = 0.05;
 
+const RECEIPT_DISCOUNT_LINE_PATTERN =
+  /rabatt|preisvorteil|preisnachlass|coupon|discount|rückvergütung|gutschein|lidl plus|aktionspreis|ersparnis|nachlass|sofortrabatt/i;
+
+export function isReceiptDiscountLine(item: Pick<ReceiptLineItem, 'name' | 'amount'>): boolean {
+  if (item.amount < 0) {
+    return true;
+  }
+
+  return item.amount > 0 && RECEIPT_DISCOUNT_LINE_PATTERN.test(item.name);
+}
+
+/** Applies discount/Rabatt lines to the immediately preceding product line (common on DE receipts). */
+export function netReceiptLineDiscounts(lineItems: ReceiptLineItem[]): ReceiptLineItem[] {
+  const netted: ReceiptLineItem[] = [];
+
+  for (const item of lineItems) {
+    if (isReceiptDiscountLine(item)) {
+      const discountAmount = roundMoney(-Math.abs(item.amount));
+      const target = netted[netted.length - 1];
+
+      if (target) {
+        target.amount = roundMoney(target.amount + discountAmount);
+      }
+
+      continue;
+    }
+
+    netted.push({
+      ...item,
+      amount: roundMoney(item.amount),
+    });
+  }
+
+  return netted.filter((item) => item.amount > 0);
+}
+
 export function roundMoney(amount: number): number {
   return Math.round(amount * 100) / 100;
 }
@@ -139,18 +175,31 @@ export function normalizeReceiptLineItems(
     return undefined;
   }
 
-  const normalized = lineItems
+  const categorized = lineItems
     .map((item) => ({
       ...item,
       category: normalizeLegacyCategory(item.category),
     }))
-    .filter((item) => allowedCategories.has(item.category) && item.amount > 0);
+    .filter((item) => allowedCategories.has(item.category));
 
-  if (!normalized.length) {
+  if (!categorized.length) {
     return undefined;
   }
 
-  return rebalanceAmountsToTotal(normalized, totalAmount);
+  const netted = netReceiptLineDiscounts(categorized);
+
+  if (!netted.length) {
+    return undefined;
+  }
+
+  const currentTotal = sumLineItemAmounts(netted);
+  const difference = roundMoney(totalAmount - currentTotal);
+
+  if (Math.abs(difference) <= RECEIPT_LINE_ITEM_SUM_TOLERANCE) {
+    return rebalanceAmountsToTotal(netted, totalAmount);
+  }
+
+  return netted;
 }
 
 export function countDistinctCategories(lineItems: ReceiptLineItem[]): number {

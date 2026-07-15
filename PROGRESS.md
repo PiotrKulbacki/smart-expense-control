@@ -24,6 +24,7 @@
 20. **Faza 9.2: dynamiczne kategorie, ustawienia, scroll pulpitu, grupowanie historii** — [✅ Zrobione]
 21. **Faza 9.3: persystencja zdjęć (Supabase Storage) i archiwum dokumentów** — [✅ Zrobione]
 22. **Faza 9.4: cennik PRO, waluta USD, kampania PROMO50 (Stripe)** — [✅ Zrobione]
+23. **Faza 9.5: refaktoryzacja UI Archiwum, audyt modelu AI, poprawa dokładności skanera** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -50,6 +51,20 @@ Każdy agent AI **musi** wykonać poniższe kroki przed zakończeniem sesji, je�
 **Nie pomijaj tego kroku.** Brak formatowania powoduje fail joba `format` w GitHub Actions (`prettier --check .`).
 
 ## Latest Handoff Log
+
+**2026-07-15 — Faza 9.5 zamknięta: refaktoryzacja UI Archiwum, audyt modelu AI Vision, poprawa dokładności skanera (Lidl receipt bugfix).**
+
+### Faza 9.5 — UI Archiwum, audyt modelu AI, poprawa dokładności skanera
+
+- **Model Vision:** domyślny model skanera zmieniony z `gpt-4o-mini` na `gpt-4o`; konfigurowalny przez `OPENAI_VISION_MODEL` (env, `turbo.json`, `.env.example`).
+- **Dynamiczna kotwica temporalna:** przy każdym wywołaniu API do promptu wstrzykiwana jest aktualna data serwera (`YYYY-MM-DD`) — poprawna interpretacja skróconych dat (np. `02.07.26` → `2026-07-02`).
+- **Strict OCR Integrity:** prompt zabrania modyfikacji cen w celu dopasowania sumy; rabaty jako osobne pozycje ujemne; `detail: 'high'` dla Vision API; serwer wymusza `needsManualReview` gdy suma pozycji ≠ total.
+- **Archiwum UI:** foldery miesięczne w responsywnej siatce (`grid-cols-1…4`); nawigacja folder → lista dokumentów z przyciskiem „Wróć"; kompaktowe karty poziome z miniaturą `w-16 h-24` / `w-20 h-28`.
+- **i18n:** `scanner.archive.backToFolders` (en/pl/de/es).
+- **Test Lidl:** paragon IMG_9903 — data `2026-07-02`, kwota `36.52 EUR`, pozycja „Salat Hähnchen" `2.49` odczytana bez fudgingu cen.
+- **Waluta USD:** dodana do transakcji, skanera, kursów walut i waluty głównej użytkownika (`CURRENCY_CODES`, migracja `20260715164500_add_currency_usd`); rabaty ujemne w `receiptLineItemAmountSchema`.
+
+---
 
 **2026-07-14 — Faza 9.4 zamknięta: nowy cennik PRO, waluta USD, integracja kodu promocyjnego PROMO50 (Stripe).**
 

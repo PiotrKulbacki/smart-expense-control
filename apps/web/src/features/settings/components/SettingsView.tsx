@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import { SUPPORTED_CURRENCIES } from '@shared/features/currency';
+import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import {
   FINANCIAL_MONTH_DAY_MAX,
   FINANCIAL_MONTH_DAY_MIN,
@@ -28,7 +30,7 @@ export function SettingsView() {
   const { locale } = useLocale();
   const [user, setUser] = useState<SafeUser | null>(null);
   const [name, setName] = useState('');
-  const [primaryCurrency, setPrimaryCurrency] = useState<'PLN' | 'EUR' | 'GBP'>('PLN');
+  const [primaryCurrency, setPrimaryCurrency] = useState<CurrencyCode>('PLN');
   const [financialMonthStartDay, setFinancialMonthStartDay] = useState(1);
   const [defaultMonthlyBudget, setDefaultMonthlyBudget] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -324,7 +326,7 @@ export function SettingsView() {
                 }
                 className="auth-input"
               >
-                {(['PLN', 'EUR', 'GBP'] as const).map((currency) => (
+                {SUPPORTED_CURRENCIES.map((currency) => (
                   <option key={currency} value={currency}>
                     {currency}
                   </option>

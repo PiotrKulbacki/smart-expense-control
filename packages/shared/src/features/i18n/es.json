@@ -147,6 +147,7 @@
       "previewActionShort": "Vista previa",
       "closePreview": "Cerrar vista previa",
       "viewTransactions": "Ver transacciones",
+      "backToFolders": "Volver a carpetas",
       "errors": {
         "loadFailed": "No se pudo cargar el archivo de documentos"
       }
@@ -262,7 +263,7 @@
       },
       "currency": {
         "title": "Soporte multi-moneda",
-        "description": "Rastrea PLN, EUR y GBP — todo convertido a tu moneda principal."
+        "description": "Rastrea PLN, EUR, GBP y USD — todo convertido a tu moneda principal."
       }
     },
     "pricing": {

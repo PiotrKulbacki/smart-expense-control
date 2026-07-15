@@ -149,6 +149,7 @@
       "previewActionShort": "Podgląd",
       "closePreview": "Zamknij podgląd",
       "viewTransactions": "Przejdź do transakcji",
+      "backToFolders": "Wróć do folderów",
       "errors": {
         "loadFailed": "Nie udało się wczytać archiwum dokumentów"
       }
@@ -264,7 +265,7 @@
       },
       "currency": {
         "title": "Wielowalutowość",
-        "description": "Śledź PLN, EUR i GBP — wszystko przeliczone na Twoją główną walutę."
+        "description": "Śledź PLN, EUR, GBP i USD — wszystko przeliczone na Twoją główną walutę."
       }
     },
     "pricing": {

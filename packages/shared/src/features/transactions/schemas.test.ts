@@ -92,6 +92,49 @@ describe('receiptScanResultSchema', () => {
 
     expect(parsed.success).toBe(true);
   });
+
+  it('accepts discount line items with negative amounts', () => {
+    const parsed = receiptScanResultSchema.safeParse({
+      amount: 36.52,
+      currency: 'EUR',
+      category: 'Groceries',
+      description: 'Lidl',
+      date: '2026-07-02',
+      needsManualReview: true,
+      hasMultipleCategories: true,
+      lineItems: [
+        { name: 'Salat Hähnchen', amount: 2.49, category: 'Groceries' },
+        { name: 'Lidl Plus Rabatt', amount: -2.8, category: 'Groceries' },
+        { name: 'Preisvorteil', amount: -1.46, category: 'Groceries' },
+      ],
+      suggestedSplits: [
+        {
+          category: 'Groceries',
+          amount: 32.26,
+          items: [
+            { name: 'Salat Hähnchen', amount: 2.49 },
+            { name: 'Lidl Plus Rabatt', amount: -2.8 },
+          ],
+        },
+      ],
+    });
+
+    expect(parsed.success).toBe(true);
+  });
+
+  it('accepts USD currency from AI scan result', () => {
+    const parsed = receiptScanResultSchema.safeParse({
+      amount: 42.5,
+      currency: 'USD',
+      category: 'Groceries',
+      description: 'Whole Foods',
+      date: '2026-07-02',
+      needsManualReview: false,
+      hasMultipleCategories: false,
+    });
+
+    expect(parsed.success).toBe(true);
+  });
 });
 
 describe('split amount helpers', () => {

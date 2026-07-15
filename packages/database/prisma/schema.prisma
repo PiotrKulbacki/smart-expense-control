@@ -17,6 +17,7 @@ enum Currency {
   PLN
   EUR
   GBP
+  USD
 }
 
 enum Frequency {

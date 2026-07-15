@@ -147,6 +147,7 @@
       "previewActionShort": "Preview",
       "closePreview": "Close preview",
       "viewTransactions": "View transactions",
+      "backToFolders": "Back to folders",
       "errors": {
         "loadFailed": "Could not load your document archive"
       }
@@ -262,7 +263,7 @@
       },
       "currency": {
         "title": "Multi-currency support",
-        "description": "Track PLN, EUR, and GBP — all converted to your primary currency."
+        "description": "Track PLN, EUR, GBP, and USD — all converted to your primary currency."
       }
     },
     "pricing": {

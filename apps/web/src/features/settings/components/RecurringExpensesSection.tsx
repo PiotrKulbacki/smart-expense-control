@@ -5,6 +5,7 @@ import { MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { convertAmount } from '@shared/features/currency';
 import type { ExchangeRateMap } from '@shared/features/currency/types';
+import { SUPPORTED_CURRENCIES } from '@shared/features/currency';
 import { translateError } from '@shared/features/i18n';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 import { Button } from '@web/components/ui/button';
@@ -230,7 +231,7 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
           onChange={(event) => setCurrency(event.target.value as CurrencyCode)}
           className="auth-input"
         >
-          {(['PLN', 'EUR', 'GBP'] as const).map((option) => (
+          {SUPPORTED_CURRENCIES.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>

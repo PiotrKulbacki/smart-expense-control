@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { translateError } from '@shared/features/i18n';
+import { SUPPORTED_CURRENCIES } from '@shared/features/currency';
 import {
   transactionFormSchema,
   toLocalDateInputValue,
@@ -134,7 +135,7 @@ export function TransactionForm({
             className="auth-input flex h-10 w-full"
             {...register('currency')}
           >
-            {(['PLN', 'EUR', 'GBP'] as const).map((currency) => (
+            {SUPPORTED_CURRENCIES.map((currency) => (
               <option key={currency} value={currency}>
                 {currency}
               </option>

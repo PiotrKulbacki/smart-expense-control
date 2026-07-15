@@ -4,13 +4,14 @@ import {
   convertAmount,
   EXCHANGE_RATE_CACHE_TTL_MS,
   fetchRatesFromFrankfurter,
+  SUPPORTED_CURRENCIES,
   STABLE_FALLBACK_RATES,
   type ExchangeRateMap,
 } from '@shared/features/currency';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 
 async function getLatestDbRates(): Promise<ExchangeRateMap> {
-  const currencies: CurrencyCode[] = ['PLN', 'EUR', 'GBP'];
+  const currencies: CurrencyCode[] = [...SUPPORTED_CURRENCIES];
   const pairs: Array<{ from: CurrencyCode; to: CurrencyCode; rate: number }> = [];
 
   for (const from of currencies) {

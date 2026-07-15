@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, FolderOpen, ImageIcon, X, ZoomIn } from 'lucide-react';
+import { ArrowLeft, ExternalLink, FolderOpen, ImageIcon, X, ZoomIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
@@ -25,13 +25,6 @@ type MonthBucket = {
   documents: ReceiptArchiveDocument[];
 };
 
-type DayBucket = {
-  key: string;
-  day: number;
-  month: number;
-  documents: ReceiptArchiveDocument[];
-};
-
 type ReceiptArchiveProps = {
   refreshKey?: number;
 };
@@ -42,6 +35,14 @@ function formatMoney(amount: number, currency: string, locale: string): string {
     currency,
     maximumFractionDigits: 2,
   }).format(amount);
+}
+
+function formatDocumentDate(date: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(new Date(date));
 }
 
 function groupDocumentsByMonth(documents: ReceiptArchiveDocument[]): MonthBucket[] {
@@ -73,40 +74,17 @@ function groupDocumentsByMonth(documents: ReceiptArchiveDocument[]): MonthBucket
   });
 }
 
-function groupDocumentsByDay(documents: ReceiptArchiveDocument[]): DayBucket[] {
-  const buckets = new Map<string, DayBucket>();
-
-  for (const document of documents) {
-    const date = new Date(document.date);
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const key = `${String(day).padStart(2, '0')}.${String(month).padStart(2, '0')}`;
-
-    const bucket = buckets.get(key) ?? {
-      key,
-      day,
-      month,
-      documents: [],
-    };
-
-    bucket.documents.push(document);
-    buckets.set(key, bucket);
-  }
-
-  return [...buckets.values()].sort((left, right) => {
-    if (left.month !== right.month) {
-      return right.month - left.month;
-    }
-
-    return right.day - left.day;
-  });
+function sortDocumentsByDate(documents: ReceiptArchiveDocument[]): ReceiptArchiveDocument[] {
+  return [...documents].sort(
+    (left, right) => new Date(right.date).getTime() - new Date(left.date).getTime()
+  );
 }
 
 function ArchiveSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className="bg-elevated h-32 animate-pulse rounded-2xl" />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={index} className="bg-elevated h-28 animate-pulse rounded-2xl" />
       ))}
     </div>
   );
@@ -162,7 +140,43 @@ function ReceiptPreviewModal({
   );
 }
 
-function DocumentCard({
+function FolderCard({
+  month,
+  isSelected,
+  onSelect,
+}: {
+  month: MonthBucket;
+  isSelected: boolean;
+  onSelect: (key: string) => void;
+}) {
+  const t = useT();
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(month.key)}
+      className={cn(
+        'bg-elevated/60 hover:border-[var(--cool)]/40 group flex flex-col items-start rounded-2xl border p-4 text-left transition hover:shadow-md sm:p-5',
+        isSelected
+          ? 'ring-[var(--cool)]/30 border-[var(--cool)] shadow-md ring-1'
+          : 'border-[var(--border-cool)]'
+      )}
+      aria-pressed={isSelected}
+    >
+      <span className="bg-cool/10 text-cool flex h-10 w-10 items-center justify-center rounded-xl transition group-hover:scale-105">
+        <FolderOpen className="h-5 w-5" />
+      </span>
+      <span className="font-display mt-4 text-2xl font-bold tracking-tight text-[var(--text)]">
+        {String(month.month).padStart(2, '0')} / {month.year}
+      </span>
+      <span className="text-muted mt-1 text-xs">
+        {t('scanner.archive.documentCount', { count: month.documents.length })}
+      </span>
+    </button>
+  );
+}
+
+function DocumentRow({
   document,
   locale,
   onPreview,
@@ -175,31 +189,30 @@ function DocumentCard({
   const title = document.description ?? t('scanner.archive.untitledDocument');
 
   return (
-    <article className="bg-elevated/60 hover:border-[var(--cool)]/40 group overflow-hidden rounded-xl border border-[var(--border-cool)] transition hover:shadow-md">
+    <article className="bg-elevated/60 hover:border-[var(--cool)]/40 flex gap-3 rounded-xl border border-[var(--border-cool)] p-3 transition hover:shadow-sm sm:gap-4 sm:p-3.5">
       <button
         type="button"
         onClick={() => onPreview(document)}
-        className="relative block w-full overflow-hidden"
+        className="group/thumb relative shrink-0 overflow-hidden rounded-md shadow-sm"
         aria-label={t('scanner.archive.previewAction', { name: title })}
       >
-        <div className="aspect-[4/3] w-full overflow-hidden bg-[var(--surface)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={document.previewUrl}
-            alt={title}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-            loading="lazy"
-          />
-        </div>
-        <span className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white opacity-0 transition group-hover:opacity-100">
-          <ZoomIn className="h-4 w-4" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={document.previewUrl}
+          alt={title}
+          className="h-24 w-16 object-cover transition duration-300 group-hover/thumb:scale-105 sm:h-28 sm:w-20"
+          loading="lazy"
+        />
+        <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white transition group-hover/thumb:bg-black/35">
+          <ZoomIn className="h-4 w-4 opacity-0 transition group-hover/thumb:opacity-100" />
         </span>
       </button>
 
-      <div className="space-y-3 p-3">
-        <div>
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
+        <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-[var(--text)]">{title}</p>
-          <p className="text-muted mt-0.5 text-xs">
+          <p className="text-muted mt-0.5 text-xs">{formatDocumentDate(document.date, locale)}</p>
+          <p className="mt-1 text-sm font-medium text-[var(--text)]">
             {formatMoney(document.totalAmount, document.currency, locale)}
           </p>
         </div>
@@ -208,16 +221,16 @@ function DocumentCard({
           <button
             type="button"
             onClick={() => onPreview(document)}
-            className="btn-ghost h-8 px-3 text-xs"
+            className="btn-ghost h-7 px-2.5 text-xs"
           >
-            <ImageIcon className="mr-1.5 h-3.5 w-3.5" />
+            <ImageIcon className="mr-1 h-3.5 w-3.5" />
             {t('scanner.archive.previewActionShort')}
           </button>
           <Link
             href={`/history?receiptGroupId=${encodeURIComponent(document.receiptGroupId)}`}
-            className="btn-ghost inline-flex h-8 items-center px-3 text-xs"
+            className="btn-ghost inline-flex h-7 items-center px-2.5 text-xs"
           >
-            <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+            <ExternalLink className="mr-1 h-3.5 w-3.5" />
             {t('scanner.archive.viewTransactions')}
           </Link>
         </div>
@@ -235,6 +248,14 @@ export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
   const [previewDocument, setPreviewDocument] = useState<ReceiptArchiveDocument | null>(null);
 
   const monthBuckets = useMemo(() => groupDocumentsByMonth(documents), [documents]);
+  const selectedMonth = useMemo(
+    () => monthBuckets.find((month) => month.key === openMonthKey) ?? null,
+    [monthBuckets, openMonthKey]
+  );
+  const selectedDocuments = useMemo(
+    () => (selectedMonth ? sortDocumentsByDate(selectedMonth.documents) : []),
+    [selectedMonth]
+  );
 
   const loadArchive = useCallback(async () => {
     setIsLoading(true);
@@ -263,6 +284,12 @@ export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
     void loadArchive();
   }, [loadArchive, refreshKey]);
 
+  useEffect(() => {
+    if (openMonthKey && !monthBuckets.some((month) => month.key === openMonthKey)) {
+      setOpenMonthKey(null);
+    }
+  }, [monthBuckets, openMonthKey]);
+
   return (
     <section className="panel relative z-10 p-6">
       <div className="relative z-10">
@@ -285,75 +312,54 @@ export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
             </p>
             <p className="text-muted mt-1 max-w-sm text-sm">{t('scanner.archive.emptyHint')}</p>
           </div>
-        ) : (
+        ) : selectedMonth ? (
           <div className="space-y-4">
-            {monthBuckets.map((month) => {
-              const isOpen = openMonthKey === month.key;
-              const dayBuckets = groupDocumentsByDay(month.documents);
+            <button
+              type="button"
+              onClick={() => setOpenMonthKey(null)}
+              className="btn-ghost inline-flex h-9 items-center gap-2 px-3 text-sm"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t('scanner.archive.backToFolders')}
+            </button>
 
-              return (
-                <div
-                  key={month.key}
-                  className="bg-[var(--surface)]/40 overflow-hidden rounded-2xl border border-[var(--border-cool)]"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setOpenMonthKey(isOpen ? null : month.key)}
-                    className="hover:bg-elevated/40 flex w-full items-center gap-4 p-4 text-left transition sm:p-5"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="bg-cool/10 text-cool flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                      <FolderOpen className="h-6 w-6" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="font-display block text-xl font-bold tracking-tight text-[var(--text)]">
-                        {String(month.month).padStart(2, '0')} / {month.year}
-                      </span>
-                      <span className="text-muted mt-0.5 block text-sm">
-                        {t('scanner.archive.documentCount', { count: month.documents.length })}
-                      </span>
-                    </span>
-                    <span
-                      className={cn(
-                        'text-muted text-sm transition-transform duration-300',
-                        isOpen && 'rotate-180'
-                      )}
-                    >
-                      ▾
-                    </span>
-                  </button>
-
-                  <div
-                    className={cn(
-                      'grid transition-[grid-template-rows] duration-300 ease-in-out',
-                      isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="space-y-6 border-t border-[var(--border)] px-4 pb-5 pt-4 sm:px-5">
-                        {dayBuckets.map((day) => (
-                          <div key={day.key}>
-                            <h3 className="text-muted mb-3 text-xs font-semibold uppercase tracking-wide">
-                              {day.key}
-                            </h3>
-                            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                              {day.documents.map((document) => (
-                                <DocumentCard
-                                  key={document.receiptGroupId}
-                                  document={document}
-                                  locale={locale}
-                                  onPreview={setPreviewDocument}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+            <div className="bg-[var(--surface)]/40 rounded-2xl border border-[var(--border-cool)] p-4 sm:p-5">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="bg-cool/10 text-cool flex h-10 w-10 items-center justify-center rounded-xl">
+                  <FolderOpen className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-display text-xl font-bold tracking-tight text-[var(--text)]">
+                    {String(selectedMonth.month).padStart(2, '0')} / {selectedMonth.year}
+                  </p>
+                  <p className="text-muted text-xs">
+                    {t('scanner.archive.documentCount', { count: selectedDocuments.length })}
+                  </p>
                 </div>
-              );
-            })}
+              </div>
+
+              <div className="space-y-2">
+                {selectedDocuments.map((document) => (
+                  <DocumentRow
+                    key={document.receiptGroupId}
+                    document={document}
+                    locale={locale}
+                    onPreview={setPreviewDocument}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {monthBuckets.map((month) => (
+              <FolderCard
+                key={month.key}
+                month={month}
+                isSelected={false}
+                onSelect={setOpenMonthKey}
+              />
+            ))}
           </div>
         )}
       </div>

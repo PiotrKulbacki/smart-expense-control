@@ -91,6 +91,12 @@ async function main() {
       { fromCurrency: 'EUR', toCurrency: 'GBP', rate: 0.86 },
       { fromCurrency: 'GBP', toCurrency: 'PLN', rate: 5.05 },
       { fromCurrency: 'GBP', toCurrency: 'EUR', rate: 1.16 },
+      { fromCurrency: 'PLN', toCurrency: 'USD', rate: 0.25 },
+      { fromCurrency: 'EUR', toCurrency: 'USD', rate: 1.08 },
+      { fromCurrency: 'GBP', toCurrency: 'USD', rate: 1.27 },
+      { fromCurrency: 'USD', toCurrency: 'PLN', rate: 4.0 },
+      { fromCurrency: 'USD', toCurrency: 'EUR', rate: 0.93 },
+      { fromCurrency: 'USD', toCurrency: 'GBP', rate: 0.79 },
     ],
   });
 

@@ -147,6 +147,7 @@
       "previewActionShort": "Vorschau",
       "closePreview": "Vorschau schließen",
       "viewTransactions": "Transaktionen anzeigen",
+      "backToFolders": "Zurück zu Ordnern",
       "errors": {
         "loadFailed": "Dokumentenarchiv konnte nicht geladen werden"
       }
@@ -262,7 +263,7 @@
       },
       "currency": {
         "title": "Multi-Währungsunterstützung",
-        "description": "Verfolgen Sie PLN, EUR und GBP — alles in Ihre Hauptwährung umgerechnet."
+        "description": "Verfolgen Sie PLN, EUR, GBP und USD — alles in Ihre Hauptwährung umgerechnet."
       }
     },
     "pricing": {

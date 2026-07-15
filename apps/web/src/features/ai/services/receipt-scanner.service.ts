@@ -8,6 +8,7 @@ import {
 import { getAllowedCategoryKeys } from '@web/features/categories/services/category.service';
 import { normalizeLegacyCategory } from '@shared/features/transactions/categories';
 import {
+  CURRENCY_CODES,
   receiptScanResultSchema,
   RECEIPT_SCAN_ERROR_CODES,
   type ReceiptScanResult,
@@ -24,7 +25,7 @@ import {
 import { isSupabaseStorageConfigured } from '@web/lib/supabase-server';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
-const MODEL = 'gpt-4o-mini';
+const DEFAULT_VISION_MODEL = 'gpt-4o';
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
@@ -37,8 +38,13 @@ export type ReceiptScanDraft = ReceiptScanResult & {
 export type { AiScanQuotaStatus };
 export { getAiScanQuotaStatus };
 
-function buildSystemPrompt(categoryKeys: string[]): string {
+function getVisionModel(): string {
+  return env.OPENAI_VISION_MODEL ?? DEFAULT_VISION_MODEL;
+}
+
+function buildSystemPrompt(categoryKeys: string[], currentDate: string): string {
   const categories = categoryKeys.join(', ');
+  const currencies = CURRENCY_CODES.join(', ');
   const hasAlcohol = categoryKeys.includes('Alcohol');
   const alcoholRule = hasAlcohol
     ? `
@@ -50,13 +56,31 @@ function buildSystemPrompt(categoryKeys: string[]): string {
 - ALCOHOLIC BEVERAGES: If "Alcohol" is not in the allowed list, still never use "Other" for alcoholic drinks — use the closest allowed category.`;
 
   return `You are a document OCR assistant for expenses (receipts, invoices, bills). Extract expense data from images.
+
+TEMPORAL ANCHOR:
+Today's reference date is ${currentDate} (ISO 8601). Use it when interpreting abbreviated or two-digit years on receipts.
+Example: "02.07.26" with reference 2026-07-15 → date 2026-07-02 (not 2022). Prefer the most complete date printed on the receipt (e.g. TSE timestamps, payment footer) over abbreviated header dates when they disagree.
+
+OCR INTEGRITY (CRITICAL — NO FUDGING):
+- Transcribe every printed product line exactly as shown, with exact spelling and exact individual prices.
+- NEVER adjust, recalculate, round, or invent line item prices to make them sum to the receipt total.
+- NEVER omit line items to force totals to match.
+- Discount lines (Rabatt, Preisvorteil, Lidl Plus Rabatt, coupon, refund) must be included as separate line items with negative amounts when printed as deductions.
+- Discount lines immediately follow the product they apply to — keep that order in lineItems.
+- Do NOT fold discounts into product prices yourself; return product at printed gross price, then discount as its own negative line.
+- Deposit charges (Pfand, Kaucja, bottle deposit) → positive amount; deposit returns/refunds (Pfand-Rückgabe) → negative amount.
+- Quantity lines (e.g. "2 x 2,79 = 5,58") → use the line total (5.58) as amount; preserve the product name.
+- The amount field must be the printed total paid ("Zu zahlen", "Total", "Sum", etc.) exactly as shown.
+- If line items do not sum to the printed total, still return all items with exact printed prices and set needsManualReview to true.
+- All monetary values in JSON must be numbers with dot decimal separator (e.g. 2.49), never strings with commas.
+
 Return ONLY valid JSON with these fields:
 - amount (number, positive, total paid)
-- currency (one of: PLN, EUR, GBP)
+- currency (one of: ${currencies})
 - date (ISO 8601 date string YYYY-MM-DD)
 - category (exactly one of: ${categories}) — the dominant category if the receipt were recorded as a single expense
 - description (short string, e.g. store or vendor name)
-- needsManualReview (boolean — true if any field is uncertain or unreadable)
+- needsManualReview (boolean — true if any field is uncertain, unreadable, or line items do not sum to total)
 - hasMultipleCategories (boolean — true if the receipt clearly contains items from multiple spending categories)
 - lineItems (optional array — REQUIRED when the receipt has multiple categories or many distinct products):
   - Each element: { "name": string, "amount": number, "category": one of the allowed categories }
@@ -68,7 +92,7 @@ ${alcoholRule}
   - Each element: { "category": one of the allowed categories, "amount": number, "items": optional array of { "name": string, "amount": number } }
   - Use 2-5 groups maximum; group similar items together
   - Map cleaning/household products to Household, cosmetics to Cosmetics, food to Groceries, alcohol to Alcohol, fuel to Fuel
-  - The sum of suggestedSplits[].amount AND lineItems[].amount must each equal amount within 0.01
+  - Sum suggestedSplits from actual line item amounts — do NOT fudge split amounts to match total
 
 If the image is not a financial document or is completely unreadable, set needsManualReview to true and use your best guess for other fields. Omit lineItems/suggestedSplits when the receipt is single-category.`;
 }
@@ -97,6 +121,9 @@ async function callOpenAiVision(imageUrl: string, categoryKeys: string[]): Promi
     throw new Error(RECEIPT_SCAN_ERROR_CODES.AI_FAILED);
   }
 
+  const currentDate = new Date().toISOString().slice(0, 10);
+  const visionModel = getVisionModel();
+
   const response = await fetch(OPENAI_API_URL, {
     method: 'POST',
     headers: {
@@ -104,11 +131,11 @@ async function callOpenAiVision(imageUrl: string, categoryKeys: string[]): Promi
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: visionModel,
       temperature: 0.1,
       response_format: { type: 'json_object' },
       messages: [
-        { role: 'system', content: buildSystemPrompt(categoryKeys) },
+        { role: 'system', content: buildSystemPrompt(categoryKeys, currentDate) },
         {
           role: 'user',
           content: [
@@ -120,6 +147,7 @@ async function callOpenAiVision(imageUrl: string, categoryKeys: string[]): Promi
               type: 'image_url',
               image_url: {
                 url: imageUrl,
+                detail: 'high',
               },
             },
           ],
@@ -260,6 +288,14 @@ export async function scanReceiptFromFile(
       lineItems: splitDraft.lineItems,
       suggestedSplits: splitDraft.suggestedSplits,
     };
+
+    if (result.lineItems?.length) {
+      const lineItemsSum = result.lineItems.reduce((total, item) => total + item.amount, 0);
+
+      if (Math.abs(lineItemsSum - result.amount) > 0.01) {
+        result.needsManualReview = true;
+      }
+    }
 
     if (result.needsManualReview && result.amount <= 0) {
       await deleteReceiptImage(storagePath);
