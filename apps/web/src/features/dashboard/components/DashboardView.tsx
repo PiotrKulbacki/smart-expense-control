@@ -30,6 +30,7 @@ import {
   type ChartTransaction,
 } from '@web/features/transactions/lib/chart-date-filter';
 import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
+import { countLogicalTransactions } from '@web/features/dashboard/lib/transaction-counts';
 import { TransactionsInsightsCard } from '@web/features/dashboard/components/TransactionsInsightsCard';
 
 type DashboardSummary = {
@@ -40,6 +41,11 @@ type DashboardSummary = {
   totalSpent: number;
   billingPeriodTotalSpent: number;
   transactionCount: number;
+  transactionStats?: {
+    total: number;
+    manual: number;
+    scanned: number;
+  };
   categoryTotals: Array<{ category: string; amount: number }>;
   currentMonthBudget: number | null;
   noSpendDays?: {
@@ -146,17 +152,28 @@ export function DashboardView() {
     });
   }, [transactions, appliedFilter, summary]);
 
-  const displayedTransactionCount = useMemo(() => {
+  const displayedTransactionStats = useMemo(() => {
     if (!summary) {
-      return 0;
+      return { total: 0, manual: 0, scanned: 0 };
     }
 
     if (appliedFilter === 'period' && !customDateRange) {
-      return summary.transactionCount;
+      return (
+        summary.transactionStats ?? {
+          total: summary.transactionCount,
+          manual: 0,
+          scanned: 0,
+        }
+      );
     }
 
-    return filteredRecentTransactions.length;
-  }, [summary, appliedFilter, customDateRange, filteredRecentTransactions.length]);
+    return countLogicalTransactions(
+      filteredRecentTransactions.map((transaction) => ({
+        receiptGroupId: transaction.receiptGroupId ?? null,
+        isAiScanned: transaction.isAiScanned ?? false,
+      }))
+    );
+  }, [summary, appliedFilter, customDateRange, filteredRecentTransactions]);
 
   const visibleTotalSpent = useMemo(
     () =>
@@ -395,7 +412,7 @@ export function DashboardView() {
           )}
         </article>
         <TransactionsInsightsCard
-          transactionCount={displayedTransactionCount}
+          transactionStats={displayedTransactionStats}
           noSpendDays={summary.noSpendDays ?? null}
         />
       </section>

@@ -302,7 +302,9 @@
     "subtitle": "Przegląd wydatków w bieżącym okresie rozliczeniowym",
     "summary": {
       "totalSpent": "Suma wydatków",
-      "transactions": "Transakcje"
+      "transactions": "Wszystkie transakcje",
+      "manualCount": "{{count}} ręcznie",
+      "scannedCount": "{{count}} zeskanowane"
     },
     "noSpendDays": {
       "title": "Dni bez wydatków",

@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { CalendarDays, RefreshCw, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
-import { translateError } from '@shared/features/i18n';
 import type { AiInsightContent } from '@shared/features/ai/schemas';
+import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import type { TransactionCountStats } from '@web/features/dashboard/lib/transaction-counts';
+import { CalendarDays, Camera, PencilLine, Receipt, RefreshCw, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 type NoSpendDaysSummary = {
   noSpendDays: number;
@@ -47,12 +48,12 @@ const INSIGHT_TYPE_STYLES: Record<
 };
 
 type TransactionsInsightsCardProps = {
-  transactionCount: number;
+  transactionStats: TransactionCountStats;
   noSpendDays: NoSpendDaysSummary | null;
 };
 
 export function TransactionsInsightsCard({
-  transactionCount,
+  transactionStats,
   noSpendDays,
 }: TransactionsInsightsCardProps) {
   const t = useT();
@@ -105,25 +106,43 @@ export function TransactionsInsightsCard({
   return (
     <article className="panel relative z-10 flex h-full flex-col p-5 sm:p-6">
       <div className="relative z-10 grid flex-1 gap-4 lg:grid-cols-2 lg:items-stretch lg:gap-5">
-        {/* Left: transactions + no-spend days as one unit */}
         <div className="flex min-w-0 flex-col justify-between gap-4">
-          <div>
-            <p className="text-muted text-sm font-medium">{t('dashboard.summary.transactions')}</p>
-            <p className="font-display mt-2 text-3xl font-bold text-[var(--text)]">
-              {transactionCount}
-            </p>
+          <div className="flex min-w-0 items-start gap-2.5">
+            <div className="bg-cool/10 text-cool mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+              <Receipt className="h-4 w-4" aria-hidden />
+            </div>
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="text-muted break-words text-[13px] font-medium leading-snug">
+                {t('dashboard.summary.transactions')}
+              </p>
+              <p className="font-display mt-1 text-lg font-semibold text-[var(--text)] sm:text-xl">
+                {transactionStats.total}
+              </p>
+              <div className="text-muted mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] leading-snug sm:text-xs">
+                <span className="inline-flex items-center gap-1">
+                  <PencilLine className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+                  {t('dashboard.summary.manualCount', { count: transactionStats.manual })}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Camera className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+                  {t('dashboard.summary.scannedCount', { count: transactionStats.scanned })}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="border-cool/15 bg-cool/5 flex min-w-0 items-start gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5">
+          <div className="border-cool/10 border-t" />
+
+          <div className="flex min-w-0 items-start gap-2.5">
             <div className="bg-cool/10 text-cool mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
               <CalendarDays className="h-4 w-4" aria-hidden />
             </div>
             <div className="min-w-0 flex-1 overflow-hidden">
-              <p className="text-muted break-words text-[11px] font-medium leading-snug">
+              <p className="text-muted break-words text-[13px] font-medium leading-snug">
                 {t('dashboard.noSpendDays.title')}
               </p>
               {noSpendDays ? (
-                <p className="font-display mt-1 truncate whitespace-nowrap text-base font-semibold text-[var(--text)] sm:text-lg">
+                <p className="font-display mt-1 truncate whitespace-nowrap text-lg font-semibold text-[var(--text)] sm:text-xl">
                   {t('dashboard.noSpendDays.value', {
                     noSpend: noSpendDays.noSpendDays,
                     total: noSpendDays.totalDays,
@@ -136,14 +155,13 @@ export function TransactionsInsightsCard({
           </div>
         </div>
 
-        {/* Right: AI insight — full text on stacked layouts; scroll when side-by-side */}
         <div
           className={`relative flex min-w-0 flex-col rounded-xl border ${typeStyles.border} ${typeStyles.bg} p-3 sm:p-3.5 lg:min-h-0 lg:overflow-hidden`}
         >
           <div className="flex shrink-0 items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-1.5">
               <Sparkles className={`h-3.5 w-3.5 shrink-0 ${typeStyles.icon}`} aria-hidden />
-              <p className="text-muted truncate text-[11px] font-medium leading-snug">
+              <p className="text-muted truncate text-[13px] font-medium leading-snug">
                 {t('dashboard.insights.title')}
               </p>
             </div>

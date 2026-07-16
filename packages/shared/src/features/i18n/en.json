@@ -300,7 +300,9 @@
     "subtitle": "Your spending overview for the current billing period",
     "summary": {
       "totalSpent": "Total spending",
-      "transactions": "Transactions"
+      "transactions": "All transactions",
+      "manualCount": "{{count}} manual",
+      "scannedCount": "{{count}} scanned"
     },
     "noSpendDays": {
       "title": "No-spend days",

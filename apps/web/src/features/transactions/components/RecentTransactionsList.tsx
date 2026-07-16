@@ -31,6 +31,7 @@ export type RecentTransaction = {
   category: string;
   description: string | null;
   date: string;
+  isAiScanned?: boolean;
   receiptGroupId?: string | null;
 };
 

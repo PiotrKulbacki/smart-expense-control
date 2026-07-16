@@ -300,7 +300,9 @@
     "subtitle": "Ihre Ausgabenübersicht für den aktuellen Abrechnungszeitraum",
     "summary": {
       "totalSpent": "Ausgabensumme",
-      "transactions": "Transaktionen"
+      "transactions": "Alle Transaktionen",
+      "manualCount": "{{count}} manuell",
+      "scannedCount": "{{count}} gescannt"
     },
     "noSpendDays": {
       "title": "Tage ohne Ausgaben",

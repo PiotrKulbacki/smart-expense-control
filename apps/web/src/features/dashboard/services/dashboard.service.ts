@@ -12,6 +12,10 @@ import {
   computeNoSpendDays,
   type NoSpendDaysResult,
 } from '@web/features/dashboard/lib/no-spend-days';
+import {
+  countLogicalTransactions,
+  type TransactionCountStats,
+} from '@web/features/dashboard/lib/transaction-counts';
 
 export type DashboardTransaction = {
   id: string;
@@ -39,7 +43,9 @@ export type DashboardSummary = {
   totalSpent: number;
   billingPeriodTotalSpent: number;
   fixedCostsTotal: number;
+  /** Logical expenses (split receipts count as 1) */
   transactionCount: number;
+  transactionStats: TransactionCountStats;
   categoryTotals: Array<{ category: string; amount: number }>;
   currentMonthBudget: number | null;
   defaultMonthlyBudget: number | null;
@@ -162,7 +168,7 @@ export async function getDashboardData(
     recentTransactions,
     fixedCostsTotal,
     cachedPeriodAggregation,
-    noSpendSourceTransactions,
+    billingPeriodCountSource,
   ] = await Promise.all([
     usesDefaultPeriod
       ? Promise.resolve([])
@@ -175,6 +181,9 @@ export async function getDashboardData(
             amount: true,
             currency: true,
             category: true,
+            receiptGroupId: true,
+            isAiScanned: true,
+            date: true,
           },
         }),
     prisma.transaction.findMany({
@@ -208,22 +217,36 @@ export async function getDashboardData(
     }),
     usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
     getOrRefreshPeriodAggregation(userId, now),
-    // Always scoped to the payday billing cycle from settings — never calendar month / chart filter.
+    // Billing-cycle rows for no-spend days + logical transaction counts
     prisma.transaction.findMany({
       where: {
         userId,
         date: { gte: billingPeriodStart, lte: billingPeriodEnd },
       },
-      select: { date: true },
+      select: {
+        date: true,
+        receiptGroupId: true,
+        isAiScanned: true,
+      },
     }),
   ]);
 
   const noSpendDays = computeNoSpendDays({
     periodStart: billingPeriodStart,
     periodEnd: billingPeriodEnd,
-    transactionDates: noSpendSourceTransactions.map((transaction) => transaction.date),
+    transactionDates: billingPeriodCountSource.map((transaction) => transaction.date),
     now,
   });
+
+  const transactionStats = countLogicalTransactions(
+    usesDefaultPeriod
+      ? billingPeriodCountSource
+      : periodTransactions.map((transaction) => ({
+          receiptGroupId: transaction.receiptGroupId,
+          isAiScanned: transaction.isAiScanned,
+        }))
+  );
+  const transactionCount = transactionStats.total;
 
   const billingPeriodTotalSpent =
     cachedPeriodAggregation != null
@@ -232,7 +255,6 @@ export async function getDashboardData(
 
   const categoryMap = new Map<string, number>();
   let totalSpent = 0;
-  let transactionCount = 0;
   let categoryTotals: Array<{ category: string; amount: number }>;
   const resolvedFixedCostsTotal =
     usesDefaultPeriod && cachedPeriodAggregation
@@ -241,7 +263,6 @@ export async function getDashboardData(
 
   if (usesDefaultPeriod && cachedPeriodAggregation) {
     totalSpent = billingPeriodTotalSpent;
-    transactionCount = cachedPeriodAggregation.transactionCount;
     categoryTotals = cachedPeriodAggregation.categoryTotalsPrimary;
   } else {
     for (const transaction of periodTransactions) {
@@ -267,7 +288,6 @@ export async function getDashboardData(
     );
 
     totalSpent += resolvedFixedCostsTotal;
-    transactionCount = periodTransactions.length;
   }
 
   const chartTransactions: DashboardChartTransaction[] = chartSourceTransactions.map(
@@ -324,6 +344,7 @@ export async function getDashboardData(
       billingPeriodTotalSpent: Math.round(billingPeriodTotalSpent * 100) / 100,
       fixedCostsTotal: Math.round(resolvedFixedCostsTotal * 100) / 100,
       transactionCount,
+      transactionStats,
       categoryTotals,
       currentMonthBudget: user.currentMonthBudget,
       defaultMonthlyBudget: user.defaultMonthlyBudget,

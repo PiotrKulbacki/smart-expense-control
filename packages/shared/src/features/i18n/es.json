@@ -300,7 +300,9 @@
     "subtitle": "Resumen de gastos del periodo de facturación actual",
     "summary": {
       "totalSpent": "Suma de gastos",
-      "transactions": "Transacciones"
+      "transactions": "Todas las transacciones",
+      "manualCount": "{{count}} manuales",
+      "scannedCount": "{{count}} escaneadas"
     },
     "noSpendDays": {
       "title": "Días sin gastos",
