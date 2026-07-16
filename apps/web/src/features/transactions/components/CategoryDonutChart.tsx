@@ -1,8 +1,8 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { DatePickerWithRange } from '@web/components/ui/date-range-picker';
 import {
   Select,
@@ -20,6 +20,19 @@ import {
 } from '@web/features/transactions/lib/category-config';
 import type { ChartDateRange } from '@web/features/transactions/lib/chart-date-filter';
 import { cn } from '@web/lib/utils';
+
+const CategoryDonutChartPie = dynamic(
+  () =>
+    import('@web/features/transactions/components/CategoryDonutChartPie').then(
+      (module) => module.CategoryDonutChartPie
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-elevated mx-auto h-64 w-full max-w-sm animate-pulse rounded-full" />
+    ),
+  }
+);
 
 type CategoryDonutChartProps = {
   primaryCurrency: string;
@@ -187,33 +200,12 @@ export function CategoryDonutChart({
                 <p className="text-muted text-sm">{t('dashboard.chartFilter.allHidden')}</p>
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    dataKey="amount"
-                    nameKey="label"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={68}
-                    outerRadius={96}
-                    paddingAngle={2}
-                    strokeWidth={2}
-                    stroke="var(--surface)"
-                  >
-                    {chartData.map((entry) => (
-                      <Cell key={entry.category} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) =>
-                      typeof value === 'number'
-                        ? formatMoney(value, primaryCurrency, locale)
-                        : String(value ?? '')
-                    }
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <CategoryDonutChartPie
+                chartData={chartData}
+                primaryCurrency={primaryCurrency}
+                locale={locale}
+                formatMoney={formatMoney}
+              />
             )}
           </div>
 

@@ -3,12 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { endOfDay, startOfDay } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import { toCalendarDateInputValue } from '@shared/features/transactions/schemas';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useCategories } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { DashboardLoadingSkeleton } from '@web/features/layout/components/RouteLoadingSkeletons';
 import { BudgetProgress } from '@web/features/transactions/components/BudgetProgress';
 import { CategoryDonutChart } from '@web/features/transactions/components/CategoryDonutChart';
 import { DashboardCtas } from '@web/features/transactions/components/DashboardCtas';
@@ -27,45 +30,24 @@ import {
   getChartFilterDayMetrics,
   getChartRangeStart,
   type ChartDateRange,
-  type ChartTransaction,
 } from '@web/features/transactions/lib/chart-date-filter';
 import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
 import { countLogicalTransactions } from '@web/features/dashboard/lib/transaction-counts';
 import { CategoryLimitsProgressCard } from '@web/features/dashboard/components/CategoryLimitsProgressCard';
 import { TransactionsInsightsCard } from '@web/features/dashboard/components/TransactionsInsightsCard';
-import type { CategoryLimitProgress } from '@shared/features/transactions/category-limit-schemas';
+import type { DashboardData } from '@web/features/dashboard/services/dashboard.service';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import {
+  fetchDashboard,
+  fetchScanQuota,
+  type ScanQuotaPayload,
+} from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
-type DashboardSummary = {
-  primaryCurrency: CurrencyCode;
-  financialMonthStartDay: number;
-  periodStart: string;
-  periodEnd: string;
-  totalSpent: number;
-  billingPeriodTotalSpent: number;
-  transactionCount: number;
-  transactionStats?: {
-    total: number;
-    manual: number;
-    scanned: number;
-  };
-  categoryTotals: Array<{ category: string; amount: number }>;
-  currentMonthBudget: number | null;
-  noSpendDays?: {
-    noSpendDays: number;
-    totalDays: number;
-    ratio: string;
-  };
-  categoryLimits?: CategoryLimitProgress[];
+type DashboardViewProps = {
+  initialDashboardData?: DashboardData;
+  initialScanQuota?: ScanQuotaPayload;
 };
-
-type ScanQuota = {
-  used: number;
-  limit: number;
-  remaining: number;
-};
-
-type UserPlan = 'FREE' | 'PRO';
 
 function formatMoney(amount: number, currency: string, locale: string): string {
   return new Intl.NumberFormat(locale, {
@@ -89,33 +71,32 @@ function toFormInitialValues(transaction: RecentTransaction): TransactionFormIni
   };
 }
 
-function buildDashboardUrl(customDateRange?: DateRange): string {
+function buildDashboardDateRange(customDateRange?: DateRange) {
   if (!customDateRange?.from || !customDateRange?.to) {
-    return '/api/dashboard';
+    return undefined;
   }
 
-  const params = new URLSearchParams();
-  params.set('from', startOfDay(customDateRange.from).toISOString());
-  params.set('to', endOfDay(customDateRange.to).toISOString());
-  return `/api/dashboard?${params.toString()}`;
+  return {
+    from: startOfDay(customDateRange.from),
+    to: endOfDay(customDateRange.to),
+  };
 }
 
-export function DashboardView() {
+export function DashboardView({ initialDashboardData, initialScanQuota }: DashboardViewProps = {}) {
   const t = useT();
   const { locale } = useLocale();
-  const { colorMap, nameMap } = useCategories();
+  const user = useAppUser();
+  const queryClient = useQueryClient();
+  const { colorMap, nameMap, isLoading: categoriesLoading } = useCategories();
   const categoryDisplayContext = useMemo(() => ({ colorMap, nameMap }), [colorMap, nameMap]);
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
-  const [transactions, setTransactions] = useState<RecentTransaction[]>([]);
-  const [chartTransactions, setChartTransactions] = useState<ChartTransaction[]>([]);
-  const [scanQuota, setScanQuota] = useState<ScanQuota | null>(null);
-  const [userPlan, setUserPlan] = useState<UserPlan>('FREE');
   const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>();
+  const dashboardDateRange = useMemo(
+    () => buildDashboardDateRange(customDateRange),
+    [customDateRange]
+  );
   const [filterSelection, setFilterSelection] = useState<ChartDateRange>('period');
   const [appliedFilter, setAppliedFilter] = useState<ChartDateRange>('period');
   const [hiddenCategories, setHiddenCategories] = useState<Set<string>>(() => new Set());
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<RecentTransaction | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
@@ -124,6 +105,47 @@ export function DashboardView() {
   const [isDeleteGroupDialogOpen, setIsDeleteGroupDialogOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<SplitTransactionGroup | null>(null);
   const [isEditGroupDialogOpen, setIsEditGroupDialogOpen] = useState(false);
+
+  const dashboardQuery = useQuery({
+    queryKey: queryKeys.dashboard(user.id, dashboardDateRange),
+    queryFn: () => fetchDashboard(dashboardDateRange),
+    initialData: !dashboardDateRange ? initialDashboardData : undefined,
+  });
+
+  const scanQuotaQuery = useQuery({
+    queryKey: queryKeys.scanQuota(user.id),
+    queryFn: fetchScanQuota,
+    initialData: initialScanQuota,
+  });
+
+  const summary = dashboardQuery.data?.summary ?? null;
+  const transactions = dashboardQuery.data?.recentTransactions ?? [];
+  const chartTransactions = dashboardQuery.data?.chartTransactions ?? [];
+  const scanQuota = scanQuotaQuery.data?.quota ?? null;
+  const userPlan = scanQuotaQuery.data?.plan ?? 'FREE';
+  const isLoading =
+    categoriesLoading || (dashboardQuery.isLoading && dashboardQuery.data === undefined);
+  const isRefreshing = dashboardQuery.isFetching && !isLoading;
+
+  useEffect(() => {
+    if (dashboardQuery.isError) {
+      toast.error(
+        translateError(
+          dashboardQuery.error instanceof Error
+            ? dashboardQuery.error.message
+            : 'auth.errors.generic',
+          locale
+        )
+      );
+    }
+  }, [dashboardQuery.isError, dashboardQuery.error, locale]);
+
+  const refreshDashboard = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['dashboard', user.id] }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.scanQuota(user.id) }),
+    ]);
+  }, [queryClient, user.id]);
 
   const categoryTotals = useMemo(() => {
     if (!summary) {
@@ -220,79 +242,14 @@ export function DashboardView() {
     setHiddenCategories(new Set());
   }, [appliedFilter]);
 
-  const loadDashboard = useCallback(
-    async (options?: { silent?: boolean; dateRange?: DateRange }) => {
-      const silent = options?.silent ?? false;
-      const dateRange = options?.dateRange;
-
-      if (!silent) {
-        setIsLoading(true);
-      } else {
-        setIsRefreshing(true);
-      }
-
-      try {
-        const [dashboardResponse, quotaResponse] = await Promise.all([
-          fetch(buildDashboardUrl(dateRange)),
-          fetch('/api/ai/scan-quota'),
-        ]);
-
-        const dashboardData = (await dashboardResponse.json()) as {
-          summary?: DashboardSummary;
-          recentTransactions?: RecentTransaction[];
-          chartTransactions?: ChartTransaction[];
-          error?: string;
-        };
-
-        if (!dashboardResponse.ok) {
-          toast.error(translateError(dashboardData.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setSummary(dashboardData.summary ?? null);
-        setTransactions(dashboardData.recentTransactions ?? []);
-        setChartTransactions(dashboardData.chartTransactions ?? []);
-
-        if (quotaResponse.ok) {
-          const quotaData = (await quotaResponse.json()) as {
-            plan?: UserPlan;
-            quota?: { used: number; limit: number; remaining: number };
-          };
-          setUserPlan(quotaData.plan ?? 'FREE');
-          setScanQuota(
-            quotaData.quota
-              ? {
-                  used: quotaData.quota.used,
-                  limit: quotaData.quota.limit,
-                  remaining: quotaData.quota.remaining,
-                }
-              : null
-          );
-        }
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      } finally {
-        setIsLoading(false);
-        setIsRefreshing(false);
-      }
-    },
-    [locale, t]
-  );
-
-  useEffect(() => {
-    void loadDashboard();
-  }, [loadDashboard]);
-
   function handleCustomRangeApply(range: DateRange | undefined) {
     if (range?.from && range?.to) {
       setCustomDateRange(range);
-      void loadDashboard({ silent: true, dateRange: range });
       return;
     }
 
     if (!range && customDateRange) {
       setCustomDateRange(undefined);
-      void loadDashboard({ silent: true });
     }
   }
 
@@ -362,22 +319,23 @@ export function DashboardView() {
   }
 
   function handleBudgetUpdated(budget: number | null) {
-    setSummary((current) => (current ? { ...current, currentMonthBudget: budget } : current));
+    queryClient.setQueryData<DashboardData>(
+      queryKeys.dashboard(user.id, dashboardDateRange),
+      (current) =>
+        current
+          ? {
+              ...current,
+              summary: {
+                ...current.summary,
+                currentMonthBudget: budget,
+              },
+            }
+          : current
+    );
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="bg-elevated h-10 w-48 animate-pulse rounded-lg" />
-        <div className="bg-elevated h-10 w-72 animate-pulse rounded-lg" />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="bg-elevated h-48 animate-pulse rounded-2xl" />
-          <div className="bg-elevated h-48 animate-pulse rounded-2xl" />
-        </div>
-        <div className="bg-elevated h-64 animate-pulse rounded-2xl" />
-        <div className="bg-elevated h-72 animate-pulse rounded-2xl" />
-      </div>
-    );
+    return <DashboardLoadingSkeleton />;
   }
 
   if (!summary) {
@@ -490,21 +448,21 @@ export function DashboardView() {
         primaryCurrency={summary.primaryCurrency}
         transactionId={editingTransaction?.id}
         initialValues={editingTransaction ? toFormInitialValues(editingTransaction) : undefined}
-        onSuccess={() => void loadDashboard({ silent: true, dateRange: customDateRange })}
+        onSuccess={() => void refreshDashboard()}
       />
 
       <DeleteTransactionDialog
         transactionId={deletingTransactionId}
         open={isDeleteDialogOpen}
         onOpenChange={handleDeleteDialogOpenChange}
-        onSuccess={() => void loadDashboard({ silent: true, dateRange: customDateRange })}
+        onSuccess={() => void refreshDashboard()}
       />
 
       <DeleteTransactionGroupDialog
         receiptGroupId={deletingGroupId}
         open={isDeleteGroupDialogOpen}
         onOpenChange={handleDeleteGroupDialogOpenChange}
-        onSuccess={() => void loadDashboard({ silent: true, dateRange: customDateRange })}
+        onSuccess={() => void refreshDashboard()}
       />
 
       <EditTransactionGroupDialog
@@ -513,7 +471,7 @@ export function DashboardView() {
         initialDate={editingGroup?.date ?? new Date().toISOString()}
         open={isEditGroupDialogOpen}
         onOpenChange={handleEditGroupDialogOpenChange}
-        onSuccess={() => void loadDashboard({ silent: true, dateRange: customDateRange })}
+        onSuccess={() => void refreshDashboard()}
       />
     </div>
   );

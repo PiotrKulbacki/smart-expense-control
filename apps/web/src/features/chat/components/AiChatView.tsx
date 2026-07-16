@@ -1,13 +1,23 @@
 'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Bot, Send, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import type { ChatMessage } from '@shared/features/ai/schemas';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import {
+  fetchChatHistory,
+  fetchChatQuota,
+  type ChatHistoryPayload,
+  type ChatQuotaPayload,
+  type HistoryMessage,
+} from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
 const HISTORY_PAGE_SIZE = 30;
 
@@ -17,14 +27,6 @@ type ChatQuota = {
   remaining: number;
   canUse: boolean;
   isBlocked: boolean;
-};
-
-type HistoryMessage = ChatMessage & { id: string; createdAt: string };
-
-type HistoryResponse = {
-  messages?: HistoryMessage[];
-  hasMore?: boolean;
-  error?: string;
 };
 
 type ScrollAnchor = {
@@ -92,18 +94,24 @@ function mergeOlderMessages(current: HistoryMessage[], older: HistoryMessage[]):
   return sortMessagesChronologically([...uniqueOlder, ...current]);
 }
 
-export function AiChatView() {
+type AiChatViewProps = {
+  initialHistoryPage: ChatHistoryPayload;
+};
+
+export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
   const t = useT();
   const { locale } = useLocale();
-  const [messages, setMessages] = useState<HistoryMessage[]>([]);
+  const user = useAppUser();
+  const queryClient = useQueryClient();
+  const [messages, setMessages] = useState<HistoryMessage[]>(
+    sortMessagesChronologically(initialHistoryPage.messages)
+  );
   const [input, setInput] = useState('');
-  const [quota, setQuota] = useState<ChatQuota | null>(null);
-  const [userPlan, setUserPlan] = useState<'FREE' | 'PRO' | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [historyPage, setHistoryPage] = useState(0);
-  const [hasMoreHistory, setHasMoreHistory] = useState(false);
+  const [historyPage, setHistoryPage] = useState(initialHistoryPage.page);
+  const [hasMoreHistory, setHasMoreHistory] = useState(initialHistoryPage.hasMore);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topSentinelRef = useRef<HTMLDivElement>(null);
@@ -111,59 +119,26 @@ export function AiChatView() {
   const scrollAnchorRef = useRef<ScrollAnchor | null>(null);
   const shouldScrollToBottomRef = useRef(false);
 
-  useEffect(() => {
-    async function loadQuota() {
-      try {
-        const response = await fetch('/api/ai/chat-quota');
-        const data = (await response.json()) as {
-          quota?: ChatQuota;
-          plan?: 'FREE' | 'PRO';
-          error?: string;
-        };
-
-        if (!response.ok) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setQuota(data.quota ?? null);
-        setUserPlan(data.plan ?? null);
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      }
-    }
-
-    void loadQuota();
-  }, [locale, t]);
+  const quotaQuery = useQuery({
+    queryKey: queryKeys.chatQuota(user.id),
+    queryFn: fetchChatQuota,
+  });
 
   useEffect(() => {
-    async function loadHistory() {
-      setIsLoadingHistory(true);
-      setHistoryPage(0);
-      setHasMoreHistory(false);
-      scrollAnchorRef.current = null;
-
-      try {
-        const response = await fetch(`/api/ai/history?limit=${HISTORY_PAGE_SIZE}&page=0`);
-        const data = (await response.json()) as HistoryResponse;
-
-        if (!response.ok) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setMessages(sortMessagesChronologically(data.messages ?? []));
-        setHasMoreHistory(data.hasMore ?? false);
-        shouldScrollToBottomRef.current = true;
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      } finally {
-        setIsLoadingHistory(false);
-      }
+    if (!quotaQuery.isError) {
+      return;
     }
 
-    void loadHistory();
-  }, [locale, t]);
+    toast.error(
+      translateError(
+        quotaQuery.error instanceof Error ? quotaQuery.error.message : 'auth.errors.generic',
+        locale
+      )
+    );
+  }, [locale, quotaQuery.error, quotaQuery.isError]);
+
+  const quota = quotaQuery.data?.quota ?? null;
+  const userPlan = quotaQuery.data?.plan ?? null;
 
   const loadMoreHistory = useCallback(async () => {
     if (isLoadingMore || !hasMoreHistory || isLoadingHistory) {
@@ -182,18 +157,11 @@ export function AiChatView() {
 
     try {
       const nextPage = historyPage + 1;
-      const response = await fetch(`/api/ai/history?limit=${HISTORY_PAGE_SIZE}&page=${nextPage}`);
-      const data = (await response.json()) as HistoryResponse;
+      const data = await fetchChatHistory(HISTORY_PAGE_SIZE, nextPage);
 
-      if (!response.ok) {
-        toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-        scrollAnchorRef.current = null;
-        return;
-      }
-
-      setMessages((current) => mergeOlderMessages(current, data.messages ?? []));
+      setMessages((current) => mergeOlderMessages(current, data.messages));
       setHistoryPage(nextPage);
-      setHasMoreHistory(data.hasMore ?? false);
+      setHasMoreHistory(data.hasMore);
     } catch {
       toast.error(t('auth.errors.networkError'));
       scrollAnchorRef.current = null;
@@ -302,13 +270,7 @@ export function AiChatView() {
         shouldScrollToBottomRef.current = true;
       }
 
-      const quotaResponse = await fetch('/api/ai/chat-quota');
-      const quotaData = (await quotaResponse.json()) as {
-        quota?: ChatQuota;
-        plan?: 'FREE' | 'PRO';
-      };
-      setQuota(quotaData.quota ?? null);
-      setUserPlan(quotaData.plan ?? null);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.chatQuota(user.id) });
     } catch {
       toast.error(t('auth.errors.networkError'));
       setMessages((current) => current.filter((message) => message.id !== userMessage.id));

@@ -3,11 +3,15 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LocaleSwitcher } from '@web/features/layout/components/LocaleSwitcher';
+import { fetchDashboard } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 import { isAiEnabledOnClient } from '@web/lib/ai-feature';
 
 const NAV_ITEMS = [
@@ -27,6 +31,8 @@ type AppSidebarProps = {
 export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const user = useAppUser();
   const t = useT();
   const { locale } = useLocale();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -36,6 +42,17 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   useEffect(() => {
     setPendingHref(null);
   }, [pathname]);
+
+  function prefetchRoute(href: string) {
+    router.prefetch(href);
+
+    if (href === '/dashboard') {
+      void queryClient.prefetchQuery({
+        queryKey: queryKeys.dashboard(user.id),
+        queryFn: () => fetchDashboard(),
+      });
+    }
+  }
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -112,6 +129,8 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
               key={item.href}
               href={item.href}
               onClick={() => setPendingHref(item.href)}
+              onMouseEnter={() => prefetchRoute(item.href)}
+              onFocus={() => prefetchRoute(item.href)}
               className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 font-mono text-sm transition ${
                 isActive
                   ? 'bg-warm/10 text-warm'

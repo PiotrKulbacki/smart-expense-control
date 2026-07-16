@@ -1,5 +1,6 @@
 import { prisma } from '@smart-expense-control/database';
 import bcrypt from 'bcryptjs';
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import {
@@ -79,7 +80,7 @@ export function buildAuthResponse(
   return tokens ? { user, ...tokens } : { user };
 }
 
-export async function getUserFromSession(): Promise<SafeUser | null> {
+async function resolveUserFromSession(): Promise<SafeUser | null> {
   const cookieStore = await cookies();
   const sessionToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
@@ -98,6 +99,8 @@ export async function getUserFromSession(): Promise<SafeUser | null> {
 
   return toSafeUser(session.user);
 }
+
+export const getUserFromSession = cache(resolveUserFromSession);
 
 export async function getUserFromBearerToken(
   authorizationHeader: string | null

@@ -1,20 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   formatBillingPeriodLabel,
-  getPreviousQuotaPeriodStart,
   getQuotaPeriodEnd,
   getQuotaPeriodStart,
 } from '@shared/features/billing/financial-month';
-import { translateError } from '@shared/features/i18n';
 import { toCalendarDateInputValue, type CurrencyCode } from '@shared/features/transactions/schemas';
 import { Button } from '@web/components/ui/button';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useCategories } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { HistoryLoadingSkeleton } from '@web/features/layout/components/RouteLoadingSkeletons';
 import { DeleteTransactionDialog } from '@web/features/transactions/components/DeleteTransactionDialog';
 import { DeleteTransactionGroupDialog } from '@web/features/transactions/components/DeleteTransactionGroupDialog';
 import { EditTransactionGroupDialog } from '@web/features/transactions/components/EditTransactionGroupDialog';
@@ -25,10 +25,13 @@ import {
 import type { SplitTransactionGroup } from '@web/features/transactions/lib/transaction-groups';
 import { TransactionFormModal } from '@web/features/transactions/components/TransactionFormModal';
 import type { TransactionFormInitialValues } from '@web/features/transactions/components/TransactionForm';
+import { fetchHistoryTransactions } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
-type HistoryUserMeta = {
-  primaryCurrency: CurrencyCode;
-  financialMonthStartDay: number;
+type HistoryViewProps = {
+  initialPeriodStart: string;
+  initialTransactions: RecentTransaction[];
+  highlightReceiptGroupId?: string | null;
 };
 
 function toDateInputValue(isoDate: string): string {
@@ -45,18 +48,21 @@ function toFormInitialValues(transaction: RecentTransaction): TransactionFormIni
   };
 }
 
-export function HistoryView() {
+export function HistoryView({
+  initialPeriodStart,
+  initialTransactions,
+  highlightReceiptGroupId: initialHighlightReceiptGroupId = null,
+}: HistoryViewProps) {
   const t = useT();
   const { locale } = useLocale();
   const searchParams = useSearchParams();
-  const highlightReceiptGroupId = searchParams.get('receiptGroupId');
-  const { colorMap, nameMap } = useCategories();
+  const highlightReceiptGroupId =
+    searchParams.get('receiptGroupId') ?? initialHighlightReceiptGroupId;
+  const user = useAppUser();
+  const queryClient = useQueryClient();
+  const { colorMap, nameMap, isLoading: categoriesLoading } = useCategories();
   const categoryDisplayContext = useMemo(() => ({ colorMap, nameMap }), [colorMap, nameMap]);
-  const [userMeta, setUserMeta] = useState<HistoryUserMeta | null>(null);
-  const [periodStart, setPeriodStart] = useState<Date | null>(null);
-  const [transactions, setTransactions] = useState<RecentTransaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [periodStart, setPeriodStart] = useState<Date>(() => new Date(initialPeriodStart));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<RecentTransaction | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<string | null>(null);
@@ -66,126 +72,43 @@ export function HistoryView() {
   const [editingGroup, setEditingGroup] = useState<SplitTransactionGroup | null>(null);
   const [isEditGroupDialogOpen, setIsEditGroupDialogOpen] = useState(false);
 
-  const loadTransactions = useCallback(
-    async (options: {
-      start: Date;
-      end: Date;
-      silent?: boolean;
-      receiptGroupId?: string | null;
-    }) => {
-      if (!options.silent) {
-        setIsLoading(true);
-      } else {
-        setIsRefreshing(true);
-      }
+  const periodEnd = getQuotaPeriodEnd(periodStart);
+  const historyQueryKey = queryKeys.historyTransactions(user.id, {
+    from: periodStart.toISOString(),
+    to: periodEnd.toISOString(),
+    receiptGroupId: highlightReceiptGroupId,
+  });
 
-      try {
-        const params = new URLSearchParams();
-        if (options.receiptGroupId) {
-          params.set('receiptGroupId', options.receiptGroupId);
-        } else {
-          params.set('from', options.start.toISOString());
-          params.set('to', options.end.toISOString());
-        }
+  const transactionsQuery = useQuery({
+    queryKey: historyQueryKey,
+    queryFn: () =>
+      fetchHistoryTransactions({
+        from: periodStart.toISOString(),
+        to: periodEnd.toISOString(),
+        receiptGroupId: highlightReceiptGroupId,
+      }),
+    initialData: periodStart.toISOString() === initialPeriodStart ? initialTransactions : undefined,
+  });
 
-        const response = await fetch(`/api/transactions?${params.toString()}`);
-        const data = (await response.json()) as {
-          transactions?: RecentTransaction[];
-          error?: string;
-        };
+  const transactions = transactionsQuery.data ?? [];
+  const isLoading =
+    categoriesLoading || (transactionsQuery.isLoading && transactionsQuery.data === undefined);
+  const isRefreshing = transactionsQuery.isFetching && !isLoading;
 
-        if (!response.ok) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setTransactions(data.transactions ?? []);
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      } finally {
-        setIsLoading(false);
-        setIsRefreshing(false);
-      }
-    },
-    [locale, t]
-  );
-
-  useEffect(() => {
-    async function init() {
-      try {
-        const response = await fetch('/api/auth/me');
-        const data = (await response.json()) as {
-          user?: {
-            primaryCurrency: CurrencyCode;
-            financialMonthStartDay: number;
-          };
-          error?: string;
-        };
-
-        if (!response.ok || !data.user) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        const meta = {
-          primaryCurrency: data.user.primaryCurrency,
-          financialMonthStartDay: data.user.financialMonthStartDay,
-        };
-        setUserMeta(meta);
-
-        if (highlightReceiptGroupId) {
-          const groupResponse = await fetch(
-            `/api/transactions?receiptGroupId=${encodeURIComponent(highlightReceiptGroupId)}`
-          );
-          const groupData = (await groupResponse.json()) as {
-            transactions?: RecentTransaction[];
-          };
-          const anchor = groupData.transactions?.[0];
-
-          if (anchor) {
-            const anchorDate = new Date(anchor.date);
-            const periodStartForAnchor = getQuotaPeriodStart(
-              meta.financialMonthStartDay,
-              anchorDate
-            );
-            const periodEndForAnchor = getQuotaPeriodEnd(periodStartForAnchor);
-            setPeriodStart(periodStartForAnchor);
-            await loadTransactions({
-              start: periodStartForAnchor,
-              end: periodEndForAnchor,
-            });
-            return;
-          }
-        }
-
-        const previousStart = getPreviousQuotaPeriodStart(meta.financialMonthStartDay);
-        const previousEnd = getQuotaPeriodEnd(previousStart);
-        setPeriodStart(previousStart);
-        await loadTransactions({ start: previousStart, end: previousEnd });
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      }
-    }
-
-    void init();
-  }, [highlightReceiptGroupId, locale, loadTransactions, t]);
+  const reloadCurrentPeriod = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: historyQueryKey });
+  }, [historyQueryKey, queryClient]);
 
   function shiftPeriod(direction: -1 | 1) {
-    if (!userMeta || !periodStart) {
-      return;
-    }
-
     const nextStart = new Date(periodStart);
     nextStart.setUTCMonth(nextStart.getUTCMonth() + direction);
-    const nextEnd = getQuotaPeriodEnd(nextStart);
 
-    const currentStart = getQuotaPeriodStart(userMeta.financialMonthStartDay, new Date());
+    const currentStart = getQuotaPeriodStart(user.financialMonthStartDay, new Date());
     if (direction === 1 && nextStart >= currentStart) {
       return;
     }
 
     setPeriodStart(nextStart);
-    void loadTransactions({ start: nextStart, end: nextEnd, silent: true });
   }
 
   function openEditForm(transaction: RecentTransaction) {
@@ -236,27 +159,16 @@ export function HistoryView() {
     }
   }
 
-  function reloadCurrentPeriod() {
-    if (!periodStart) {
-      return;
-    }
-
-    const end = getQuotaPeriodEnd(periodStart);
-    void loadTransactions({ start: periodStart, end, silent: true });
+  function reloadCurrentPeriodSync() {
+    void reloadCurrentPeriod();
   }
 
-  if (isLoading || !userMeta || !periodStart) {
-    return (
-      <div className="space-y-4">
-        <div className="bg-elevated h-10 w-48 animate-pulse rounded-lg" />
-        <div className="bg-elevated h-72 animate-pulse rounded-2xl" />
-      </div>
-    );
+  if (isLoading) {
+    return <HistoryLoadingSkeleton />;
   }
 
-  const periodEnd = getQuotaPeriodEnd(periodStart);
   const periodLabel = formatBillingPeriodLabel(periodStart, periodEnd, locale);
-  const currentPeriodStart = getQuotaPeriodStart(userMeta.financialMonthStartDay, new Date());
+  const currentPeriodStart = getQuotaPeriodStart(user.financialMonthStartDay, new Date());
   const canGoNext = periodStart < currentPeriodStart;
 
   return (
@@ -295,7 +207,7 @@ export function HistoryView() {
 
       <RecentTransactionsList
         transactions={transactions}
-        primaryCurrency={userMeta.primaryCurrency}
+        primaryCurrency={user.primaryCurrency}
         locale={locale}
         categoryDisplayContext={categoryDisplayContext}
         isRefreshing={isRefreshing}
@@ -315,24 +227,24 @@ export function HistoryView() {
       <TransactionFormModal
         open={isFormOpen}
         onOpenChange={handleFormOpenChange}
-        primaryCurrency={userMeta.primaryCurrency}
+        primaryCurrency={user.primaryCurrency}
         transactionId={editingTransaction?.id}
         initialValues={editingTransaction ? toFormInitialValues(editingTransaction) : undefined}
-        onSuccess={reloadCurrentPeriod}
+        onSuccess={reloadCurrentPeriodSync}
       />
 
       <DeleteTransactionDialog
         transactionId={deletingTransactionId}
         open={isDeleteDialogOpen}
         onOpenChange={handleDeleteDialogOpenChange}
-        onSuccess={reloadCurrentPeriod}
+        onSuccess={reloadCurrentPeriodSync}
       />
 
       <DeleteTransactionGroupDialog
         receiptGroupId={deletingGroupId}
         open={isDeleteGroupDialogOpen}
         onOpenChange={handleDeleteGroupDialogOpenChange}
-        onSuccess={reloadCurrentPeriod}
+        onSuccess={reloadCurrentPeriodSync}
       />
 
       <EditTransactionGroupDialog
@@ -341,7 +253,7 @@ export function HistoryView() {
         initialDate={editingGroup?.date ?? new Date().toISOString()}
         open={isEditGroupDialogOpen}
         onOpenChange={handleEditGroupDialogOpenChange}
-        onSuccess={reloadCurrentPeriod}
+        onSuccess={reloadCurrentPeriodSync}
       />
     </div>
   );

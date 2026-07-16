@@ -37,6 +37,17 @@ const CHAT_HISTORY_LIMIT = 20;
 
 export type { QuotaStatus };
 export { getAiChatQuotaStatus };
+export type ChatHistoryPage = {
+  messages: Array<{
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    createdAt: string;
+  }>;
+  hasMore: boolean;
+  page: number;
+  limit: number;
+};
 
 function toIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -236,6 +247,39 @@ export async function getUserAiChatQuota(userId: string): Promise<QuotaStatus | 
   }
 
   return getAiChatQuotaStatus(user.currentPlan as PlanType, user.monthlyAiChatCount);
+}
+
+export async function getUserChatHistoryPage(
+  userId: string,
+  limit: number,
+  page: number
+): Promise<ChatHistoryPage> {
+  const rows = await prisma.chatMessage.findMany({
+    where: { userId },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: limit + 1,
+    skip: page * limit,
+    select: {
+      id: true,
+      role: true,
+      content: true,
+      createdAt: true,
+    },
+  });
+
+  const hasMore = rows.length > limit;
+  const pageRows = hasMore ? rows.slice(0, limit) : rows;
+  const messages = pageRows
+    .reverse()
+    .filter((row) => row.role === 'user' || row.role === 'assistant')
+    .map((row) => ({
+      id: row.id,
+      role: row.role as 'user' | 'assistant',
+      content: row.content,
+      createdAt: row.createdAt.toISOString(),
+    }));
+
+  return { messages, hasMore, page, limit };
 }
 
 async function incrementAiChatCount(userId: string): Promise<void> {

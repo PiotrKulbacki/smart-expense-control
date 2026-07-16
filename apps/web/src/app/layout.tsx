@@ -5,6 +5,7 @@ import { PostHogProvider } from '@web/features/analytics/components/PostHogProvi
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
 import { CategoriesProvider } from '@web/features/categories/components/CategoriesProvider';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
+import { QueryProvider } from '@web/features/query/QueryProvider';
 import { DEFAULT_LOCALE, isLocale } from '@shared/features/i18n';
 import type { Metadata } from 'next';
 import './globals.css';
@@ -44,12 +45,14 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <MeshBackground />
         <LocaleProvider initialLocale={initialLocale}>
-          <CategoriesProvider>
-            <PostHogProvider>
-              {children}
-              <ToastProvider />
-            </PostHogProvider>
-          </CategoriesProvider>
+          <QueryProvider>
+            <CategoriesProvider>
+              <PostHogProvider>
+                {children}
+                <ToastProvider />
+              </PostHogProvider>
+            </CategoriesProvider>
+          </QueryProvider>
         </LocaleProvider>
       </body>
     </html>

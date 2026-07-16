@@ -165,74 +165,55 @@ export async function getDashboardData(
   const rateMap = await getExchangeRates();
   const usesDefaultPeriod = !dateRange.from && !dateRange.to;
 
-  const [
-    periodTransactions,
-    chartSourceTransactions,
-    recentTransactions,
-    fixedCostsTotal,
-    cachedPeriodAggregation,
-    billingPeriodCountSource,
-  ] = await Promise.all([
-    usesDefaultPeriod
-      ? Promise.resolve([])
-      : prisma.transaction.findMany({
-          where: {
-            userId,
-            date: { gte: periodStart, lte: periodEnd },
-          },
-          select: {
-            amount: true,
-            currency: true,
-            category: true,
-            receiptGroupId: true,
-            isAiScanned: true,
-            date: true,
-          },
-        }),
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: chartDataStart, lte: periodEnd },
-      },
-      select: {
-        amount: true,
-        currency: true,
-        category: true,
-        date: true,
-      },
-    }),
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: chartDataStart, lte: periodEnd },
-      },
-      orderBy: { date: 'desc' },
-      select: {
-        id: true,
-        amount: true,
-        currency: true,
-        category: true,
-        description: true,
-        date: true,
-        isAiScanned: true,
-        receiptGroupId: true,
-      },
-    }),
-    usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
-    getOrRefreshPeriodAggregation(userId, now),
-    // Billing-cycle rows for no-spend days + logical transaction counts
-    prisma.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: billingPeriodStart, lte: billingPeriodEnd },
-      },
-      select: {
-        date: true,
-        receiptGroupId: true,
-        isAiScanned: true,
-      },
-    }),
-  ]);
+  const [rangedTransactions, fixedCostsTotal, cachedPeriodAggregation, billingPeriodCountSource] =
+    await Promise.all([
+      prisma.transaction.findMany({
+        where: {
+          userId,
+          date: { gte: chartDataStart, lte: periodEnd },
+        },
+        orderBy: { date: 'desc' },
+        select: {
+          id: true,
+          amount: true,
+          currency: true,
+          category: true,
+          description: true,
+          date: true,
+          isAiScanned: true,
+          receiptGroupId: true,
+        },
+      }),
+      usesDefaultPeriod ? Promise.resolve(0) : getFixedCostsTotal(userId, primaryCurrency, rateMap),
+      getOrRefreshPeriodAggregation(userId, now),
+      prisma.transaction.findMany({
+        where: {
+          userId,
+          date: { gte: billingPeriodStart, lte: billingPeriodEnd },
+        },
+        select: {
+          date: true,
+          receiptGroupId: true,
+          isAiScanned: true,
+        },
+      }),
+    ]);
+
+  const categoryLimits = await getCategoryLimitProgressForUser(
+    userId,
+    cachedPeriodAggregation?.categoryTotalsPrimary ?? []
+  );
+
+  const periodStartMs = periodStart.getTime();
+  const periodEndMs = periodEnd.getTime();
+  const periodTransactions = usesDefaultPeriod
+    ? []
+    : rangedTransactions.filter((transaction) => {
+        const transactionTime = transaction.date.getTime();
+        return transactionTime >= periodStartMs && transactionTime <= periodEndMs;
+      });
+  const recentTransactions = rangedTransactions;
+  const chartSourceTransactions = rangedTransactions;
 
   const noSpendDays = computeNoSpendDays({
     periodStart: billingPeriodStart,
@@ -318,11 +299,6 @@ export async function getDashboardData(
   }
 
   // Category limits always compare against the billing-period spend (not custom chart range).
-  const categoryLimits = await getCategoryLimitProgressForUser(
-    userId,
-    cachedPeriodAggregation?.categoryTotalsPrimary ?? []
-  );
-
   const mappedRecentTransactions = recentTransactions.map((transaction) => {
     const amount = transaction.amount.toNumber();
     return {

@@ -27,6 +27,7 @@
 23. **Faza 9.5: refaktoryzacja UI Archiwum, audyt modelu AI, poprawa dokładności skanera** — [✅ Zrobione]
 24. **Faza 9.6: metryka „Dni bez wydatków" i AI Insights na Dashboardzie** — [✅ Zrobione]
 25. **Faza 9.7: limity wydatków na kategorie (settings + dashboard + AI)** — [✅ Zrobione]
+26. **Faza 9.8: optymalizacja wydajności ładowania widoków (prefetch, cache, API)** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -79,6 +80,25 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-16 — Faza 9.8 zamknięta: optymalizacja wydajności ładowania widoków aplikacji.**
+
+### Faza 9.8 — Performance: prefetch, cache, API
+
+- **TanStack Query:** `QueryProvider` w root layout; `staleTime` 30s; klucze w `query-keys.ts`; fetchery w `fetchers.ts`.
+- **Server prefetch:** `dashboard/page.tsx` — `getDashboardData` + `getUserAiScanQuota` na serwerze, hydracja do klienta; `history/page.tsx` — transakcje okresu + `resolveHistoryInitialState`; `settings/page.tsx` — `initialUser` z sesji (bez `GET /api/auth/me`).
+- **`(app)/layout.tsx`:** `getUserFromSession` opakowane w `cache()` (deduplikacja w obrębie requestu); `AppUserProvider`; prefetch kategorii (`listUserCategories`) + `HydrationBoundary`.
+- **`loading.tsx`:** per route (`dashboard`, `history`, `settings`, `chat`, `scanner`) + fallback `(app)/loading.tsx`; szkielety w `RouteLoadingSkeletons.tsx` (identyczne klasy jak dotychczas).
+- **API dashboard:** jedno zapytanie transakcji zamiast dwóch (chart + recent); filtrowanie okresu w pamięci.
+- **Kursy walut:** jedno `findMany` + deduplikacja par w pamięci; cache in-process 60s (`IN_MEMORY_CACHE_TTL_MS`).
+- **Klient:** `CategoriesProvider` na `useQuery`; `DashboardView` / `HistoryView` na React Query z `initialData`; loader do momentu gotowości kategorii + danych widoku; AI Insights ładowane przez `requestIdleCallback` (defer); Recharts w `CategoryDonutChartPie` przez `next/dynamic`.
+- **Scanner:** `scanner/page.tsx` — server prefetch dla `/api/ai/scan-quota` i archiwum dokumentów; `ReceiptScanner` oraz `ReceiptArchive` oparte o React Query zamiast pierwszego `useEffect` po wejściu do zakładki.
+- **Settings:** `settings/page.tsx` — hydracja danych dla `CategoryLimitsSection`, `RecurringExpensesSection` i kursów walut; obie sekcje korzystają z query cache zamiast osobnych initial fetchy po renderze paneli.
+- **Chat AI:** `chat/page.tsx` — server prefetch quota + pierwszej strony historii; `AiChatView` startuje z gotowym stanem rozmowy, a dalsze strony historii są dociągane lazy przy scrollu.
+- **Sidebar:** `router.prefetch` + prefetch dashboard API przy hover/focus na linku.
+- **Zależność:** `@tanstack/react-query` w `apps/web`.
+
+---
 
 **2026-07-16 — Faza 9.7 zamknięta: limity wydatków na kategorie (settings, dashboard, AI).**
 

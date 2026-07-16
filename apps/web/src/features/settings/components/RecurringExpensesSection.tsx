@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { convertAmount } from '@shared/features/currency';
@@ -18,13 +19,13 @@ import {
 import { Input } from '@web/components/ui/input';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
-
-type RecurringExpenseItem = {
-  id: string;
-  amount: number;
-  currency: string;
-  category: string;
-};
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
+import {
+  fetchCurrencyRates,
+  fetchRecurringExpenses,
+  type RecurringExpenseItem,
+} from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
 type RecurringExpensesSectionProps = {
   primaryCurrency: CurrencyCode;
@@ -41,52 +42,49 @@ function formatMoney(amount: number, currency: string, locale: string): string {
 export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesSectionProps) {
   const t = useT();
   const { locale } = useLocale();
-  const [expenses, setExpenses] = useState<RecurringExpenseItem[]>([]);
-  const [rateMap, setRateMap] = useState<ExchangeRateMap>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const user = useAppUser();
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState<CurrencyCode>(primaryCurrency);
 
-  const loadExpenses = useCallback(async () => {
-    try {
-      const [expensesResponse, ratesResponse] = await Promise.all([
-        fetch('/api/recurring-expenses'),
-        fetch('/api/currency/rates'),
-      ]);
+  const expensesQuery = useQuery({
+    queryKey: queryKeys.recurringExpenses(user.id),
+    queryFn: fetchRecurringExpenses,
+  });
 
-      const data = (await expensesResponse.json()) as {
-        recurringExpenses?: RecurringExpenseItem[];
-        error?: string;
-      };
-
-      if (!expensesResponse.ok) {
-        toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-        return;
-      }
-
-      setExpenses(data.recurringExpenses ?? []);
-
-      if (ratesResponse.ok) {
-        const ratesData = (await ratesResponse.json()) as { rates?: ExchangeRateMap };
-        setRateMap(ratesData.rates ?? {});
-      }
-    } catch {
-      toast.error(t('auth.errors.networkError'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [locale, t]);
+  const ratesQuery = useQuery({
+    queryKey: queryKeys.currencyRates(user.id),
+    queryFn: fetchCurrencyRates,
+  });
 
   useEffect(() => {
-    void loadExpenses();
-  }, [loadExpenses]);
+    const errorSource = expensesQuery.isError ? expensesQuery.error : ratesQuery.error;
+    const isError = expensesQuery.isError || ratesQuery.isError;
+
+    if (!isError) {
+      return;
+    }
+
+    toast.error(
+      translateError(
+        errorSource instanceof Error ? errorSource.message : 'auth.errors.generic',
+        locale
+      )
+    );
+  }, [expensesQuery.error, expensesQuery.isError, locale, ratesQuery.error, ratesQuery.isError]);
 
   useEffect(() => {
     setCurrency(primaryCurrency);
   }, [primaryCurrency]);
+
+  const expenses = expensesQuery.data ?? [];
+  const rateMap: ExchangeRateMap = ratesQuery.data ?? {};
+  const isLoading =
+    (expensesQuery.isLoading && expensesQuery.data === undefined) ||
+    (ratesQuery.isLoading && ratesQuery.data === undefined);
 
   const monthlyTotal = useMemo(() => {
     let total = 0;
@@ -151,7 +149,10 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
       toast.success(t('recurring.success.created'));
       setName('');
       setAmount('');
-      await loadExpenses();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.recurringExpenses(user.id) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.currencyRates(user.id) }),
+      ]);
     } catch {
       toast.error(t('auth.errors.networkError'));
     } finally {
@@ -175,7 +176,7 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
       }
 
       toast.success(t('recurring.success.deleted'));
-      await loadExpenses();
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recurringExpenses(user.id) });
     } catch {
       toast.error(t('auth.errors.networkError'));
     } finally {

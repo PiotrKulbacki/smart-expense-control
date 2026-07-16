@@ -100,7 +100,61 @@ export function TransactionsInsightsCard({
   );
 
   useEffect(() => {
-    void loadInsight(false);
+    const run = () => {
+      void loadInsight(false);
+    };
+
+    const supportsIdleCallback = 'requestIdleCallback' in window;
+
+    // #region agent log
+    void fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Debug-Session-Id': 'bee806',
+      },
+      body: JSON.stringify({
+        sessionId: 'bee806',
+        runId: 'pre-fix_settimeout_typing',
+        hypothesisId: 'H1',
+        location: 'TransactionsInsightsCard.tsx:109',
+        message: 'InsightsCard useEffect idle callback support check',
+        data: { supportsIdleCallback },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
+    if (supportsIdleCallback) {
+      const idleCallback = window.requestIdleCallback(run, { timeout: 1_500 });
+      return () => {
+        window.cancelIdleCallback(idleCallback);
+      };
+    }
+
+    // #region agent log
+    void fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Debug-Session-Id': 'bee806',
+      },
+      body: JSON.stringify({
+        sessionId: 'bee806',
+        runId: 'pre-fix_settimeout_typing',
+        hypothesisId: 'H1',
+        location: 'TransactionsInsightsCard.tsx:126',
+        message: 'InsightsCard fallback scheduling setTimeout branch',
+        data: {},
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
+
+    const timer = setTimeout(run, 0);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [loadInsight]);
 
   const typeStyles = insight ? INSIGHT_TYPE_STYLES[insight.type] : INSIGHT_TYPE_STYLES.tip;

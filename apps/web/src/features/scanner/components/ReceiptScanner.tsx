@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
@@ -20,6 +21,7 @@ import {
 } from '@shared/features/transactions/schemas';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { CategorySelectWithCreate } from '@web/features/scanner/components/CategorySelectWithCreate';
 import { ReceiptArchive } from '@web/features/scanner/components/ReceiptArchive';
 import { compressReceiptImage } from '@web/features/scanner/lib/compress-receipt-image';
@@ -27,6 +29,8 @@ import {
   getCategoryOptionLabel,
   useCategories,
 } from '@web/features/categories/hooks/useCategories';
+import { fetchScanQuota } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
 type ScanQuota = {
   limit: number;
@@ -105,9 +109,10 @@ function formatItemMoney(amount: number, currency: string, locale: string): stri
 export function ReceiptScanner() {
   const t = useT();
   const { locale } = useLocale();
+  const user = useAppUser();
+  const queryClient = useQueryClient();
   const { categories } = useCategories();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [quota, setQuota] = useState<ScanQuota | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [draft, setDraft] = useState<ReceiptDraft | null>(null);
@@ -127,25 +132,27 @@ export function ReceiptScanner() {
     return manualSplitLines;
   }, [lineItems, manualSplitLines]);
 
+  const scanQuotaQuery = useQuery({
+    queryKey: queryKeys.scanQuota(user.id),
+    queryFn: fetchScanQuota,
+  });
+
   useEffect(() => {
-    async function loadQuota() {
-      try {
-        const response = await fetch('/api/ai/scan-quota');
-        const data = (await response.json()) as { quota?: ScanQuota; error?: string };
-
-        if (!response.ok) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setQuota(data.quota ?? null);
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      }
+    if (!scanQuotaQuery.isError) {
+      return;
     }
 
-    void loadQuota();
-  }, [locale, t]);
+    toast.error(
+      translateError(
+        scanQuotaQuery.error instanceof Error
+          ? scanQuotaQuery.error.message
+          : 'auth.errors.generic',
+        locale
+      )
+    );
+  }, [locale, scanQuotaQuery.error, scanQuotaQuery.isError]);
+
+  const quota = scanQuotaQuery.data?.quota ?? null;
 
   function applyDraft(nextDraft: ReceiptDraft) {
     const splitState = initializeDraftState(nextDraft);
@@ -289,9 +296,7 @@ export function ReceiptScanner() {
         }
       }
 
-      const quotaResponse = await fetch('/api/ai/scan-quota');
-      const quotaData = (await quotaResponse.json()) as { quota?: ScanQuota };
-      setQuota(quotaData.quota ?? null);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.scanQuota(user.id) });
     } catch {
       toast.error(t('auth.errors.networkError'));
     } finally {

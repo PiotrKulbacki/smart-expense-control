@@ -23,22 +23,33 @@ import { RecurringExpensesSection } from '@web/features/settings/components/Recu
 import { CategoriesSection } from '@web/features/settings/components/CategoriesSection';
 import { CategoryLimitsSection } from '@web/features/settings/components/CategoryLimitsSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { SettingsLoadingSkeleton } from '@web/features/layout/components/RouteLoadingSkeletons';
 
-export function SettingsView() {
+type SettingsViewProps = {
+  initialUser: SafeUser;
+};
+
+export function SettingsView({ initialUser }: SettingsViewProps) {
   const t = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { locale } = useLocale();
-  const [user, setUser] = useState<SafeUser | null>(null);
-  const [name, setName] = useState('');
-  const [primaryCurrency, setPrimaryCurrency] = useState<CurrencyCode>('PLN');
-  const [financialMonthStartDay, setFinancialMonthStartDay] = useState(1);
-  const [defaultMonthlyBudget, setDefaultMonthlyBudget] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<SafeUser | null>(initialUser);
+  const [name, setName] = useState(initialUser.name ?? '');
+  const [primaryCurrency, setPrimaryCurrency] = useState<CurrencyCode>(initialUser.primaryCurrency);
+  const [financialMonthStartDay, setFinancialMonthStartDay] = useState(
+    initialUser.financialMonthStartDay
+  );
+  const [defaultMonthlyBudget, setDefaultMonthlyBudget] = useState(
+    initialUser.defaultMonthlyBudget != null ? String(initialUser.defaultMonthlyBudget) : ''
+  );
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isBillingLoading, setIsBillingLoading] = useState(false);
-  const [checkoutCurrency, setCheckoutCurrency] = useState<BillingCurrency>('PLN');
+  const [checkoutCurrency, setCheckoutCurrency] = useState<BillingCurrency>(
+    () => readStoredBillingCurrency() ?? initialUser.primaryCurrency
+  );
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isCheckoutSuccess, setIsCheckoutSuccess] = useState(false);
   const [cycleDayModal, setCycleDayModal] = useState<{
@@ -97,33 +108,8 @@ export function SettingsView() {
   }, [searchParams, t, router]);
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const response = await fetch('/api/auth/me');
-        const data = (await response.json()) as { user?: SafeUser; error?: string };
-
-        if (!response.ok || !data.user) {
-          toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-          return;
-        }
-
-        setUser(data.user);
-        setName(data.user.name ?? '');
-        setPrimaryCurrency(data.user.primaryCurrency);
-        setFinancialMonthStartDay(data.user.financialMonthStartDay);
-        setDefaultMonthlyBudget(
-          data.user.defaultMonthlyBudget != null ? String(data.user.defaultMonthlyBudget) : ''
-        );
-        setCheckoutCurrency(readStoredBillingCurrency() ?? data.user.primaryCurrency);
-      } catch {
-        toast.error(t('auth.errors.networkError'));
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    void loadUser();
-  }, [locale, t]);
+    setCheckoutCurrency(readStoredBillingCurrency() ?? initialUser.primaryCurrency);
+  }, [initialUser.primaryCurrency]);
 
   useEffect(() => {
     if (!user) {
@@ -285,7 +271,7 @@ export function SettingsView() {
   }
 
   if (isLoading) {
-    return <div className="bg-elevated h-64 animate-pulse rounded-2xl" />;
+    return <SettingsLoadingSkeleton />;
   }
 
   if (!user) {

@@ -1,18 +1,13 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import type { CategoryListItem } from '@shared/features/transactions/category-schemas';
 import { useLocale } from '@web/features/i18n/LocaleProvider';
+import { fetchCategories } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 
 type CategoriesContextValue = {
   categories: CategoryListItem[];
@@ -26,33 +21,36 @@ const CategoriesContext = createContext<CategoriesContextValue | null>(null);
 
 export function CategoriesProvider({ children }: { children: ReactNode }) {
   const { locale } = useLocale();
-  const [categories, setCategories] = useState<CategoryListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  const {
+    data: categories = [],
+    isLoading,
+    isFetching,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: queryKeys.categories(),
+    queryFn: fetchCategories,
+  });
+
+  useEffect(() => {
+    if (!isError) {
+      return;
+    }
+
+    toast.error(
+      translateError(error instanceof Error ? error.message : 'auth.errors.generic', locale)
+    );
+  }, [error, isError, locale]);
 
   const loadCategories = useCallback(async () => {
     try {
-      const response = await fetch('/api/categories');
-      const data = (await response.json()) as {
-        categories?: CategoryListItem[];
-        error?: string;
-      };
-
-      if (!response.ok) {
-        toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-        return;
-      }
-
-      setCategories(data.categories ?? []);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.categories() });
     } catch {
       toast.error(translateError('auth.errors.networkError', locale));
-    } finally {
-      setIsLoading(false);
     }
-  }, [locale]);
-
-  useEffect(() => {
-    void loadCategories();
-  }, [loadCategories]);
+  }, [locale, queryClient]);
 
   const colorMap = useMemo(
     () => new Map(categories.map((category) => [category.key, category.color])),
@@ -72,10 +70,10 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
       categories,
       colorMap,
       nameMap,
-      isLoading,
+      isLoading: isLoading || isFetching,
       reload: loadCategories,
     }),
-    [categories, colorMap, nameMap, isLoading, loadCategories]
+    [categories, colorMap, nameMap, isLoading, isFetching, loadCategories]
   );
 
   return <CategoriesContext.Provider value={value}>{children}</CategoriesContext.Provider>;

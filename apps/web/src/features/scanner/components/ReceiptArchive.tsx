@@ -1,11 +1,15 @@
 'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, FolderOpen, ImageIcon, X, ZoomIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { fetchReceiptArchive } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 import { cn } from '@web/lib/utils';
 
 export type ReceiptArchiveDocument = {
@@ -242,10 +246,41 @@ function DocumentRow({
 export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
   const t = useT();
   const { locale } = useLocale();
-  const [documents, setDocuments] = useState<ReceiptArchiveDocument[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const user = useAppUser();
+  const queryClient = useQueryClient();
   const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
   const [previewDocument, setPreviewDocument] = useState<ReceiptArchiveDocument | null>(null);
+
+  const archiveQuery = useQuery({
+    queryKey: queryKeys.receiptArchive(user.id),
+    queryFn: fetchReceiptArchive,
+  });
+
+  useEffect(() => {
+    if (!archiveQuery.isError) {
+      return;
+    }
+
+    toast.error(
+      translateError(
+        archiveQuery.error instanceof Error
+          ? archiveQuery.error.message
+          : 'scanner.archive.errors.loadFailed',
+        locale
+      )
+    );
+  }, [archiveQuery.error, archiveQuery.isError, locale]);
+
+  useEffect(() => {
+    if (refreshKey <= 0) {
+      return;
+    }
+
+    void queryClient.invalidateQueries({ queryKey: queryKeys.receiptArchive(user.id) });
+  }, [queryClient, refreshKey, user.id]);
+
+  const documents = archiveQuery.data ?? [];
+  const isLoading = archiveQuery.isLoading && archiveQuery.data === undefined;
 
   const monthBuckets = useMemo(() => groupDocumentsByMonth(documents), [documents]);
   const selectedMonth = useMemo(
@@ -256,33 +291,6 @@ export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
     () => (selectedMonth ? sortDocumentsByDate(selectedMonth.documents) : []),
     [selectedMonth]
   );
-
-  const loadArchive = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/receipts/archive');
-      const data = (await response.json()) as {
-        documents?: ReceiptArchiveDocument[];
-        error?: string;
-      };
-
-      if (!response.ok) {
-        toast.error(translateError(data.error ?? 'scanner.archive.errors.loadFailed', locale));
-        return;
-      }
-
-      setDocuments(data.documents ?? []);
-    } catch {
-      toast.error(t('auth.errors.networkError'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [locale, t]);
-
-  useEffect(() => {
-    void loadArchive();
-  }, [loadArchive, refreshKey]);
 
   useEffect(() => {
     if (openMonthKey && !monthBuckets.some((month) => month.key === openMonthKey)) {

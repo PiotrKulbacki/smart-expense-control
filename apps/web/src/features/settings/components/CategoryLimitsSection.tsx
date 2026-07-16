@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
@@ -13,8 +14,11 @@ import {
   getCategoryOptionLabel,
   useSortedCategoriesForSelect,
 } from '@web/features/categories/hooks/useCategories';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import { fetchCategoryLimits } from '@web/features/query/fetchers';
+import { queryKeys } from '@web/features/query/query-keys';
 import {
   getCategoryColor,
   resolveCategoryLabel,
@@ -28,14 +32,14 @@ type CategoryLimitsSectionProps = {
 export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSectionProps) {
   const t = useT();
   const { locale } = useLocale();
+  const user = useAppUser();
+  const queryClient = useQueryClient();
   const {
     categories,
     colorMap,
     nameMap,
     isLoading: isCategoriesLoading,
   } = useSortedCategoriesForSelect();
-  const [limits, setLimits] = useState<CategoryLimitRecord[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [categoryKey, setCategoryKey] = useState('');
@@ -48,6 +52,26 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     [colorMap, nameMap]
   );
 
+  const limitsQuery = useQuery({
+    queryKey: queryKeys.categoryLimits(user.id),
+    queryFn: fetchCategoryLimits,
+  });
+
+  useEffect(() => {
+    if (!limitsQuery.isError) {
+      return;
+    }
+
+    toast.error(
+      translateError(
+        limitsQuery.error instanceof Error ? limitsQuery.error.message : 'auth.errors.generic',
+        locale
+      )
+    );
+  }, [limitsQuery.error, limitsQuery.isError, locale]);
+
+  const limits = limitsQuery.data ?? [];
+
   const limitedKeys = useMemo(() => new Set(limits.map((limit) => limit.categoryKey)), [limits]);
 
   const availableCategories = useMemo(() => {
@@ -58,28 +82,6 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     }
     return categories.filter((category) => !limitedKeys.has(category.key));
   }, [categories, limitedKeys, editingKey]);
-
-  const loadLimits = useCallback(async () => {
-    try {
-      const response = await fetch('/api/category-limits');
-      const data = (await response.json()) as { limits?: CategoryLimitRecord[]; error?: string };
-
-      if (!response.ok) {
-        toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
-        return;
-      }
-
-      setLimits(data.limits ?? []);
-    } catch {
-      toast.error(t('auth.errors.networkError'));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [locale, t]);
-
-  useEffect(() => {
-    void loadLimits();
-  }, [loadLimits]);
 
   function openCreateForm() {
     setEditingKey(null);
@@ -127,10 +129,15 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
         return;
       }
 
-      setLimits((current) => {
-        const without = current.filter((item) => item.categoryKey !== data.limit!.categoryKey);
-        return [...without, data.limit!].sort((a, b) => a.categoryKey.localeCompare(b.categoryKey));
-      });
+      queryClient.setQueryData<CategoryLimitRecord[]>(
+        queryKeys.categoryLimits(user.id),
+        (current = []) => {
+          const without = current.filter((item) => item.categoryKey !== data.limit!.categoryKey);
+          return [...without, data.limit!].sort((a, b) =>
+            a.categoryKey.localeCompare(b.categoryKey)
+          );
+        }
+      );
       toast.success(t('settings.categoryLimits.success.saved'));
       setIsFormOpen(false);
       setEditingKey(null);
@@ -158,7 +165,10 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
         return;
       }
 
-      setLimits((current) => current.filter((item) => item.categoryKey !== key));
+      queryClient.setQueryData<CategoryLimitRecord[]>(
+        queryKeys.categoryLimits(user.id),
+        (current = []) => current.filter((item) => item.categoryKey !== key)
+      );
       toast.success(t('settings.categoryLimits.success.deleted'));
     } catch {
       toast.error(t('auth.errors.networkError'));
@@ -167,7 +177,7 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     }
   }
 
-  if (isLoading || isCategoriesLoading) {
+  if ((limitsQuery.isLoading && limitsQuery.data === undefined) || isCategoriesLoading) {
     return <div className="bg-elevated h-48 animate-pulse rounded-2xl" />;
   }
 

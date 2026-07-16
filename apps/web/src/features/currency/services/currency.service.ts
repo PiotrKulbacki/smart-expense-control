@@ -4,32 +4,59 @@ import {
   convertAmount,
   EXCHANGE_RATE_CACHE_TTL_MS,
   fetchRatesFromFrankfurter,
-  SUPPORTED_CURRENCIES,
   STABLE_FALLBACK_RATES,
   type ExchangeRateMap,
 } from '@shared/features/currency';
 import type { CurrencyCode } from '@shared/features/transactions/schemas';
 
+const IN_MEMORY_CACHE_TTL_MS = 60_000;
+
+let inMemoryRateCache: { map: ExchangeRateMap; expiresAt: number } | null = null;
+
+function getInMemoryRates(): ExchangeRateMap | null {
+  if (!inMemoryRateCache || Date.now() >= inMemoryRateCache.expiresAt) {
+    return null;
+  }
+
+  return inMemoryRateCache.map;
+}
+
+function setInMemoryRates(map: ExchangeRateMap): ExchangeRateMap {
+  inMemoryRateCache = {
+    map,
+    expiresAt: Date.now() + IN_MEMORY_CACHE_TTL_MS,
+  };
+
+  return map;
+}
+
 async function getLatestDbRates(): Promise<ExchangeRateMap> {
-  const currencies: CurrencyCode[] = [...SUPPORTED_CURRENCIES];
-  const pairs: Array<{ from: CurrencyCode; to: CurrencyCode; rate: number }> = [];
+  const rates = await prisma.exchangeRate.findMany({
+    orderBy: { fetchedAt: 'desc' },
+    select: {
+      fromCurrency: true,
+      toCurrency: true,
+      rate: true,
+    },
+  });
 
-  for (const from of currencies) {
-    for (const to of currencies) {
-      if (from === to) continue;
+  const latestByPair = new Map<string, { from: CurrencyCode; to: CurrencyCode; rate: number }>();
 
-      const latest = await prisma.exchangeRate.findFirst({
-        where: { fromCurrency: from, toCurrency: to },
-        orderBy: { fetchedAt: 'desc' },
-      });
+  for (const entry of rates) {
+    const from = entry.fromCurrency as CurrencyCode;
+    const to = entry.toCurrency as CurrencyCode;
 
-      if (latest) {
-        pairs.push({ from, to, rate: latest.rate.toNumber() });
-      }
+    if (from === to) {
+      continue;
+    }
+
+    const key = `${from}:${to}`;
+    if (!latestByPair.has(key)) {
+      latestByPair.set(key, { from, to, rate: entry.rate.toNumber() });
     }
   }
 
-  return buildRateMapFromPairs(pairs);
+  return buildRateMapFromPairs(Array.from(latestByPair.values()));
 }
 
 function isCacheFresh(fetchedAt: Date): boolean {
@@ -65,23 +92,28 @@ async function persistRates(
  * Falls back to last known DB rates, then to stable hardcoded rates.
  */
 export async function syncExchangeRates(): Promise<ExchangeRateMap> {
+  const cachedRates = getInMemoryRates();
+  if (cachedRates) {
+    return cachedRates;
+  }
+
   const newestTimestamp = await getNewestRateTimestamp();
 
   if (newestTimestamp && isCacheFresh(newestTimestamp)) {
-    return getLatestDbRates();
+    return setInMemoryRates(await getLatestDbRates());
   }
 
   try {
     const fetchedPairs = await fetchRatesFromFrankfurter();
     await persistRates(fetchedPairs);
-    return buildRateMapFromPairs(fetchedPairs);
+    return setInMemoryRates(buildRateMapFromPairs(fetchedPairs));
   } catch {
     const dbRates = await getLatestDbRates();
     if (Object.keys(dbRates).length > 0) {
-      return dbRates;
+      return setInMemoryRates(dbRates);
     }
 
-    return STABLE_FALLBACK_RATES as ExchangeRateMap;
+    return setInMemoryRates(STABLE_FALLBACK_RATES as ExchangeRateMap);
   }
 }
 
