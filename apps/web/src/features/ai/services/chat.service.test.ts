@@ -70,9 +70,9 @@ describe('chat.service quota', () => {
     });
 
     await expect(getUserAiChatQuota('user-1')).resolves.toEqual({
-      limit: Number.MAX_SAFE_INTEGER,
+      limit: 50,
       used: 42,
-      remaining: Number.MAX_SAFE_INTEGER - 42,
+      remaining: 8,
       canUse: true,
       isBlocked: false,
     });

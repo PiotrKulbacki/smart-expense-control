@@ -4,6 +4,7 @@ import { MeshBackground } from '@web/components/MeshBackground';
 import { PostHogProvider } from '@web/features/analytics/components/PostHogProvider';
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
 import { CategoriesProvider } from '@web/features/categories/components/CategoriesProvider';
+import { CookieConsentProvider } from '@web/features/cookie-consent';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
 import { QueryProvider } from '@web/features/query/QueryProvider';
 import { DEFAULT_LOCALE, isLocale } from '@shared/features/i18n';
@@ -45,14 +46,16 @@ export default async function RootLayout({
       <body suppressHydrationWarning>
         <MeshBackground />
         <LocaleProvider initialLocale={initialLocale}>
-          <QueryProvider>
-            <CategoriesProvider>
-              <PostHogProvider>
-                {children}
-                <ToastProvider />
-              </PostHogProvider>
-            </CategoriesProvider>
-          </QueryProvider>
+          <CookieConsentProvider>
+            <QueryProvider>
+              <CategoriesProvider>
+                <PostHogProvider>
+                  {children}
+                  <ToastProvider />
+                </PostHogProvider>
+              </CategoriesProvider>
+            </QueryProvider>
+          </CookieConsentProvider>
         </LocaleProvider>
       </body>
     </html>

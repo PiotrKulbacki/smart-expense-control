@@ -13,7 +13,7 @@ export type SafeUser = {
   email: string;
   name: string | null;
   avatarUrl: string | null;
-  currentPlan: 'FREE' | 'PRO';
+  currentPlan: 'FREE' | 'PRO' | 'PREMIUM';
   createdAt: string;
 };
 

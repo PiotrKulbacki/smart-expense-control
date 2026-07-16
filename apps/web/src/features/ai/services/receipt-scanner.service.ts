@@ -2,6 +2,7 @@ import { prisma } from '@smart-expense-control/database';
 import {
   getAiScanLimit,
   getAiScanQuotaStatus,
+  getPhotoRetentionDays,
   type AiScanQuotaStatus,
   type PlanType,
 } from '@shared/features/billing/plan-limits';
@@ -310,12 +311,17 @@ export async function scanReceiptFromFile(
       needsManualReview: result.needsManualReview,
     });
 
+    const persistReceiptImage = getPhotoRetentionDays(quota.plan) > 0;
+    if (!persistReceiptImage) {
+      await deleteReceiptImage(storagePath);
+    }
+
     return {
       draft: {
         ...result,
         isAiScanned: true,
         receiptGroupId,
-        receiptImageUrl: storagePath,
+        receiptImageUrl: persistReceiptImage ? storagePath : '',
       },
     };
   } catch (error) {

@@ -26,8 +26,8 @@ export async function POST(request: Request) {
     }
 
     // FREE: monthly DB quota is the business limit — skip Redis per-minute cap.
-    // PRO: apply Redis abuse protection (30 req/min) against endpoint spam.
-    if (quotaCheck.plan === 'PRO') {
+    // Paid plans: apply Redis abuse protection against endpoint spam.
+    if (quotaCheck.plan === 'PRO' || quotaCheck.plan === 'PREMIUM') {
       const rateLimit = await checkAiRateLimit(request, 'chat', user.id);
       if (!rateLimit.allowed) {
         return jsonError(RATE_LIMIT_ERROR, 429);

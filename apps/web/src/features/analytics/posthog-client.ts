@@ -6,7 +6,7 @@ import { env } from '@web/env';
 let initialized = false;
 
 export function initPostHog(): void {
-  if (initialized || typeof window === 'undefined') {
+  if (typeof window === 'undefined') {
     return;
   }
 
@@ -15,14 +15,32 @@ export function initPostHog(): void {
     return;
   }
 
+  if (initialized) {
+    posthog.opt_in_capturing();
+    return;
+  }
+
   posthog.init(key, {
     api_host: env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://eu.i.posthog.com',
     person_profiles: 'identified_only',
     capture_pageview: true,
     capture_pageleave: true,
+    persistence: 'localStorage+cookie',
   });
 
   initialized = true;
+}
+
+export function disablePostHog(): void {
+  if (typeof window === 'undefined' || !env.NEXT_PUBLIC_POSTHOG_KEY) {
+    return;
+  }
+
+  if (!initialized) {
+    return;
+  }
+
+  posthog.opt_out_capturing();
 }
 
 export function getPostHogClient(): typeof posthog | null {

@@ -2,6 +2,7 @@ import { prisma } from '@smart-expense-control/database';
 import type { UpdateUserInput } from '@shared/features/user/schemas';
 import { toSafeUser, type SafeUser } from '@web/features/auth/types';
 import { clearUserPeriodAggregations } from '@web/features/analytics/services/period-aggregation-cache.service';
+import { deleteAllUserReceiptImages } from '@web/features/scanner/services/receipt-storage.service';
 
 export async function updateUser(userId: string, input: UpdateUserInput): Promise<SafeUser> {
   const existing = await prisma.user.findUnique({
@@ -49,5 +50,6 @@ export async function updateUser(userId: string, input: UpdateUserInput): Promis
 }
 
 export async function deleteUserAccount(userId: string): Promise<void> {
+  await deleteAllUserReceiptImages(userId);
   await prisma.user.delete({ where: { id: userId } });
 }

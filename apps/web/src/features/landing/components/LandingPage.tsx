@@ -7,7 +7,7 @@ import {
   BillingCurrencySwitcher,
   readStoredBillingCurrency,
 } from '@web/features/billing/components/BillingCurrencySwitcher';
-import { ProPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
+import { PlanPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
 import { useT } from '@web/features/i18n/LocaleProvider';
 
 const FREE_PRICE_KEYS: Record<BillingCurrency, string> = {
@@ -44,12 +44,21 @@ export function LandingPage() {
     t('landing.pricing.free.feature1'),
     t('landing.pricing.free.feature2'),
     t('landing.pricing.free.feature3'),
+    t('landing.pricing.free.feature4'),
   ];
 
   const proFeatures = [
     t('landing.pricing.pro.feature1'),
     t('landing.pricing.pro.feature2'),
     t('landing.pricing.pro.feature3'),
+    t('landing.pricing.pro.feature4'),
+  ];
+
+  const premiumFeatures = [
+    t('landing.pricing.premium.feature1'),
+    t('landing.pricing.premium.feature2'),
+    t('landing.pricing.premium.feature3'),
+    t('landing.pricing.premium.feature4'),
   ];
 
   const registerHref = `/register?currency=${billingCurrency}`;
@@ -113,7 +122,7 @@ export function LandingPage() {
               <BillingCurrencySwitcher value={billingCurrency} onChange={setBillingCurrency} />
             </div>
           </div>
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
             <article className="panel relative z-10 p-8">
               <p className="text-muted relative z-10 font-mono text-xs uppercase tracking-widest">
                 FREE
@@ -135,7 +144,11 @@ export function LandingPage() {
               <p className="text-warm relative z-10 font-mono text-xs uppercase tracking-widest">
                 PRO
               </p>
-              <ProPriceDisplay currency={billingCurrency} className="relative z-10 mt-2" />
+              <PlanPriceDisplay
+                plan="PRO"
+                currency={billingCurrency}
+                className="relative z-10 mt-2"
+              />
               <ul className="relative z-10 mt-6 space-y-3 text-sm text-[var(--text)]">
                 {proFeatures.map((feature) => (
                   <li key={feature}>• {feature}</li>
@@ -143,6 +156,25 @@ export function LandingPage() {
               </ul>
               <Link href={registerHref} className="btn-primary relative z-10 mt-8 inline-flex">
                 {t('landing.pricing.pro.cta')}
+              </Link>
+            </article>
+
+            <article className="panel border-cool/30 relative z-10 p-8">
+              <p className="text-cool relative z-10 font-mono text-xs uppercase tracking-widest">
+                PREMIUM
+              </p>
+              <PlanPriceDisplay
+                plan="PREMIUM"
+                currency={billingCurrency}
+                className="relative z-10 mt-2"
+              />
+              <ul className="relative z-10 mt-6 space-y-3 text-sm text-[var(--text)]">
+                {premiumFeatures.map((feature) => (
+                  <li key={feature}>• {feature}</li>
+                ))}
+              </ul>
+              <Link href={registerHref} className="btn-primary relative z-10 mt-8 inline-flex">
+                {t('landing.pricing.premium.cta')}
               </Link>
             </article>
           </div>

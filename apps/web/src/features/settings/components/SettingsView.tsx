@@ -16,7 +16,8 @@ import {
   BillingCurrencySwitcher,
   readStoredBillingCurrency,
 } from '@web/features/billing/components/BillingCurrencySwitcher';
-import { ProPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
+import { PlanPriceDisplay } from '@web/features/billing/components/ProPriceDisplay';
+import type { CheckoutPlan } from '@shared/features/billing';
 import { ProUpgradeCycleDayDialog } from '@web/features/billing/components/ProUpgradeCycleDayDialog';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { RecurringExpensesSection } from '@web/features/settings/components/RecurringExpensesSection';
@@ -199,14 +200,14 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
     }
   }
 
-  async function handleUpgrade() {
+  async function handleUpgrade(plan: CheckoutPlan) {
     setIsBillingLoading(true);
 
     try {
       const response = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currency: checkoutCurrency }),
+        body: JSON.stringify({ currency: checkoutCurrency, plan }),
       });
       const data = (await response.json()) as { url?: string; error?: string };
 
@@ -373,10 +374,23 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
         <p className="text-muted relative z-10 mt-2 text-sm">
           {t('billing.labels.currentPlan', { plan: user.currentPlan })}
         </p>
-        {user.currentPlan === 'FREE' && (
+        {user.currentPlan !== 'PREMIUM' && (
           <>
-            <div className="relative z-10 mt-4">
-              <ProPriceDisplay currency={checkoutCurrency} />
+            <div className="relative z-10 mt-4 space-y-6">
+              {user.currentPlan === 'FREE' && (
+                <div>
+                  <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--text)]">
+                    PRO
+                  </p>
+                  <PlanPriceDisplay plan="PRO" currency={checkoutCurrency} />
+                </div>
+              )}
+              <div>
+                <p className="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--text)]">
+                  PREMIUM
+                </p>
+                <PlanPriceDisplay plan="PREMIUM" currency={checkoutCurrency} />
+              </div>
             </div>
             <div className="relative z-10 mt-4">
               <p className="mb-2 text-sm font-medium text-[var(--text)]">
@@ -387,17 +401,29 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           </>
         )}
         <div className="relative z-10 mt-4 flex flex-wrap gap-3">
-          {user.currentPlan === 'FREE' ? (
+          {user.currentPlan === 'FREE' && (
             <button
               type="button"
               disabled={isBillingLoading}
-              onClick={() => void handleUpgrade()}
+              onClick={() => void handleUpgrade('PRO')}
               className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
               {isBillingLoading && <LoadingSpinner />}
               {t('billing.labels.upgradeToPro')}
             </button>
-          ) : (
+          )}
+          {user.currentPlan !== 'PREMIUM' && (
+            <button
+              type="button"
+              disabled={isBillingLoading}
+              onClick={() => void handleUpgrade('PREMIUM')}
+              className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            >
+              {isBillingLoading && <LoadingSpinner />}
+              {t('billing.labels.upgradeToPremium')}
+            </button>
+          )}
+          {user.currentPlan !== 'FREE' && (
             <button
               type="button"
               disabled={isBillingLoading}
@@ -416,6 +442,9 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           {t('settings.danger.title')}
         </h2>
         <p className="text-muted relative z-10 mt-2 text-sm">{t('settings.danger.description')}</p>
+        <p className="text-muted border-border/60 bg-elevated/40 relative z-10 mt-3 rounded-xl border px-3 py-2 text-sm leading-6">
+          {t('settings.danger.inactiveAccountNotice')}
+        </p>
         <label className="relative z-10 mt-4 block text-sm">
           <span className="auth-label text-glow">
             {t('settings.danger.confirmLabel', { email: user.email })}

@@ -12,6 +12,7 @@ import {
   toSafeUser,
 } from '@web/features/auth/types';
 import { generateToken, hashToken, signAccessToken } from '@web/features/auth/lib/tokens';
+import { touchUserLastActive } from '@web/features/auth/services/last-active.service';
 
 export { toSafeUser };
 
@@ -97,6 +98,7 @@ async function resolveUserFromSession(): Promise<SafeUser | null> {
     return null;
   }
 
+  touchUserLastActive(session.user.id, session.user.lastActiveAt);
   return toSafeUser(session.user);
 }
 
@@ -118,7 +120,12 @@ export async function getUserFromBearerToken(
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  return user ? toSafeUser(user) : null;
+  if (!user) {
+    return null;
+  }
+
+  touchUserLastActive(user.id, user.lastActiveAt);
+  return toSafeUser(user);
 }
 
 export async function revokeSession(token: string): Promise<void> {

@@ -278,15 +278,26 @@
         "feature1": "5 receipt scans per month",
         "feature2": "10 AI chat messages per month",
         "feature3": "Full expense dashboard",
+        "feature4": "No receipt photo storage",
         "cta": "Get started free"
       },
       "pro": {
         "discount": "{{percent}}% off",
         "promoCodeBadge": "Use code {{code}} at checkout for {{percent}}% off!",
-        "feature1": "150 receipt scans per month",
-        "feature2": "Unlimited AI chat",
-        "feature3": "Priority support",
+        "feature1": "50 receipt scans per month",
+        "feature2": "50 AI chat messages per month",
+        "feature3": "Receipt photos kept for 60 days",
+        "feature4": "Priority support",
         "cta": "Go Pro"
+      },
+      "premium": {
+        "discount": "{{percent}}% off",
+        "promoCodeBadge": "Use code {{code}} at checkout for {{percent}}% off!",
+        "feature1": "120 receipt scans per month",
+        "feature2": "250 AI chat messages per month",
+        "feature3": "Receipt photos kept for 12 months",
+        "feature4": "Priority support",
+        "cta": "Go Premium"
       }
     },
     "cta": {
@@ -496,6 +507,7 @@
     "danger": {
       "title": "Danger zone",
       "description": "Permanently delete your account and all associated data. This action cannot be undone.",
+      "inactiveAccountNotice": "Accounts inactive for 2 years are automatically and permanently deleted from our database along with all related transactions and documents.",
       "confirmLabel": "Type your email ({{email}}) to confirm",
       "deleteAccount": "Delete my account permanently"
     },
@@ -515,11 +527,12 @@
       "subscription": "Subscription",
       "currentPlan": "Current plan: {{plan}}",
       "upgradeToPro": "Upgrade to Pro",
+      "upgradeToPremium": "Upgrade to Premium",
       "manageSubscription": "Manage subscription",
       "paymentCurrency": "Payment currency"
     },
     "success": {
-      "upgraded": "Welcome to Pro! Your subscription is active."
+      "upgraded": "Welcome! Your subscription is active."
     },
     "cycleDayModal": {
       "title": "Billing cycle start day changed",
@@ -536,8 +549,10 @@
       "portalUnavailable": "Subscription portal is temporarily unavailable",
       "noSubscription": "No active subscription found",
       "alreadyPro": "You already have an active Pro subscription",
+      "alreadyOnPlan": "You already have this subscription plan",
       "invalidCurrency": "Please select a valid payment currency",
-      "priceUnavailable": "Pro pricing is not available for the selected currency",
+      "invalidPlan": "Please select a valid subscription plan",
+      "priceUnavailable": "Pricing is not available for the selected currency",
       "cycleDayChoiceNotPending": "Billing cycle day choice is no longer pending"
     }
   },
@@ -549,6 +564,38 @@
     "privacy": {
       "title": "Privacy Policy",
       "content": "We process your account and transaction data to provide expense tracking and AI features. You can permanently delete your account and all associated data at any time from Settings."
+    }
+  },
+  "cookies": {
+    "banner": {
+      "title": "We use cookies",
+      "description": "We use necessary cookies to keep the app working, and optional cookies for analytics and marketing. You can accept all, reject optional ones, or choose categories.",
+      "acceptAll": "Accept all",
+      "rejectOptional": "Reject optional",
+      "managePreferences": "Manage preferences"
+    },
+    "preferences": {
+      "title": "Cookie preferences",
+      "description": "Choose which cookie categories we may use. Necessary cookies are always on so the app can function securely.",
+      "close": "Close",
+      "save": "Save preferences",
+      "acceptAll": "Accept all",
+      "rejectOptional": "Reject optional"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Necessary",
+        "description": "Required for sign-in, session security, language, and core app features. These cannot be disabled.",
+        "badge": "Always on"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Help us understand how the product is used (for example PostHog) so we can improve performance and features."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "description": "Used for optional marketing tools and non-essential third-party widgets. Not required to use the app."
+      }
     }
   }
 }

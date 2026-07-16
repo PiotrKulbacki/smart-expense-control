@@ -15,7 +15,7 @@ type ScanQuota = {
 type DashboardCtasProps = {
   onAddManual: () => void;
   scanQuota: ScanQuota | null;
-  plan: 'FREE' | 'PRO';
+  plan: 'FREE' | 'PRO' | 'PREMIUM';
   isRefreshing?: boolean;
 };
 
