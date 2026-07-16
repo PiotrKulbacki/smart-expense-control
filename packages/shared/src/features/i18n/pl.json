@@ -552,5 +552,37 @@
       "title": "Polityka prywatności",
       "content": "Przetwarzamy dane konta i transakcji, aby świadczyć usługi śledzenia wydatków i funkcji AI. Możesz trwale usunąć konto i wszystkie powiązane dane w dowolnym momencie w Ustawieniach."
     }
+  },
+  "cookies": {
+    "banner": {
+      "title": "Używamy plików cookie",
+      "description": "Stosujemy niezbędne pliki cookie, aby aplikacja działała poprawnie, oraz opcjonalne — do analityki i marketingu. Możesz zaakceptować wszystkie, odrzucić opcjonalne lub wybrać kategorie.",
+      "acceptAll": "Akceptuj wszystkie",
+      "rejectOptional": "Odrzuć opcjonalne",
+      "managePreferences": "Zarządzaj preferencjami"
+    },
+    "preferences": {
+      "title": "Preferencje plików cookie",
+      "description": "Wybierz kategorie plików cookie, na które wyrażasz zgodę. Niezbędne cookie są zawsze włączone, aby aplikacja działała bezpiecznie.",
+      "close": "Zamknij",
+      "save": "Zapisz preferencje",
+      "acceptAll": "Akceptuj wszystkie",
+      "rejectOptional": "Odrzuć opcjonalne"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Niezbędne",
+        "description": "Wymagane do logowania, bezpieczeństwa sesji, języka oraz podstawowych funkcji aplikacji. Nie można ich wyłączyć.",
+        "badge": "Zawsze włączone"
+      },
+      "analytics": {
+        "title": "Analityczne",
+        "description": "Pomagają nam zrozumieć, jak korzystasz z produktu (np. PostHog), aby ulepszać wydajność i funkcje."
+      },
+      "marketing": {
+        "title": "Marketingowe",
+        "description": "Służą opcjonalnym narzędziom marketingowym i nieistotnym widgetom zewnętrznym. Nie są wymagane do korzystania z aplikacji."
+      }
+    }
   }
 }

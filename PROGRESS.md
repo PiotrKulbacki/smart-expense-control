@@ -28,6 +28,7 @@
 24. **Faza 9.6: metryka „Dni bez wydatków" i AI Insights na Dashboardzie** — [✅ Zrobione]
 25. **Faza 9.7: limity wydatków na kategorie (settings + dashboard + AI)** — [✅ Zrobione]
 26. **Faza 9.8: optymalizacja wydajności ładowania widoków (prefetch, cache, API)** — [✅ Zrobione]
+27. **Faza 9.9: zgoda na ciasteczka (Cookie Consent Banner & Preferences, RODO/GDPR)** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -80,6 +81,19 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-16 — Faza 9.9 zamknięta: Cookie Consent Banner & Preferences (RODO/GDPR).**
+
+### Faza 9.9 — Cookie consent
+
+- **Context/hook:** `CookieConsentProvider` + `useCookieConsent()` w `apps/web/src/features/cookie-consent/` — kategorie `necessary` (zawsze on), `analytics`, `marketing`.
+- **Persystencja:** cookie przeglądarki `sec_cookie_consent` (JSON, `max-age` 365 dni, SameSite=Lax); helpery `canUseAnalytics` / `canUseMarketing`.
+- **UI:** miękki floating banner (lewy dolny róg, dark glass) — Akceptuj wszystkie / Odrzuć opcjonalne / Zarządzaj preferencjami; modal z toggle’ami (niezbędne zablokowane).
+- **Integracja:** PostHog inicjalizowany dopiero przy `consent.analytics === true`; `opt_out_capturing` przy odmowie/wycofaniu.
+- **i18n:** `cookies.*` w en/pl/de/es.
+- **Testy:** `storage.test.ts` (parsowanie cookie).
+
+---
 
 **2026-07-16 — Faza 9.8 zamknięta: optymalizacja wydajności ładowania widoków aplikacji.**
 

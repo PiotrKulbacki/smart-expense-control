@@ -550,5 +550,37 @@
       "title": "Privacy Policy",
       "content": "We process your account and transaction data to provide expense tracking and AI features. You can permanently delete your account and all associated data at any time from Settings."
     }
+  },
+  "cookies": {
+    "banner": {
+      "title": "We use cookies",
+      "description": "We use necessary cookies to keep the app working, and optional cookies for analytics and marketing. You can accept all, reject optional ones, or choose categories.",
+      "acceptAll": "Accept all",
+      "rejectOptional": "Reject optional",
+      "managePreferences": "Manage preferences"
+    },
+    "preferences": {
+      "title": "Cookie preferences",
+      "description": "Choose which cookie categories we may use. Necessary cookies are always on so the app can function securely.",
+      "close": "Close",
+      "save": "Save preferences",
+      "acceptAll": "Accept all",
+      "rejectOptional": "Reject optional"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Necessary",
+        "description": "Required for sign-in, session security, language, and core app features. These cannot be disabled.",
+        "badge": "Always on"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Help us understand how the product is used (for example PostHog) so we can improve performance and features."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "description": "Used for optional marketing tools and non-essential third-party widgets. Not required to use the app."
+      }
+    }
   }
 }

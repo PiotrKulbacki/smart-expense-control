@@ -550,5 +550,37 @@
       "title": "Política de privacidad",
       "content": "Procesamos tus datos de cuenta y transacciones para ofrecer seguimiento de gastos y funciones IA. Puedes eliminar permanentemente tu cuenta y todos los datos asociados en cualquier momento desde Ajustes."
     }
+  },
+  "cookies": {
+    "banner": {
+      "title": "Usamos cookies",
+      "description": "Usamos cookies necesarias para que la app funcione y cookies opcionales de analítica y marketing. Puedes aceptar todas, rechazar las opcionales o elegir categorías.",
+      "acceptAll": "Aceptar todas",
+      "rejectOptional": "Rechazar opcionales",
+      "managePreferences": "Gestionar preferencias"
+    },
+    "preferences": {
+      "title": "Preferencias de cookies",
+      "description": "Elige qué categorías de cookies podemos usar. Las cookies necesarias están siempre activas para que la app funcione de forma segura.",
+      "close": "Cerrar",
+      "save": "Guardar preferencias",
+      "acceptAll": "Aceptar todas",
+      "rejectOptional": "Rechazar opcionales"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Necesarias",
+        "description": "Requeridas para el inicio de sesión, la seguridad de la sesión, el idioma y las funciones básicas. No se pueden desactivar.",
+        "badge": "Siempre activas"
+      },
+      "analytics": {
+        "title": "Analíticas",
+        "description": "Nos ayudan a entender cómo se usa el producto (por ejemplo PostHog) para mejorar el rendimiento y las funciones."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "description": "Se usan para herramientas de marketing opcionales y widgets de terceros no esenciales. No son necesarias para usar la app."
+      }
+    }
   }
 }

@@ -550,5 +550,37 @@
       "title": "Datenschutz",
       "content": "Wir verarbeiten Ihre Konto- und Transaktionsdaten, um Ausgabenverfolgung und KI-Funktionen bereitzustellen. Sie können Ihr Konto und alle zugehörigen Daten jederzeit in den Einstellungen dauerhaft löschen."
     }
+  },
+  "cookies": {
+    "banner": {
+      "title": "Wir verwenden Cookies",
+      "description": "Wir nutzen notwendige Cookies für den Betrieb der App sowie optionale Cookies für Analyse und Marketing. Sie können alle akzeptieren, optionale ablehnen oder Kategorien wählen.",
+      "acceptAll": "Alle akzeptieren",
+      "rejectOptional": "Optionale ablehnen",
+      "managePreferences": "Einstellungen verwalten"
+    },
+    "preferences": {
+      "title": "Cookie-Einstellungen",
+      "description": "Wählen Sie, welche Cookie-Kategorien wir verwenden dürfen. Notwendige Cookies sind immer aktiv, damit die App sicher funktioniert.",
+      "close": "Schließen",
+      "save": "Einstellungen speichern",
+      "acceptAll": "Alle akzeptieren",
+      "rejectOptional": "Optionale ablehnen"
+    },
+    "categories": {
+      "necessary": {
+        "title": "Notwendig",
+        "description": "Erforderlich für Anmeldung, Sitzungssicherheit, Sprache und zentrale App-Funktionen. Diese können nicht deaktiviert werden.",
+        "badge": "Immer aktiv"
+      },
+      "analytics": {
+        "title": "Analyse",
+        "description": "Helfen uns zu verstehen, wie das Produkt genutzt wird (z. B. PostHog), um Leistung und Funktionen zu verbessern."
+      },
+      "marketing": {
+        "title": "Marketing",
+        "description": "Für optionale Marketing-Tools und nicht essenzielle Drittanbieter-Widgets. Nicht erforderlich für die Nutzung der App."
+      }
+    }
   }
 }
