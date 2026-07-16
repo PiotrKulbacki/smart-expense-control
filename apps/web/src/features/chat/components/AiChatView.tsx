@@ -115,9 +115,9 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topSentinelRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
   const scrollAnchorRef = useRef<ScrollAnchor | null>(null);
   const shouldScrollToBottomRef = useRef(false);
+  const isInitialMountRef = useRef(true);
 
   const quotaQuery = useQuery({
     queryKey: queryKeys.chatQuota(user.id),
@@ -205,9 +205,10 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
       return;
     }
 
-    if (shouldScrollToBottomRef.current) {
-      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+    if (shouldScrollToBottomRef.current || isInitialMountRef.current) {
+      container.scrollTop = container.scrollHeight;
       shouldScrollToBottomRef.current = false;
+      isInitialMountRef.current = false;
     }
   }, [messages, isSending]);
 
@@ -383,7 +384,6 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
               </div>
             </div>
           )}
-          <div ref={bottomRef} />
         </div>
 
         <form
