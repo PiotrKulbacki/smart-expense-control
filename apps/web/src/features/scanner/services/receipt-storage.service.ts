@@ -162,3 +162,46 @@ export async function deleteReceiptImageIfOrphaned(
     await deleteReceiptImage(receiptImageUrl);
   }
 }
+
+export async function deleteAllUserReceiptImages(userId: string): Promise<void> {
+  if (!isSupabaseStorageConfigured()) {
+    return;
+  }
+
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data, error } = await supabase.storage.from(RECEIPTS_BUCKET).list(userId, {
+      limit: 1000,
+    });
+
+    if (error) {
+      captureServerException(error, {
+        scope: 'storage.receipt.deleteAll.list',
+        userId,
+      });
+      return;
+    }
+
+    const paths = (data ?? [])
+      .map((item) => item.name)
+      .filter(Boolean)
+      .map((name) => `${userId}/${name}`);
+
+    if (paths.length === 0) {
+      return;
+    }
+
+    const { error: removeError } = await supabase.storage.from(RECEIPTS_BUCKET).remove(paths);
+    if (removeError) {
+      captureServerException(removeError, {
+        scope: 'storage.receipt.deleteAll.remove',
+        userId,
+      });
+    }
+  } catch (error) {
+    captureServerException(error, {
+      scope: 'storage.receipt.deleteAll',
+      userId,
+    });
+  }
+}

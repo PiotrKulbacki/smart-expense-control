@@ -29,6 +29,7 @@
 25. **Faza 9.7: limity wydatków na kategorie (settings + dashboard + AI)** — [✅ Zrobione]
 26. **Faza 9.8: optymalizacja wydajności ładowania widoków (prefetch, cache, API)** — [✅ Zrobione]
 27. **Faza 9.9: zgoda na ciasteczka (Cookie Consent Banner & Preferences, RODO/GDPR)** — [✅ Zrobione]
+28. **Faza 10: cennik 3-poziomowy (Premium), retencja nieaktywnych, dunning Resend, rolling photo retention** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -81,6 +82,31 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-16 — Faza 10 zamknięta: Premium, TTL kont, dunning Resend, retencja zdjęć.**
+
+### Faza 10 — Cennik 3-poziomowy + polityki retencji i dunningu
+
+- **Plany:** `FREE` | `PRO` | `PREMIUM` (enum Prisma + `PlanType`).
+- **Limity:** FREE 5 skanów / 10 czat; PRO 50 / 50; PREMIUM 120 / 250; retencja zdjęć 0 / 60 dni / 365 dni (`plan-limits.ts`).
+- **Ceny Premium UI:** 46 PLN / 11 EUR / 8.50 GBP / 12 USD; PRO bez zmian; `PROMO50` (−50%) dla PRO i Premium.
+- **Stripe:** `STRIPE_PREMIUM_PRICE_{PLN,EUR,GBP,USD}`; checkout z `{ currency, plan }`; webhook rozróżnia PRO/PREMIUM po metadata/price ID; `invoice.payment_failed` → karencja + 1. mail.
+- **Resend:** `RESEND_API_KEY`, `RESEND_FROM_EMAIL`; serwis `resend.service.ts` + `dunning-email.service.ts` (link do Stripe Billing Portal).
+- **Cron `downgrade-past-due` (cron-job.org, co godzinę):** po ~12h 2. mail reminder; po 24h downgrade do FREE (PRO i PREMIUM).
+- **TTL kont:** `User.lastActiveAt` (throttled touch przy auth); cron dzienny `DELETE /api/cron/delete-inactive-accounts` (2 lata) — storage receipts + cascade Prisma.
+- **Photo retention:** `Transaction.imageExpiresAt`; FREE bez trwałego storage; cron `cleanup-expired-receipts` czyści tylko pliki/URL (transakcje zostają).
+- **UI/i18n:** landing 3 kolumny; Settings upgrade PRO/Premium + notice TTL; en/pl/de/es.
+- **Migracja:** `20260716200000_phase10_premium_retention_dunning` (do `migrate:deploy`).
+
+**Deploy / ops:**
+
+1. `migrate:deploy` — `20260716200000_phase10_premium_retention_dunning` ✅ zastosowana.
+2. Env Vercel: `STRIPE_PREMIUM_PRICE_*`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`.
+3. **Vercel Cron (Hobby — 1 slot):** tylko `/api/cron/reset-quotas` (`5 0 * * *`).
+4. **cron-job.org:** `downgrade-past-due` (co godzinę), `refresh-aggregations`, `cleanup-expired-receipts`, `delete-inactive-accounts` — header `Authorization: Bearer CRON_SECRET`.
+5. Stripe webhook: `checkout.session.completed`, `customer.subscription.updated|deleted`, `invoice.payment_failed`.
+
+---
 
 **2026-07-16 — Faza 9.9 zamknięta: Cookie Consent Banner & Preferences (RODO/GDPR).**
 
@@ -427,10 +453,10 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 
 0. **Przed zakończeniem sesji:** obowiązkowo `npx prettier --write .` → `npm run format` (szczegóły w sekcji **Żelazne zasady agentów** powyżej). Przy akcjach async — loadery/szkielety zgodnie z zasadą **Loadery i stany ładowania**.
 1. Produkcja live — zmiany przez `dev` → PR → merge `main`.
-2. **Migracja DB (nowa):** `20260716120000_add_user_category_limits` — tabela `user_category_limits`; wdroży się przy `migrate:deploy` na Vercel.
-3. **Vercel env:** `STRIPE_PRO_PRICE_PLN|EUR|GBP|USD`, `NEXT_PUBLIC_SENTRY_DSN` (opcjonalnie org/project/token).
-4. **PostHog:** flaga `pro-promo-pricing` — rollout 100% = promocja włączona; 0% lub Disabled = ceny standardowe.
-5. **Split paragonów:** Faza 9.0 + 9.1 + 9.2 wdrożone; pozostaje ręczna weryfikacja E2E na prawdziwym paragonie mieszanym (Rosa Spritz → Alcohol).
+2. **Migracja DB (Faza 10):** `20260716200000_phase10_premium_retention_dunning` — `PREMIUM`, `lastActiveAt`, dunning email flags, `imageExpiresAt`.
+3. **Vercel env:** `STRIPE_PRO_PRICE_*`, `STRIPE_PREMIUM_PRICE_*`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `NEXT_PUBLIC_SENTRY_DSN` (opcjonalnie).
+4. **cron-job.org:** godzinowy `GET /api/cron/downgrade-past-due` + `Authorization: Bearer CRON_SECRET` (reminder + downgrade).
+5. **PostHog:** flaga `pro-promo-pricing` — nadal steruje badge promo na cenniku.
 
 ---
 
@@ -583,6 +609,14 @@ _(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez uży
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-16 — Faza 10: Premium, retencja kont, dunning Resend, rolling photo retention**
+
+- Trójpoziomowy cennik FREE/PRO/PREMIUM + Stripe Price IDs + checkout `plan`.
+- Limity PRO 50/50, Premium 120/250; retencja zdjęć 60 dni / 12 mies.; FREE bez storage.
+- `lastActiveAt` + cron usuwania kont po 2 latach; notice w Settings (i18n).
+- Karencja 24h: `invoice.payment_failed` + 2 maile Resend; cron godzinowy reminder/downgrade.
+- Migracja `20260716200000_phase10_premium_retention_dunning`.
 
 **2026-07-16 — Faza 9.7: limity wydatków na kategorie + UX ładowania**
 

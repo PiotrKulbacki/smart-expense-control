@@ -19,6 +19,25 @@ vi.mock('@web/features/analytics/posthog-server', () => ({
   captureServerEvent: vi.fn(),
 }));
 
+vi.mock('@web/features/billing/services/dunning-email.service', () => ({
+  sendPastDueDunningEmail: vi.fn(),
+}));
+
+vi.mock('@web/features/billing/services/stripe-checkout.service', () => ({
+  getStripeProPriceMap: () => ({
+    PLN: 'price_pro_pln',
+    EUR: 'price_pro_eur',
+    GBP: 'price_pro_gbp',
+    USD: 'price_pro_usd',
+  }),
+  getStripePremiumPriceMap: () => ({
+    PLN: 'price_premium_pln',
+    EUR: 'price_premium_eur',
+    GBP: 'price_premium_gbp',
+    USD: 'price_premium_usd',
+  }),
+}));
+
 import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import {
   handleCheckoutSessionCompleted,
@@ -39,7 +58,7 @@ describe('stripe-webhook.service', () => {
 
     await handleCheckoutSessionCompleted({
       customer: 'cus_123',
-      metadata: { userId: 'user-1' },
+      metadata: { userId: 'user-1', checkoutPlan: 'PRO' },
     } as unknown as Stripe.Checkout.Session);
 
     expect(mockUpdate).toHaveBeenCalledWith({
@@ -54,6 +73,24 @@ describe('stripe-webhook.service', () => {
       }),
     });
     expect(captureServerEvent).toHaveBeenCalled();
+  });
+
+  it('upgrades user to PREMIUM when checkoutPlan metadata is set', async () => {
+    mockFindUnique
+      .mockResolvedValueOnce({ financialMonthStartDay: 1 })
+      .mockResolvedValueOnce({ id: 'user-prem', currentPlan: 'FREE' });
+
+    await handleCheckoutSessionCompleted({
+      customer: 'cus_prem',
+      metadata: { userId: 'user-prem', checkoutPlan: 'PREMIUM' },
+    } as unknown as Stripe.Checkout.Session);
+
+    expect(mockUpdate).toHaveBeenCalledWith({
+      where: { id: 'user-prem' },
+      data: expect.objectContaining({
+        currentPlan: 'PREMIUM',
+      }),
+    });
   });
 
   it('downgrades user to FREE on subscription deleted', async () => {
@@ -74,6 +111,8 @@ describe('stripe-webhook.service', () => {
       data: {
         currentPlan: 'FREE',
         pastDueSince: null,
+        pastDueFirstEmailSentAt: null,
+        pastDueReminderSentAt: null,
       },
     });
   });
@@ -81,15 +120,20 @@ describe('stripe-webhook.service', () => {
   it('keeps PRO during past_due grace period', async () => {
     mockFindUnique.mockResolvedValue({
       id: 'user-3',
+      email: 'user3@example.com',
       currentPlan: 'PRO',
       stripeCustomerId: 'cus_789',
       pastDueSince: new Date(),
+      pastDueFirstEmailSentAt: null,
+      pastDueReminderSentAt: null,
     });
 
     await handleSubscriptionUpdated({
       customer: 'cus_789',
       status: 'past_due',
-    } as Stripe.Subscription);
+      items: { data: [{ price: { id: 'price_pro_eur' } }] },
+      metadata: {},
+    } as unknown as Stripe.Subscription);
 
     expect(mockUpdate).toHaveBeenCalledWith({
       where: { id: 'user-3' },
@@ -105,15 +149,20 @@ describe('stripe-webhook.service', () => {
 
     mockFindUnique.mockResolvedValue({
       id: 'user-4',
+      email: 'user4@example.com',
       currentPlan: 'PRO',
       stripeCustomerId: 'cus_999',
       pastDueSince: expired,
+      pastDueFirstEmailSentAt: new Date(),
+      pastDueReminderSentAt: new Date(),
     });
 
     await handleSubscriptionUpdated({
       customer: 'cus_999',
       status: 'past_due',
-    } as Stripe.Subscription);
+      items: { data: [{ price: { id: 'price_pro_eur' } }] },
+      metadata: {},
+    } as unknown as Stripe.Subscription);
 
     expect(mockUpdate).toHaveBeenCalledWith({
       where: { id: 'user-4' },
@@ -127,22 +176,29 @@ describe('stripe-webhook.service', () => {
   it('keeps PRO when subscription is active with cancel_at_period_end', async () => {
     mockFindUnique.mockResolvedValue({
       id: 'user-5',
+      email: 'user5@example.com',
       currentPlan: 'PRO',
       stripeCustomerId: 'cus_555',
       pastDueSince: null,
+      pastDueFirstEmailSentAt: null,
+      pastDueReminderSentAt: null,
     });
 
     await handleSubscriptionUpdated({
       customer: 'cus_555',
       status: 'active',
       cancel_at_period_end: true,
-    } as Stripe.Subscription);
+      items: { data: [{ price: { id: 'price_pro_eur' } }] },
+      metadata: { checkoutPlan: 'PRO' },
+    } as unknown as Stripe.Subscription);
 
     expect(mockUpdate).toHaveBeenCalledWith({
       where: { id: 'user-5' },
       data: {
         currentPlan: 'PRO',
         pastDueSince: null,
+        pastDueFirstEmailSentAt: null,
+        pastDueReminderSentAt: null,
       },
     });
   });

@@ -278,15 +278,26 @@
         "feature1": "5 escaneos de recibos al mes",
         "feature2": "10 mensajes de chat IA al mes",
         "feature3": "Panel de gastos completo",
+        "feature4": "Sin almacenamiento de fotos de recibos",
         "cta": "Empezar gratis"
       },
       "pro": {
         "discount": "{{percent}}% de descuento",
         "promoCodeBadge": "Usa el código {{code}} en el pago para obtener {{percent}}% de descuento!",
-        "feature1": "150 escaneos de recibos al mes",
-        "feature2": "Chat IA ilimitado",
-        "feature3": "Soporte prioritario",
+        "feature1": "50 escaneos de recibos al mes",
+        "feature2": "50 mensajes de chat IA al mes",
+        "feature3": "Fotos de recibos guardadas 60 días",
+        "feature4": "Soporte prioritario",
         "cta": "Ir a Pro"
+      },
+      "premium": {
+        "discount": "{{percent}}% de descuento",
+        "promoCodeBadge": "Usa el código {{code}} en el pago para obtener {{percent}}% de descuento!",
+        "feature1": "120 escaneos de recibos al mes",
+        "feature2": "250 mensajes de chat IA al mes",
+        "feature3": "Fotos de recibos guardadas 12 meses",
+        "feature4": "Soporte prioritario",
+        "cta": "Ir a Premium"
       }
     },
     "cta": {
@@ -496,6 +507,7 @@
     "danger": {
       "title": "Zona de peligro",
       "description": "Elimina permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
+      "inactiveAccountNotice": "Las cuentas inactivas durante 2 años se eliminan automática y permanentemente de nuestra base de datos junto con todas las transacciones y documentos relacionados.",
       "confirmLabel": "Escribe tu email ({{email}}) para confirmar",
       "deleteAccount": "Eliminar mi cuenta permanentemente"
     },
@@ -515,11 +527,12 @@
       "subscription": "Suscripción",
       "currentPlan": "Plan actual: {{plan}}",
       "upgradeToPro": "Actualizar a Pro",
+      "upgradeToPremium": "Actualizar a Premium",
       "manageSubscription": "Gestionar suscripción",
       "paymentCurrency": "Moneda de pago"
     },
     "success": {
-      "upgraded": "¡Bienvenido a Pro! Tu suscripción está activa."
+      "upgraded": "¡Bienvenido! Tu suscripción está activa."
     },
     "cycleDayModal": {
       "title": "Cambió el día de inicio del ciclo de facturación",
@@ -536,8 +549,10 @@
       "portalUnavailable": "El portal de suscripción no está disponible temporalmente",
       "noSubscription": "No se encontró suscripción activa",
       "alreadyPro": "Ya tienes una suscripción Pro activa",
+      "alreadyOnPlan": "Ya tienes este plan de suscripción",
       "invalidCurrency": "Selecciona una moneda de pago válida",
-      "priceUnavailable": "El precio Pro no está disponible para la moneda seleccionada",
+      "invalidPlan": "Selecciona un plan de suscripción válido",
+      "priceUnavailable": "El precio no está disponible para la moneda seleccionada",
       "cycleDayChoiceNotPending": "La elección del día del ciclo ya no es necesaria"
     }
   },

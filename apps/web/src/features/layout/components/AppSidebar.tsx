@@ -25,7 +25,7 @@ const NAV_ITEMS = [
 type AppSidebarProps = {
   userName: string | null;
   userEmail: string;
-  userPlan: 'FREE' | 'PRO';
+  userPlan: 'FREE' | 'PRO' | 'PREMIUM';
 };
 
 export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
@@ -162,7 +162,7 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
           <LocaleSwitcher className="auth-input w-full py-2 text-sm" />
         </div>
 
-        {userPlan === 'PRO' && (
+        {userPlan !== 'FREE' && (
           <button
             type="button"
             disabled={isPortalLoading || isLoggingOut}

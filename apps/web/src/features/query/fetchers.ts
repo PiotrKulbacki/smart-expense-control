@@ -10,7 +10,7 @@ import type { ReceiptArchiveDocument } from '@web/features/scanner/services/rece
 import type { RecentTransaction } from '@web/features/transactions/components/RecentTransactionsList';
 
 export type ScanQuotaPayload = {
-  plan: 'FREE' | 'PRO';
+  plan: 'FREE' | 'PRO' | 'PREMIUM';
   quota: {
     used: number;
     limit: number;
@@ -28,7 +28,7 @@ export type RecurringExpenseItem = {
 };
 
 export type ChatQuotaPayload = {
-  plan: 'FREE' | 'PRO';
+  plan: 'FREE' | 'PRO' | 'PREMIUM';
   quota: {
     limit: number;
     used: number;

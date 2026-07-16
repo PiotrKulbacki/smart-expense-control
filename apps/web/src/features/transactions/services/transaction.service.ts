@@ -1,5 +1,6 @@
 import { prisma, type Transaction } from '@smart-expense-control/database';
 import { convertAmount } from '@shared/features/currency';
+import { getReceiptImageExpiresAt, type PlanType } from '@shared/features/billing/plan-limits';
 import type {
   CreateTransactionBatchInput,
   CreateTransactionInput,
@@ -9,7 +10,10 @@ import type {
 import { TRANSACTION_ERROR_CODES } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
 import { invalidateAggregationForTransactionDates } from '@web/features/analytics/services/period-aggregation-cache.service';
-import { deleteReceiptImageIfOrphaned } from '@web/features/scanner/services/receipt-storage.service';
+import {
+  deleteReceiptImage,
+  deleteReceiptImageIfOrphaned,
+} from '@web/features/scanner/services/receipt-storage.service';
 
 export type TransactionDto = {
   id: string;
@@ -22,6 +26,7 @@ export type TransactionDto = {
   isAiScanned: boolean;
   receiptGroupId: string | null;
   receiptImageUrl: string | null;
+  imageExpiresAt: string | null;
   createdAt: string;
 };
 
@@ -48,8 +53,31 @@ function toTransactionDto(transaction: Transaction): TransactionDto {
     isAiScanned: transaction.isAiScanned,
     receiptGroupId: transaction.receiptGroupId,
     receiptImageUrl: transaction.receiptImageUrl,
+    imageExpiresAt: transaction.imageExpiresAt?.toISOString() ?? null,
     createdAt: transaction.createdAt.toISOString(),
   };
+}
+
+async function resolveReceiptPersistence(
+  userId: string,
+  receiptImageUrl: string | null | undefined
+): Promise<{ receiptImageUrl: string | null; imageExpiresAt: Date | null }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { currentPlan: true },
+  });
+  const plan = (user?.currentPlan ?? 'FREE') as PlanType;
+  const imageExpiresAt = getReceiptImageExpiresAt(plan);
+  const incomingUrl = receiptImageUrl ?? null;
+
+  if (!incomingUrl || !imageExpiresAt) {
+    if (incomingUrl) {
+      await deleteReceiptImage(incomingUrl);
+    }
+    return { receiptImageUrl: null, imageExpiresAt: null };
+  }
+
+  return { receiptImageUrl: incomingUrl, imageExpiresAt };
 }
 
 export async function listTransactions(
@@ -113,6 +141,8 @@ export async function createTransaction(
   userId: string,
   input: CreateTransactionInput
 ): Promise<TransactionDto> {
+  const receiptPersistence = await resolveReceiptPersistence(userId, input.receiptImageUrl);
+
   const transaction = await prisma.transaction.create({
     data: {
       userId,
@@ -123,7 +153,8 @@ export async function createTransaction(
       date: input.date,
       isAiScanned: input.isAiScanned ?? false,
       receiptGroupId: input.receiptGroupId ?? null,
-      receiptImageUrl: input.receiptImageUrl ?? null,
+      receiptImageUrl: receiptPersistence.receiptImageUrl,
+      imageExpiresAt: receiptPersistence.imageExpiresAt,
     },
   });
 
@@ -138,7 +169,7 @@ export async function createTransactionBatch(
 ): Promise<TransactionDto[]> {
   const { shared, splits } = input;
   const receiptGroupId = shared.receiptGroupId ?? (splits.length > 1 ? crypto.randomUUID() : null);
-  const receiptImageUrl = shared.receiptImageUrl ?? null;
+  const receiptPersistence = await resolveReceiptPersistence(userId, shared.receiptImageUrl);
 
   const transactions = await prisma.$transaction(
     splits.map((split) =>
@@ -152,7 +183,8 @@ export async function createTransactionBatch(
           date: shared.date,
           isAiScanned: shared.isAiScanned ?? false,
           receiptGroupId,
-          receiptImageUrl,
+          receiptImageUrl: receiptPersistence.receiptImageUrl,
+          imageExpiresAt: receiptPersistence.imageExpiresAt,
         },
       })
     )

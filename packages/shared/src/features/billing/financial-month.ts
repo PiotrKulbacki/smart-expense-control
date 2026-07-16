@@ -2,6 +2,11 @@ export const FINANCIAL_MONTH_DAY_MIN = 1;
 export const FINANCIAL_MONTH_DAY_MAX = 28;
 
 export const PAST_DUE_GRACE_MS = 24 * 60 * 60 * 1000;
+/** Second dunning email after ~12h of past_due grace. */
+export const PAST_DUE_REMINDER_AFTER_MS = 12 * 60 * 60 * 1000;
+
+/** Inactive accounts older than this are eligible for automatic deletion (RODO). */
+export const INACTIVE_ACCOUNT_TTL_MS = 2 * 365 * 24 * 60 * 60 * 1000;
 
 export function clampFinancialMonthDay(day: number): number {
   return Math.min(FINANCIAL_MONTH_DAY_MAX, Math.max(FINANCIAL_MONTH_DAY_MIN, day));

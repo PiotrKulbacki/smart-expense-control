@@ -3,10 +3,6 @@
     {
       "path": "/api/cron/reset-quotas",
       "schedule": "5 0 * * *"
-    },
-    {
-      "path": "/api/cron/refresh-aggregations",
-      "schedule": "15 2 * * *"
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { checkoutRequestSchema } from '@shared/features/billing';
+import { checkoutRequestSchema, isPaidPlan } from '@shared/features/billing';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
 import { createCheckoutSession } from '@web/features/billing/services/stripe-checkout.service';
@@ -11,10 +11,6 @@ export async function POST(request: Request) {
       return jsonError('auth.errors.unauthorized', 401);
     }
 
-    if (user.currentPlan === 'PRO') {
-      return jsonError('billing.errors.alreadyPro', 400);
-    }
-
     const body = await request.json();
     const parsed = checkoutRequestSchema.safeParse(body);
 
@@ -22,11 +18,26 @@ export async function POST(request: Request) {
       return jsonError('billing.errors.invalidCurrency', 400);
     }
 
+    const targetPlan = parsed.data.plan;
+
+    if (user.currentPlan === 'PREMIUM') {
+      return jsonError('billing.errors.alreadyOnPlan', 400);
+    }
+
+    if (user.currentPlan === 'PRO' && targetPlan === 'PRO') {
+      return jsonError('billing.errors.alreadyPro', 400);
+    }
+
+    if (isPaidPlan(user.currentPlan) && targetPlan === 'PRO') {
+      return jsonError('billing.errors.alreadyPro', 400);
+    }
+
     const result = await createCheckoutSession({
       userId: user.id,
       email: user.email,
       stripeCustomerId: user.stripeCustomerId,
       currency: parsed.data.currency,
+      plan: targetPlan,
     });
 
     if ('error' in result) {

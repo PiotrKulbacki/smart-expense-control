@@ -1,8 +1,9 @@
 import Stripe from 'stripe';
 import {
   CHECKOUT_ERROR_CODES,
-  resolveStripeProPriceId,
+  resolveStripePaidPriceId,
   type BillingCurrency,
+  type CheckoutPlan,
 } from '@shared/features/billing';
 import { env } from '@web/env';
 
@@ -23,14 +24,34 @@ function getConfiguredStripeProPrices(): Record<BillingCurrency, string | undefi
   };
 }
 
+function getConfiguredStripePremiumPrices(): Record<BillingCurrency, string | undefined> {
+  return {
+    PLN: env.STRIPE_PREMIUM_PRICE_PLN,
+    EUR: env.STRIPE_PREMIUM_PRICE_EUR,
+    GBP: env.STRIPE_PREMIUM_PRICE_GBP,
+    USD: env.STRIPE_PREMIUM_PRICE_USD,
+  };
+}
+
+export function getStripeProPriceMap(): Record<BillingCurrency, string | undefined> {
+  return getConfiguredStripeProPrices();
+}
+
+export function getStripePremiumPriceMap(): Record<BillingCurrency, string | undefined> {
+  return getConfiguredStripePremiumPrices();
+}
+
 export async function createCheckoutSession(params: {
   userId: string;
   email: string;
   stripeCustomerId: string | null;
   currency: BillingCurrency;
+  plan: CheckoutPlan;
 }): Promise<{ url: string } | { error: string }> {
   const stripe = getStripeClient();
-  const priceId = resolveStripeProPriceId(params.currency, getConfiguredStripeProPrices());
+  const priceMap =
+    params.plan === 'PREMIUM' ? getConfiguredStripePremiumPrices() : getConfiguredStripeProPrices();
+  const priceId = resolveStripePaidPriceId(params.plan, params.currency, priceMap);
 
   if (!stripe || !priceId) {
     return { error: CHECKOUT_ERROR_CODES.PRICE_UNAVAILABLE };
@@ -45,9 +66,17 @@ export async function createCheckoutSession(params: {
     allow_promotion_codes: true,
     success_url: `${env.NEXT_PUBLIC_APP_URL}/settings?checkout=success`,
     cancel_url: `${env.NEXT_PUBLIC_APP_URL}/settings?checkout=cancel`,
-    metadata: { userId: params.userId, checkoutCurrency: params.currency },
+    metadata: {
+      userId: params.userId,
+      checkoutCurrency: params.currency,
+      checkoutPlan: params.plan,
+    },
     subscription_data: {
-      metadata: { userId: params.userId, checkoutCurrency: params.currency },
+      metadata: {
+        userId: params.userId,
+        checkoutCurrency: params.currency,
+        checkoutPlan: params.plan,
+      },
     },
   });
 

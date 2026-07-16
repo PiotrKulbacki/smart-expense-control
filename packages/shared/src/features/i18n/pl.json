@@ -280,15 +280,26 @@
         "feature1": "5 skanów paragonów miesięcznie",
         "feature2": "10 wiadomości czatu AI miesięcznie",
         "feature3": "Pełny dashboard wydatków",
+        "feature4": "Bez przechowywania zdjęć paragonów",
         "cta": "Zacznij za darmo"
       },
       "pro": {
         "discount": "{{percent}}% taniej",
         "promoCodeBadge": "Użyj kodu {{code}} przy kasie, aby zyskać {{percent}}% zniżki!",
-        "feature1": "150 skanów paragonów miesięcznie",
-        "feature2": "Nielimitowany czat AI",
-        "feature3": "Priorytetowe wsparcie",
+        "feature1": "50 skanów paragonów miesięcznie",
+        "feature2": "50 wiadomości czatu AI miesięcznie",
+        "feature3": "Zdjęcia paragonów przez 60 dni",
+        "feature4": "Priorytetowe wsparcie",
         "cta": "Przejdź na Pro"
+      },
+      "premium": {
+        "discount": "{{percent}}% taniej",
+        "promoCodeBadge": "Użyj kodu {{code}} przy kasie, aby zyskać {{percent}}% zniżki!",
+        "feature1": "120 skanów paragonów miesięcznie",
+        "feature2": "250 wiadomości czatu AI miesięcznie",
+        "feature3": "Zdjęcia paragonów przez 12 miesięcy",
+        "feature4": "Priorytetowe wsparcie",
+        "cta": "Przejdź na Premium"
       }
     },
     "cta": {
@@ -498,6 +509,7 @@
     "danger": {
       "title": "Strefa niebezpieczna",
       "description": "Trwale usuń konto i wszystkie powiązane dane. Tej operacji nie można cofnąć.",
+      "inactiveAccountNotice": "Konta nieaktywne przez okres 2 lat są automatycznie i bezpowrotnie usuwane z naszej bazy danych wraz ze wszystkimi powiązanymi transakcjami i dokumentami.",
       "confirmLabel": "Wpisz swój e-mail ({{email}}), aby potwierdzić",
       "deleteAccount": "Trwale usuń moje konto"
     },
@@ -517,11 +529,12 @@
       "subscription": "Subskrypcja",
       "currentPlan": "Aktualny plan: {{plan}}",
       "upgradeToPro": "Przejdź na Pro",
+      "upgradeToPremium": "Przejdź na Premium",
       "manageSubscription": "Zarządzaj subskrypcją",
       "paymentCurrency": "Waluta płatności"
     },
     "success": {
-      "upgraded": "Witaj w Pro! Twoja subskrypcja jest aktywna."
+      "upgraded": "Witaj! Twoja subskrypcja jest aktywna."
     },
     "cycleDayModal": {
       "title": "Zmieniono dzień rozpoczęcia cyklu rozliczeniowego",
@@ -538,8 +551,10 @@
       "portalUnavailable": "Portal subskrypcji jest chwilowo niedostępny",
       "noSubscription": "Nie znaleziono aktywnej subskrypcji",
       "alreadyPro": "Masz już aktywną subskrypcję Pro",
+      "alreadyOnPlan": "Masz już ten plan subskrypcji",
       "invalidCurrency": "Wybierz prawidłową walutę płatności",
-      "priceUnavailable": "Cennik Pro jest niedostępny dla wybranej waluty",
+      "invalidPlan": "Wybierz prawidłowy plan subskrypcji",
+      "priceUnavailable": "Cennik jest niedostępny dla wybranej waluty",
       "cycleDayChoiceNotPending": "Wybór dnia cyklu nie jest już wymagany"
     }
   },

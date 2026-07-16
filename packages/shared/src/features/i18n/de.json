@@ -278,15 +278,26 @@
         "feature1": "5 Belegscans pro Monat",
         "feature2": "10 KI-Chat-Nachrichten pro Monat",
         "feature3": "Vollständiges Ausgaben-Dashboard",
+        "feature4": "Keine Speicherung von Belegfotos",
         "cta": "Kostenlos starten"
       },
       "pro": {
         "discount": "{{percent}}% Rabatt",
         "promoCodeBadge": "Code {{code}} an der Kasse eingeben für {{percent}}% Rabatt!",
-        "feature1": "150 Belegscans pro Monat",
-        "feature2": "Unbegrenzter KI-Chat",
-        "feature3": "Prioritäts-Support",
+        "feature1": "50 Belegscans pro Monat",
+        "feature2": "50 KI-Chat-Nachrichten pro Monat",
+        "feature3": "Belegfotos 60 Tage gespeichert",
+        "feature4": "Prioritäts-Support",
         "cta": "Pro wählen"
+      },
+      "premium": {
+        "discount": "{{percent}}% Rabatt",
+        "promoCodeBadge": "Code {{code}} an der Kasse eingeben für {{percent}}% Rabatt!",
+        "feature1": "120 Belegscans pro Monat",
+        "feature2": "250 KI-Chat-Nachrichten pro Monat",
+        "feature3": "Belegfotos 12 Monate gespeichert",
+        "feature4": "Prioritäts-Support",
+        "cta": "Premium wählen"
       }
     },
     "cta": {
@@ -496,6 +507,7 @@
     "danger": {
       "title": "Gefahrenzone",
       "description": "Konto und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "inactiveAccountNotice": "Konten, die 2 Jahre inaktiv sind, werden automatisch und unwiderruflich aus unserer Datenbank gelöscht – inklusive aller zugehörigen Transaktionen und Dokumente.",
       "confirmLabel": "Geben Sie Ihre E-Mail ein ({{email}}), um zu bestätigen",
       "deleteAccount": "Mein Konto dauerhaft löschen"
     },
@@ -515,11 +527,12 @@
       "subscription": "Abonnement",
       "currentPlan": "Aktueller Plan: {{plan}}",
       "upgradeToPro": "Auf Pro upgraden",
+      "upgradeToPremium": "Auf Premium upgraden",
       "manageSubscription": "Abonnement verwalten",
       "paymentCurrency": "Zahlungswährung"
     },
     "success": {
-      "upgraded": "Willkommen bei Pro! Ihr Abonnement ist aktiv."
+      "upgraded": "Willkommen! Ihr Abonnement ist aktiv."
     },
     "cycleDayModal": {
       "title": "Starttag des Abrechnungszyklus geändert",
@@ -536,8 +549,10 @@
       "portalUnavailable": "Abonnement-Portal ist vorübergehend nicht verfügbar",
       "noSubscription": "Kein aktives Abonnement gefunden",
       "alreadyPro": "Sie haben bereits ein aktives Pro-Abonnement",
+      "alreadyOnPlan": "Sie haben diesen Abonnementplan bereits",
       "invalidCurrency": "Bitte wählen Sie eine gültige Zahlungswährung",
-      "priceUnavailable": "Pro-Preis ist für die gewählte Währung nicht verfügbar",
+      "invalidPlan": "Bitte wählen Sie einen gültigen Abonnementplan",
+      "priceUnavailable": "Preis ist für die gewählte Währung nicht verfügbar",
       "cycleDayChoiceNotPending": "Die Auswahl des Starttags ist nicht mehr erforderlich"
     }
   },

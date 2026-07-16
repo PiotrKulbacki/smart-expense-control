@@ -396,11 +396,11 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
               role="status"
             >
               <p className="text-glow text-sm font-medium">
-                {userPlan === 'PRO'
-                  ? t('chat.errors.monthlyLimitReached')
-                  : t('chat.errors.quotaExceeded')}
+                {userPlan === 'FREE'
+                  ? t('chat.errors.quotaExceeded')
+                  : t('chat.errors.monthlyLimitReached')}
               </p>
-              {userPlan !== 'PRO' && (
+              {userPlan !== 'PREMIUM' && (
                 <Link
                   href="/settings"
                   className="text-glow hover:text-glow/80 mt-2 inline-block text-sm font-semibold underline underline-offset-2"
