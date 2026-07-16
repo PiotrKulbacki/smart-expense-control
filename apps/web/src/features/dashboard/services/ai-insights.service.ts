@@ -11,6 +11,7 @@ import { env } from '@web/env';
 import { computeNoSpendDays } from '@web/features/dashboard/lib/no-spend-days';
 import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
 import { captureServerException } from '@web/lib/sentry-server';
+import { getCategoryLimitProgressForUser } from '@web/features/settings/services/category-limits.service';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const MODEL = 'gpt-4o-mini';
@@ -60,9 +61,10 @@ Rules:
 - Prefer one clear insight over generic advice.
 - Keep metric under 8 words. Keep message under 2 sentences.
 - actionableStep should be optional and concrete when present.
+- If categoryLimits are present, you MAY highlight categories near or over their limit (use percentage / remainingAmount / isOverLimit).
 - type guidance:
   - success: positive streak / under budget / healthy pattern
-  - warning: overspending risk / budget pressure
+  - warning: overspending risk / budget pressure / category limit pressure
   - anomaly: unusual spike vs typical pattern
   - tip: practical optimization idea`;
 }
@@ -73,6 +75,14 @@ function buildUserPrompt(context: {
   budget: number | null;
   remainingBudget: number | null;
   categoryTotals: Array<{ category: string; amount: number }>;
+  categoryLimits: Array<{
+    category: string;
+    limitAmount: number;
+    spentAmount: number;
+    remainingAmount: number;
+    percentage: number;
+    isOverLimit: boolean;
+  }>;
   noSpendDays: number;
   totalDays: number;
   recentTransactions: Array<{
@@ -86,7 +96,7 @@ function buildUserPrompt(context: {
   return `Current billing period context:
 ${JSON.stringify(context, null, 2)}
 
-Generate one insight JSON object.`;
+When categoryLimits is non-empty, prefer insights about categories close to or over their limits (percentage, remainingAmount, isOverLimit). Generate one insight JSON object.`;
 }
 
 async function callOpenAiInsight(systemPrompt: string, userPrompt: string): Promise<string> {
@@ -180,6 +190,11 @@ async function generateInsightContent(userId: string, locale: Locale): Promise<A
     throw new Error(INSIGHT_ERROR_CODES.AI_FAILED);
   }
 
+  const categoryLimitProgress = await getCategoryLimitProgressForUser(
+    userId,
+    periodSnapshot.categoryTotalsPrimary
+  );
+
   const totalSpent = periodSnapshot.totalSpentPrimary + periodSnapshot.fixedCostsTotal;
   const remainingBudget = budget != null ? Math.round((budget - totalSpent) * 100) / 100 : null;
   const noSpend = computeNoSpendDays({
@@ -197,6 +212,14 @@ async function generateInsightContent(userId: string, locale: Locale): Promise<A
       budget,
       remainingBudget,
       categoryTotals: periodSnapshot.categoryTotalsPrimary,
+      categoryLimits: categoryLimitProgress.map((limit) => ({
+        category: limit.categoryKey,
+        limitAmount: limit.limitAmount,
+        spentAmount: limit.spentAmount,
+        remainingAmount: limit.remainingAmount,
+        percentage: limit.percentage,
+        isOverLimit: limit.isOverLimit,
+      })),
       noSpendDays: noSpend.noSpendDays,
       totalDays: noSpend.totalDays,
       recentTransactions: recentTransactions.map((transaction) => ({

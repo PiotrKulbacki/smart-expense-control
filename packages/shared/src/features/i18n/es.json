@@ -341,6 +341,13 @@
       "editCurrentHint": "Sobrescribe el presupuesto solo para el ciclo de facturación actual.",
       "updated": "Presupuesto actualizado para este mes"
     },
+    "categoryLimits": {
+      "title": "Límites por categoría",
+      "subtitle": "Progreso respecto a los límites del ciclo de facturación actual",
+      "progress": "{{spent}} / {{limit}}",
+      "remaining": "{{amount}} restante",
+      "overLimit": "{{amount}} por encima del límite"
+    },
     "daily": {
       "avgSpent": "Media gastada: {{amount}}/día",
       "avgRemaining": "Media disponible: {{amount}}/día",
@@ -446,6 +453,30 @@
         "hasTransactions": "Esta categoría contiene transacciones",
         "invalidMigrateTarget": "Elige una categoría de destino válida",
         "builtInReadonly": "Las categorías integradas no se pueden editar ni eliminar"
+      }
+    },
+    "categoryLimits": {
+      "title": "Límites de gasto por categoría",
+      "subtitle": "Define topes mensuales para categorías seleccionadas. El progreso aparece en el panel.",
+      "add": "Añadir límite",
+      "addTitle": "Añadir límite de categoría",
+      "edit": "Editar límite",
+      "editTitle": "Editar límite de categoría",
+      "categoryLabel": "Categoría",
+      "amountLabel": "Importe del límite ({{currency}})",
+      "amountPlaceholder": "p. ej. 200",
+      "amountHint": "Se aplica al gasto del ciclo de facturación actual en tu moneda principal.",
+      "delete": "Eliminar límite",
+      "empty": "Aún no hay límites de categoría. Añade uno para seguir el gasto.",
+      "success": {
+        "saved": "Límite de categoría guardado",
+        "deleted": "Límite de categoría eliminado"
+      },
+      "errors": {
+        "invalidCategory": "Selecciona una categoría válida",
+        "invalidAmount": "Introduce un importe de límite positivo válido",
+        "notFound": "Límite de categoría no encontrado",
+        "duplicate": "Ya existe un límite para esta categoría"
       }
     },
     "success": {

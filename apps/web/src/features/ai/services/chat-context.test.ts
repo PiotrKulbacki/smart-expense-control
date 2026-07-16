@@ -106,6 +106,33 @@ describe('chat-context', () => {
     expect(prompt).toContain('Current cycle: 2026-07-12 to 2026-08-11');
   });
 
+  it('embeds category spending limits when present', () => {
+    const context = {
+      ...aggregateFinancialContext('2026-07', [], []),
+      categoryLimits: [
+        {
+          category: 'Groceries',
+          limitAmount: 200,
+          spentAmount: 180,
+          remainingAmount: 20,
+          percentage: 90,
+          isOverLimit: false,
+        },
+      ],
+    };
+    const prompt = buildChatSystemPrompt(context, 'en', {
+      todayIso: '2026-07-13',
+      financialMonthStartDay: 12,
+      cycleStartIso: '2026-07-12',
+      cycleEndIso: '2026-08-11',
+      daysRemainingInCycle: 29,
+    });
+
+    expect(prompt).toContain('Category spending limits for this cycle');
+    expect(prompt).toContain('"percentage": 90');
+    expect(prompt).toContain('"isOverLimit": false');
+  });
+
   describe('resolveActiveMonthlyBudget', () => {
     it('prefers currentMonthBudget override over defaultMonthlyBudget', () => {
       const budget = resolveActiveMonthlyBudget({

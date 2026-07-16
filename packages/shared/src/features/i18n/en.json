@@ -341,6 +341,13 @@
       "editCurrentHint": "Override the budget for the current billing cycle only.",
       "updated": "Budget updated for this month"
     },
+    "categoryLimits": {
+      "title": "Category limits",
+      "subtitle": "Progress against the limits you set for this billing cycle",
+      "progress": "{{spent}} / {{limit}}",
+      "remaining": "{{amount}} left",
+      "overLimit": "{{amount}} over limit"
+    },
     "daily": {
       "avgSpent": "Avg. spent: {{amount}}/day",
       "avgRemaining": "Avg. left to spend: {{amount}}/day",
@@ -446,6 +453,30 @@
         "hasTransactions": "This category contains transactions",
         "invalidMigrateTarget": "Please choose a valid target category",
         "builtInReadonly": "Built-in categories cannot be edited or deleted"
+      }
+    },
+    "categoryLimits": {
+      "title": "Category spending limits",
+      "subtitle": "Set monthly caps for selected categories. Progress appears on your dashboard.",
+      "add": "Add limit",
+      "addTitle": "Add category limit",
+      "edit": "Edit limit",
+      "editTitle": "Edit category limit",
+      "categoryLabel": "Category",
+      "amountLabel": "Limit amount ({{currency}})",
+      "amountPlaceholder": "e.g. 200",
+      "amountHint": "Applies to the current billing cycle spend in your primary currency.",
+      "delete": "Remove limit",
+      "empty": "No category limits yet. Add one to track spending against a cap.",
+      "success": {
+        "saved": "Category limit saved",
+        "deleted": "Category limit removed"
+      },
+      "errors": {
+        "invalidCategory": "Please select a valid category",
+        "invalidAmount": "Please enter a valid positive limit amount",
+        "notFound": "Category limit not found",
+        "duplicate": "A limit for this category already exists"
       }
     },
     "success": {

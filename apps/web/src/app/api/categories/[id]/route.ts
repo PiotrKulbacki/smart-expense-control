@@ -130,7 +130,10 @@ export async function DELETE(request: Request, context: RouteContext) {
       await migrateCategoryTransactions(user.id, categoryKey, migrateTo);
     }
 
-    await prisma.userCategory.delete({ where: { id } });
+    await prisma.$transaction([
+      prisma.userCategoryLimit.deleteMany({ where: { userId: user.id, categoryKey } }),
+      prisma.userCategory.delete({ where: { id } }),
+    ]);
 
     return NextResponse.json({ success: true });
   } catch {

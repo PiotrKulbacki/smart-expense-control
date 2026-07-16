@@ -30,6 +30,7 @@ import {
   resolveCategoryLabel,
   type CategoryDisplayContext,
 } from '@web/features/transactions/lib/category-config';
+import { sortCategoriesForSelect } from '@shared/features/transactions/categories';
 
 const PRESET_COLORS = [
   '#16a34a',
@@ -73,11 +74,24 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
     [categories]
   );
   const systemCategories = useMemo(
-    () => categories.filter((category) => !category.isCustom),
-    [categories]
+    () =>
+      sortCategoriesForSelect(
+        categories.filter((category) => !category.isCustom),
+        (category) => getCategoryOptionLabel(category, t),
+        locale
+      ),
+    [categories, t, locale]
   );
 
-  const migrationOptions = categories.filter((item) => item.key !== deleteTarget?.key);
+  const migrationOptions = useMemo(
+    () =>
+      sortCategoriesForSelect(
+        categories.filter((item) => item.key !== deleteTarget?.key),
+        (category) => getCategoryOptionLabel(category, t),
+        locale
+      ),
+    [categories, deleteTarget?.key, t, locale]
+  );
 
   function openCreateForm() {
     setEditingCategory(null);

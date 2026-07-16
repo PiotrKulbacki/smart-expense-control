@@ -32,6 +32,14 @@ export type FinancialContext = {
     description: string | null;
   }>;
   budgetSummary: DashboardBudgetSummary | null;
+  categoryLimits: Array<{
+    category: string;
+    limitAmount: number;
+    spentAmount: number;
+    remainingAmount: number;
+    percentage: number;
+    isOverLimit: boolean;
+  }>;
 };
 
 export type FinancialCycleMeta = {
@@ -165,6 +173,7 @@ export function aggregateFinancialContext(
       description: transaction.description,
     })),
     budgetSummary: null,
+    categoryLimits: [],
   };
 }
 
@@ -176,7 +185,8 @@ export function financialContextFromPeriodSnapshot(
     currentMonthBudget: number | null;
     daysElapsed: number;
     daysUntilPayday: number;
-  }
+  },
+  categoryLimits: FinancialContext['categoryLimits'] = []
 ): FinancialContext {
   return {
     currentCycleLabel: cycleLabel,
@@ -195,6 +205,7 @@ export function financialContextFromPeriodSnapshot(
       daysElapsed: budgetParams.daysElapsed,
       daysUntilPayday: budgetParams.daysUntilPayday,
     }),
+    categoryLimits,
   };
 }
 
@@ -262,6 +273,14 @@ ${context.budgetSummary.categoryTotalsPrimary.length > 0 ? JSON.stringify(contex
     : `Category totals this cycle:
 ${context.categoryTotals.length > 0 ? JSON.stringify(context.categoryTotals, null, 2) : 'No transactions this month.'}`;
 
+  const categoryLimitsSection =
+    context.categoryLimits.length > 0
+      ? `Category spending limits for this cycle (authoritative — matches dashboard progress bars):
+${JSON.stringify(context.categoryLimits, null, 2)}
+
+When the user asks about category budgets or limits, use these values. percentage may exceed 100 when over limit; isOverLimit marks categories past their cap.`
+      : '';
+
   return `You are a helpful personal finance assistant for Smart Expense Control.
 Always respond in ${language}.
 Use the user's transaction data below to answer spending questions accurately.
@@ -277,7 +296,7 @@ ${formatCycleDaysPromptLine(cycleMeta.daysRemainingInCycle)}
 ${budgetSection}${dashboardSummarySection}${spentLine}
 
 ${categorySection}
-
+${categoryLimitsSection ? `\n${categoryLimitsSection}\n` : ''}
 Recent transactions (newest first):
 ${context.recentTransactions.length > 0 ? JSON.stringify(context.recentTransactions, null, 2) : 'No transactions on record.'}`;
 }
