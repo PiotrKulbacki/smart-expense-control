@@ -19,6 +19,8 @@ export const TRANSACTION_CATEGORIES = [
 
 export type TransactionCategory = (typeof TRANSACTION_CATEGORIES)[number];
 
+export const OTHER_CATEGORY = 'Other' as const satisfies TransactionCategory;
+
 export const LEGACY_CATEGORY_MIGRATIONS: Record<string, TransactionCategory> = {
   Coffee: 'CoffeeShop',
   Shopping: 'Other',
@@ -47,4 +49,24 @@ export function parseCustomCategoryId(value: string): string | null {
   }
 
   return value.slice(CUSTOM_CATEGORY_PREFIX.length);
+}
+
+/**
+ * Sort categories alphabetically by display label, with "Other" always last.
+ */
+export function sortCategoriesForSelect<T extends { key: string }>(
+  categories: readonly T[],
+  getLabel: (category: T) => string,
+  locale?: string
+): T[] {
+  return [...categories].sort((a, b) => {
+    const aIsOther = a.key === OTHER_CATEGORY;
+    const bIsOther = b.key === OTHER_CATEGORY;
+
+    if (aIsOther !== bIsOther) {
+      return aIsOther ? 1 : -1;
+    }
+
+    return getLabel(a).localeCompare(getLabel(b), locale, { sensitivity: 'base' });
+  });
 }

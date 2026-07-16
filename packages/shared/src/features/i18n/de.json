@@ -341,6 +341,13 @@
       "editCurrentHint": "Überschreibt das Budget nur für den aktuellen Abrechnungszyklus.",
       "updated": "Budget für diesen Monat aktualisiert"
     },
+    "categoryLimits": {
+      "title": "Kategorielimits",
+      "subtitle": "Fortschritt gegenüber den Limits für den aktuellen Abrechnungszyklus",
+      "progress": "{{spent}} / {{limit}}",
+      "remaining": "{{amount}} übrig",
+      "overLimit": "{{amount}} über dem Limit"
+    },
     "daily": {
       "avgSpent": "Ø ausgegeben: {{amount}}/Tag",
       "avgRemaining": "Ø verfügbar: {{amount}}/Tag",
@@ -446,6 +453,30 @@
         "hasTransactions": "Diese Kategorie enthält Transaktionen",
         "invalidMigrateTarget": "Bitte eine gültige Zielkategorie wählen",
         "builtInReadonly": "Integrierte Kategorien können nicht bearbeitet oder gelöscht werden"
+      }
+    },
+    "categoryLimits": {
+      "title": "Ausgabenlimits pro Kategorie",
+      "subtitle": "Setzen Sie monatliche Limits für ausgewählte Kategorien. Der Fortschritt erscheint im Dashboard.",
+      "add": "Limit hinzufügen",
+      "addTitle": "Kategorielimit hinzufügen",
+      "edit": "Limit bearbeiten",
+      "editTitle": "Kategorielimit bearbeiten",
+      "categoryLabel": "Kategorie",
+      "amountLabel": "Limitbetrag ({{currency}})",
+      "amountPlaceholder": "z. B. 200",
+      "amountHint": "Gilt für Ausgaben im aktuellen Abrechnungszyklus in Ihrer Hauptwährung.",
+      "delete": "Limit entfernen",
+      "empty": "Noch keine Kategorielimits. Fügen Sie eines hinzu, um Ausgaben zu verfolgen.",
+      "success": {
+        "saved": "Kategorielimit gespeichert",
+        "deleted": "Kategorielimit entfernt"
+      },
+      "errors": {
+        "invalidCategory": "Bitte wählen Sie eine gültige Kategorie",
+        "invalidAmount": "Bitte geben Sie einen gültigen positiven Limitbetrag ein",
+        "notFound": "Kategorielimit nicht gefunden",
+        "duplicate": "Für diese Kategorie existiert bereits ein Limit"
       }
     },
     "success": {

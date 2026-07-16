@@ -31,7 +31,9 @@ import {
 } from '@web/features/transactions/lib/chart-date-filter';
 import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
 import { countLogicalTransactions } from '@web/features/dashboard/lib/transaction-counts';
+import { CategoryLimitsProgressCard } from '@web/features/dashboard/components/CategoryLimitsProgressCard';
 import { TransactionsInsightsCard } from '@web/features/dashboard/components/TransactionsInsightsCard';
+import type { CategoryLimitProgress } from '@shared/features/transactions/category-limit-schemas';
 
 type DashboardSummary = {
   primaryCurrency: CurrencyCode;
@@ -53,6 +55,7 @@ type DashboardSummary = {
     totalDays: number;
     ratio: string;
   };
+  categoryLimits?: CategoryLimitProgress[];
 };
 
 type ScanQuota = {
@@ -416,6 +419,13 @@ export function DashboardView() {
           noSpendDays={summary.noSpendDays ?? null}
         />
       </section>
+
+      <CategoryLimitsProgressCard
+        limits={summary.categoryLimits ?? []}
+        primaryCurrency={summary.primaryCurrency}
+        locale={locale}
+        categoryDisplayContext={categoryDisplayContext}
+      />
 
       <CategoryDonutChart
         categoryTotals={categoryTotals}

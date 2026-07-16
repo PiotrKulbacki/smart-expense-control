@@ -21,6 +21,7 @@ import { ProUpgradeCycleDayDialog } from '@web/features/billing/components/ProUp
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { RecurringExpensesSection } from '@web/features/settings/components/RecurringExpensesSection';
 import { CategoriesSection } from '@web/features/settings/components/CategoriesSection';
+import { CategoryLimitsSection } from '@web/features/settings/components/CategoryLimitsSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 export function SettingsView() {
@@ -166,7 +167,7 @@ export function SettingsView() {
     router.refresh();
   }
 
-  async function handleSave(event: React.FormEvent) {
+  async function handleSave(event: { preventDefault(): void }) {
     event.preventDefault();
     setIsSaving(true);
 
@@ -374,6 +375,8 @@ export function SettingsView() {
       </form>
 
       <CategoriesSection />
+
+      <CategoryLimitsSection primaryCurrency={primaryCurrency} />
 
       <RecurringExpensesSection primaryCurrency={primaryCurrency} />
 

@@ -343,6 +343,13 @@
       "editCurrentHint": "Nadpisz budżet tylko na bieżący cykl rozliczeniowy.",
       "updated": "Budżet na ten miesiąc zaktualizowany"
     },
+    "categoryLimits": {
+      "title": "Limity kategorii",
+      "subtitle": "Postęp względem limitów ustawionych na bieżący cykl rozliczeniowy",
+      "progress": "{{spent}} / {{limit}}",
+      "remaining": "Pozostało {{amount}}",
+      "overLimit": "{{amount}} ponad limit"
+    },
     "daily": {
       "avgSpent": "Średnio wydano: {{amount}}/dzień",
       "avgRemaining": "Średnio do wydania: {{amount}}/dzień",
@@ -448,6 +455,30 @@
         "hasTransactions": "Ta kategoria zawiera transakcje",
         "invalidMigrateTarget": "Wybierz prawidłową kategorię docelową",
         "builtInReadonly": "Kategorii wbudowanych nie można edytować ani usuwać"
+      }
+    },
+    "categoryLimits": {
+      "title": "Limity wydatków na kategorie",
+      "subtitle": "Ustaw miesięczne limity dla wybranych kategorii. Postęp zobaczysz na pulpicie.",
+      "add": "Dodaj limit",
+      "addTitle": "Dodaj limit kategorii",
+      "edit": "Edytuj limit",
+      "editTitle": "Edytuj limit kategorii",
+      "categoryLabel": "Kategoria",
+      "amountLabel": "Kwota limitu ({{currency}})",
+      "amountPlaceholder": "np. 200",
+      "amountHint": "Dotyczy wydatków w bieżącym cyklu rozliczeniowym w walucie głównej.",
+      "delete": "Usuń limit",
+      "empty": "Brak limitów kategorii. Dodaj jeden, aby śledzić wydatki względem limitu.",
+      "success": {
+        "saved": "Limit kategorii zapisany",
+        "deleted": "Limit kategorii usunięty"
+      },
+      "errors": {
+        "invalidCategory": "Wybierz prawidłową kategorię",
+        "invalidAmount": "Podaj prawidłową dodatnią kwotę limitu",
+        "notFound": "Nie znaleziono limitu kategorii",
+        "duplicate": "Limit dla tej kategorii już istnieje"
       }
     },
     "success": {

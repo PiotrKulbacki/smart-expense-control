@@ -6,7 +6,7 @@ import { translateError } from '@shared/features/i18n';
 import type { CategoryListItem } from '@shared/features/transactions/category-schemas';
 import {
   getCategoryOptionLabel,
-  useCategories,
+  useSortedCategoriesForSelect,
 } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
@@ -26,7 +26,7 @@ export function CategorySelectWithCreate({
 }: CategorySelectWithCreateProps) {
   const t = useT();
   const { locale } = useLocale();
-  const { categories, reload } = useCategories();
+  const { categories, reload } = useSortedCategoriesForSelect();
   const [isCreating, setIsCreating] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

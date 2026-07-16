@@ -16,6 +16,8 @@ import {
   countLogicalTransactions,
   type TransactionCountStats,
 } from '@web/features/dashboard/lib/transaction-counts';
+import { getCategoryLimitProgressForUser } from '@web/features/settings/services/category-limits.service';
+import type { CategoryLimitProgress } from '@shared/features/transactions/category-limit-schemas';
 
 export type DashboardTransaction = {
   id: string;
@@ -50,6 +52,7 @@ export type DashboardSummary = {
   currentMonthBudget: number | null;
   defaultMonthlyBudget: number | null;
   noSpendDays: NoSpendDaysResult;
+  categoryLimits: CategoryLimitProgress[];
 };
 
 export type DashboardData = {
@@ -314,6 +317,12 @@ export async function getDashboardData(
     });
   }
 
+  // Category limits always compare against the billing-period spend (not custom chart range).
+  const categoryLimits = await getCategoryLimitProgressForUser(
+    userId,
+    cachedPeriodAggregation?.categoryTotalsPrimary ?? []
+  );
+
   const mappedRecentTransactions = recentTransactions.map((transaction) => {
     const amount = transaction.amount.toNumber();
     return {
@@ -349,6 +358,7 @@ export async function getDashboardData(
       currentMonthBudget: user.currentMonthBudget,
       defaultMonthlyBudget: user.defaultMonthlyBudget,
       noSpendDays,
+      categoryLimits,
     },
     recentTransactions: mappedRecentTransactions,
     chartTransactions,

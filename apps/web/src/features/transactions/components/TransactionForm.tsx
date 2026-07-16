@@ -18,7 +18,7 @@ import { Label } from '@web/components/ui/label';
 import { Textarea } from '@web/components/ui/textarea';
 import {
   getCategoryOptionLabel,
-  useCategories,
+  useSortedCategoriesForSelect,
 } from '@web/features/categories/hooks/useCategories';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
@@ -41,7 +41,7 @@ export function TransactionForm({
 }: TransactionFormProps) {
   const t = useT();
   const { locale } = useLocale();
-  const { categories, isLoading: isCategoriesLoading } = useCategories();
+  const { categories, isLoading: isCategoriesLoading } = useSortedCategoriesForSelect();
   const isEditing = Boolean(transactionId);
 
   const {

@@ -22,6 +22,7 @@ import {
   type FinancialCycleMeta,
 } from '@web/features/ai/services/chat-context';
 import { getOrRefreshPeriodAggregation } from '@web/features/analytics/services/period-aggregation-cache.service';
+import { getCategoryLimitProgressForUser } from '@web/features/settings/services/category-limits.service';
 import { captureServerException } from '@web/lib/sentry-server';
 import {
   getBillingPeriodDayMetrics,
@@ -103,6 +104,11 @@ async function fetchFinancialContext(userId: string): Promise<{
     throw new Error(CHAT_ERROR_CODES.AI_FAILED);
   }
 
+  const categoryLimitProgress = await getCategoryLimitProgressForUser(
+    userId,
+    periodSnapshot.categoryTotalsPrimary
+  );
+
   const context = financialContextFromPeriodSnapshot(
     label,
     periodSnapshot,
@@ -117,7 +123,15 @@ async function fetchFinancialContext(userId: string): Promise<{
       currentMonthBudget: user.currentMonthBudget,
       daysElapsed: dayMetrics.daysElapsed,
       daysUntilPayday: dayMetrics.daysUntilPayday,
-    }
+    },
+    categoryLimitProgress.map((limit) => ({
+      category: limit.categoryKey,
+      limitAmount: limit.limitAmount,
+      spentAmount: limit.spentAmount,
+      remainingAmount: limit.remainingAmount,
+      percentage: limit.percentage,
+      isOverLimit: limit.isOverLimit,
+    }))
   );
 
   return { context, cycleMeta, activeBudget };
