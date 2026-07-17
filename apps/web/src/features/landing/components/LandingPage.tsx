@@ -37,7 +37,9 @@ export function LandingPage() {
         duration: Math.round(r.duration),
         transferSize: 'transferSize' in r ? Number(r.transferSize) : 0,
         renderBlocking:
-          'renderBlockingStatus' in r ? String((r as PerformanceResourceTiming).renderBlockingStatus) : null,
+          'renderBlockingStatus' in r
+            ? String((r as PerformanceResourceTiming).renderBlockingStatus)
+            : null,
       }));
     const jsResources = performance
       .getEntriesByType('resource')
