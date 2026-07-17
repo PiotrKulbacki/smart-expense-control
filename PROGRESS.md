@@ -30,6 +30,9 @@
 26. **Faza 9.8: optymalizacja wydajności ładowania widoków (prefetch, cache, API)** — [✅ Zrobione]
 27. **Faza 9.9: zgoda na ciasteczka (Cookie Consent Banner & Preferences, RODO/GDPR)** — [✅ Zrobione]
 28. **Faza 10: cennik 3-poziomowy (Premium), retencja nieaktywnych, dunning Resend, rolling photo retention** — [✅ Zrobione]
+29. **Faza 11.0: analiza prawna i struktury Regulaminu / Polityki Prywatności (RODO/UŚUDE/DE)** — [✅ Zrobione]
+30. **Faza 11.1: wdrożenie elementów compliance w UI + Impressum + drafty legal (bez pełnej treści prawnej)** — [✅ Zrobione]
+31. **Faza 11.1.1: poprawki UX i compliance po Fazie 11.1** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -82,6 +85,47 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-17 — Faza 11.1.1: poprawki UX i compliance po wdrożeniu Fazy 11.1.**
+
+### Faza 11.1.1 — UX & compliance fixes
+
+- **Strony prawne (`/terms`, `/privacy`, `/impressum`):** przeformatowano treść na sekcje z nagłówkami `h2`, akapitami i listami; dodano komponenty `LegalPageShell` + `LegalSection`; zaktualizowano i18n (en/pl/de/es) o strukturę sekcji zamiast jednego bloku `content`.
+- **Powrót na stronę główną:** link z ikoną strzałki na górze każdej strony prawnej (`legal.backToHome` w 4 językach).
+- **Cookie Consent:** przywrócono kategorię `marketing` w modalu preferencji; zapis stanu `marketing` w `sec_cookie_consent`; „Accept all” ustawia `marketing: true`.
+- **Zmiana języka na landing page:** przeniesiono `CategoriesProvider` z root layout do `(app)/layout` — niezalogowani użytkownicy nie wywołują już `/api/categories` przy zmianie locale (naprawiony fałszywy toast „musisz być zalogowany”).
+- **Sidebar:** usunięto przycisk „Zarządzaj subskrypcją” (billing dostępny w Settings).
+- **Dashboard AI Insights:** usunięto disclaimer AI z `TransactionsInsightsCard` (kwestia uregulowana w Regulaminie/PP).
+
+---
+
+**2026-07-16 — Faza 11.0 zamknięta: analiza prawna + struktury dokumentów + kwestionariusz + audyt cookies.**
+
+### Faza 11.0 — Compliance (analiza, bez ostatecznych tekstów prawnych)
+
+- **Deliverable:** [`COMPLIANCE_PHASE_11.md`](COMPLIANCE_PHASE_11.md) — pełna mapa wymogów PL/DE/UE, spisy treści Regulaminu i PP, kwestionariusz (28 pytań) dla właściciela (JDG DE), ocena Cookie Consent.
+- **Regulamin (wymogi):** UŚUDE art. 8, prawa konsumenta, DE Impressum (§ 5 DDG), Kündigungsbutton (§ 312k BGB), Widerrufsbutton od 19.06.2026 (§ 356a BGB), klauzule AI (halucynacje/OCR), subskrypcje Stripe + odstąpienie przy natychmiastowym dostępie PRO/Premium.
+- **Polityka Prywatności:** art. 13/14 RODO, TDDDG § 25, subprocessors, retencja (zdjęcia 0/60/365, TTL konta 2 lata), prawa osoby (brak eksportu Art. 20 w kodzie).
+- **Cookie Consent (Faza 9.9) — werdykt:** kierunkowo zgodny (opt-in, reject easy, PostHog gated); **luki:** brak ponownego otwarcia preferencji, brak linków do PP/Cookie Policy, Sentry bez gate, kategoria `marketing` nieużywana, brak ToS checkbox przy rejestracji.
+- **Następny krok (Faza 11.1 — wymaga zgody):** uzupełnienie kwestionariusza przez właściciela → drafty tekstów + Impressum + UI (checkout consent, cookie settings link, Sentry gate, AI disclaimer na skanerze/insights). **Bez ostatecznych tekstów prawnych w tej fazie.**
+
+---
+
+**2026-07-17 — Faza 11.1 wdrożona: compliance UX + Impressum + drafty legal.**
+
+### Faza 11.1 — Compliance UX i drafty legal (bez pełnej treści prawnej)
+
+- Dodano stronę publiczną [`/impressum`](<apps/web/src/app/(public)/impressum/page.tsx>) oraz link do niej w stopce (`PublicFooter`).
+- Zaktualizowano [`/terms`](<apps/web/src/app/(public)/terms/page.tsx>) i [`/privacy`](<apps/web/src/app/(public)/privacy/page.tsx>) o drafty treści oraz sekcję „Cookies”.
+- W cookie consent:
+  - usunięto kategorię `marketing` z UI (pozostaje nieużywana),
+  - dodano link do Polityki Prywatności w bannerze i w modal,
+  - dodano ponowne otwieranie preferencji („Cookie settings”) w stopce i w Settings.
+- Zrobiono Sentry gate po zgodzie analytics (`instrumentation-client.ts`).
+- Usunięto server-side `captureServerEvent` dla PostHog (events w praktyce zbierane są po stronie klienta po zgodzie).
+- Dodano checkbox akceptacji Terms/Privacy podczas rejestracji oraz zablokowano start OAuth Google do czasu akceptacji (`AuthForm` + walidacja backendowa).
+- Dodano checkbox zgody na natychmiastowy dostęp przed checkout PRO/Premium (związane z utratą prawa odstąpienia) (`SettingsView` + `/api/billing/checkout` + Stripe metadata).
+- Dodano disclaimer AI na skanerze paragonów i w dashboard AI insights (`ReceiptScanner` + `TransactionsInsightsCard`).
 
 **2026-07-16 — Faza 10 zamknięta i zweryfikowana (Premium, TTL, dunning Resend, photo retention).**
 

@@ -31,15 +31,15 @@ export function CookieToggle({
         }
       }}
       className={cn(
-        'focus-visible:ring-warm/30 relative h-7 w-12 shrink-0 rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2',
+        'focus-visible:ring-warm/30 relative h-7 w-12 shrink-0 overflow-hidden rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2',
         checked ? 'border-cool/40 bg-cool/30' : 'bg-elevated border-[var(--border)]',
         disabled && 'cursor-not-allowed opacity-60'
       )}
     >
       <span
         className={cn(
-          'absolute top-0.5 h-5 w-5 rounded-full shadow transition-transform',
-          checked ? 'bg-cool translate-x-5' : 'bg-muted translate-x-0.5'
+          'absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow transition-transform',
+          checked ? 'bg-cool translate-x-5' : 'bg-muted translate-x-0'
         )}
       />
     </button>

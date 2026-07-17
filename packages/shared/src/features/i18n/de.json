@@ -36,7 +36,13 @@
       "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an",
       "oauthFailed": "Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut",
       "generic": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut",
-      "networkError": "Netzwerkfehler. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut"
+      "networkError": "Netzwerkfehler. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut",
+      "legalAcceptanceRequired": "Bitte akzeptieren Sie die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie, um ein Konto zu erstellen"
+    },
+    "checkboxes": {
+      "legalAcceptancePrefix": "Ich habe die ",
+      "legalAcceptanceMiddle": " und ",
+      "legalAcceptanceSuffix": " gelesen und stimme ihnen zu."
     }
   },
   "transactions": {
@@ -233,8 +239,10 @@
     },
     "footer": {
       "copyright": "© {{year}} Smart Expense Control. Alle Rechte vorbehalten.",
+      "impressum": "Impressum",
       "terms": "Nutzungsbedingungen",
       "privacy": "Datenschutz",
+      "cookieSettings": "Cookie-Einstellungen",
       "contact": "Kontakt"
     },
     "aria": {
@@ -529,7 +537,8 @@
       "upgradeToPro": "Auf Pro upgraden",
       "upgradeToPremium": "Auf Premium upgraden",
       "manageSubscription": "Abonnement verwalten",
-      "paymentCurrency": "Zahlungswährung"
+      "paymentCurrency": "Zahlungswährung",
+      "immediateAccessConsent": "Ich verstehe, dass ich PRO/Premium sofort aktiviere. Dies kann dazu führen, dass ich das gesetzliche 14-tägige Widerrufsrecht verliere, sobald die Leistung startet."
     },
     "success": {
       "upgraded": "Willkommen! Ihr Abonnement ist aktiv."
@@ -553,23 +562,86 @@
       "invalidCurrency": "Bitte wählen Sie eine gültige Zahlungswährung",
       "invalidPlan": "Bitte wählen Sie einen gültigen Abonnementplan",
       "priceUnavailable": "Preis ist für die gewählte Währung nicht verfügbar",
-      "cycleDayChoiceNotPending": "Die Auswahl des Starttags ist nicht mehr erforderlich"
+      "cycleDayChoiceNotPending": "Die Auswahl des Starttags ist nicht mehr erforderlich",
+      "immediateAccessConsentRequired": "Bitte bestätigen Sie den sofortigen Zugriff auf PRO/Premium, um fortzufahren"
     }
   },
   "legal": {
+    "backToHome": "Zurück zur Startseite",
     "terms": {
       "title": "Nutzungsbedingungen",
-      "content": "Mit der Nutzung von Smart Expense Control verpflichten Sie sich zur verantwortungsvollen Nutzung. KI-generierte Einblicke dienen nur Informationszwecken und stellen keine Finanzberatung dar."
+      "sections": {
+        "overview": {
+          "p1": "Smart Expense Control ist ein abonnementbasiertes SaaS, mit dem Sie Ausgaben verwalten, Belege per KI (OCR) scannen, Transaktionen kategorisieren und den KI-Finanzassistenten für Informationszwecke nutzen können.",
+          "p2": "Durch die Erstellung eines Kontos und die Nutzung der Dienste stimmen Sie den Nutzungsbedingungen zu."
+        },
+        "subscription": {
+          "title": "Abonnements",
+          "p1": "Abonnements werden über Stripe abgerechnet und verlängern sich für den gewählten Abrechnungszeitraum. Sie können jederzeit kündigen; die Kündigung verhindert die nächste Verlängerung und wirkt zum Ende des laufenden Abrechnungszeitraums."
+        },
+        "withdrawal": {
+          "title": "Widerrufsrecht",
+          "p1": "Verbraucher haben grundsätzlich 14 Tage Zeit, um einen Fernabsatzvertrag zu widerrufen. Für PRO/Premium gilt: Wenn Sie sofortigen Zugriff anfordern, beginnen wir ggf. unmittelbar mit der Leistung. Mit dem Wunsch nach sofortigem Zugriff bestätigen Sie, dass Sie Ihr gesetzliches Widerrufsrecht verlieren, sobald die Leistung beginnt."
+        },
+        "refund": {
+          "title": "Freiwillige Rückerstattung (money-back)",
+          "p1": "Wir können bis zu 7 Tagen nach dem Kauf eine Rückerstattung anbieten, sofern Sie die App nicht genutzt und keine KI-Scans/Nachrichten gesendet haben.",
+          "p2": "KI-Funktionen sind nur Informationshinweise und können ungenau sein. Sie bleiben verantwortlich für die Überprüfung der Daten und für Entscheidungen."
+        },
+        "complaints": {
+          "title": "Beschwerden",
+          "p1": "Bei Beschwerden nutzen Sie bitte die Kontaktdaten im Impressum."
+        }
+      }
     },
     "privacy": {
       "title": "Datenschutz",
-      "content": "Wir verarbeiten Ihre Konto- und Transaktionsdaten, um Ausgabenverfolgung und KI-Funktionen bereitzustellen. Sie können Ihr Konto und alle zugehörigen Daten jederzeit in den Einstellungen dauerhaft löschen."
+      "sections": {
+        "dataProcessing": {
+          "title": "Verarbeitete Daten",
+          "p1": "Wir verarbeiten personenbezogene Daten, um Smart Expense Control bereitzustellen, Ihr Konto zu verwalten, Abonnements abzuwickeln und Ihnen die gewünschten KI-Funktionen zur Verfügung zu stellen.",
+          "p2": "Dazu gehören Kontodaten (z. B. E-Mail), gespeicherte Transaktionsdaten, Chat-Nachrichten und Ergebnisse aus dem Beleg-Scan.",
+          "p3": "Wir speichern Belegbilder nur so lange, wie es für Ihren ausgewählten Tarif erforderlich ist, und löschen sie gemäß unserer Aufbewahrungsrichtlinie. Sie können Ihr Konto und die zugehörigen Daten jederzeit in den Einstellungen löschen."
+        },
+        "security": {
+          "title": "Sicherheit",
+          "p1": "Wir verwenden angemessene Sicherheitsmaßnahmen und verkaufen Ihre personenbezogenen Daten nicht."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "intro": "Wir verwenden folgende Cookie-Kategorien:",
+          "list": {
+            "necessary": "Notwendige Cookies — erforderlich für den sicheren Betrieb der App.",
+            "analytics": "Analyse-Cookies — helfen uns zu verstehen, wie das Produkt genutzt wird (z. B. über PostHog)."
+          },
+          "outro": "Analyse-Cookies werden erst aktiviert, nachdem Sie zugestimmt haben. Sie können Ihre Einstellungen über den Link zu den Cookie-Einstellungen jederzeit ändern. Wir speichern Ihre Cookie-Einwilligung bis zu 365 Tage."
+        }
+      }
+    },
+    "impressum": {
+      "title": "Impressum",
+      "sections": {
+        "provider": {
+          "title": "Anbieter",
+          "name": "Piotr Kulbacki (Einzelunternehmen) — Smart Expense Control",
+          "labels": {
+            "address": "Adresse",
+            "email": "E-Mail",
+            "phone": "Telefon"
+          },
+          "items": {
+            "address": "Bendastr. 11, 12051 Berlin, Deutschland",
+            "email": "support@smartexpensecontrol.app",
+            "phone": "+49 30 00000000 (virtuelle Nummer)"
+          }
+        }
+      }
     }
   },
   "cookies": {
     "banner": {
       "title": "Wir verwenden Cookies",
-      "description": "Wir nutzen notwendige Cookies für den Betrieb der App sowie optionale Cookies für Analyse und Marketing. Sie können alle akzeptieren, optionale ablehnen oder Kategorien wählen.",
+      "description": "Wir nutzen notwendige Cookies für den Betrieb der App sowie optionale Cookies für Analyse. Sie können alle akzeptieren, optionale ablehnen oder Kategorien wählen.",
       "acceptAll": "Alle akzeptieren",
       "rejectOptional": "Optionale ablehnen",
       "managePreferences": "Einstellungen verwalten"

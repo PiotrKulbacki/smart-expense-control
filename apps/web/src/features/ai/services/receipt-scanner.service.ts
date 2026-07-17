@@ -16,8 +16,6 @@ import {
 } from '@shared/features/transactions/schemas';
 import { env } from '@web/env';
 import { resolveReceiptSplitDraft } from '@web/features/ai/services/receipt-scan-splits';
-import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
-import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import { captureServerException } from '@web/lib/sentry-server';
 import {
   deleteReceiptImage,
@@ -304,12 +302,7 @@ export async function scanReceiptFromFile(
     }
 
     await incrementAiScanCount(userId);
-
-    captureServerEvent(userId, ANALYTICS_EVENTS.AI_SCAN_COMPLETED, {
-      userId,
-      plan: quota.plan,
-      needsManualReview: result.needsManualReview,
-    });
+    // Analytics events are captured client-side only after cookie consent.
 
     const persistReceiptImage = getPhotoRetentionDays(quota.plan) > 0;
     if (!persistReceiptImage) {

@@ -12,6 +12,10 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    if (typeof body.immediateAccessConsent !== 'boolean') {
+      return jsonError('billing.errors.immediateAccessConsentRequired', 400);
+    }
+
     const parsed = checkoutRequestSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -19,6 +23,11 @@ export async function POST(request: Request) {
     }
 
     const targetPlan = parsed.data.plan;
+    const immediateAccessConsent = parsed.data.immediateAccessConsent;
+
+    if (!immediateAccessConsent) {
+      return jsonError('billing.errors.immediateAccessConsentRequired', 400);
+    }
 
     if (user.currentPlan === 'PREMIUM') {
       return jsonError('billing.errors.alreadyOnPlan', 400);
@@ -38,6 +47,7 @@ export async function POST(request: Request) {
       stripeCustomerId: user.stripeCustomerId,
       currency: parsed.data.currency,
       plan: targetPlan,
+      immediateAccessConsent,
     });
 
     if ('error' in result) {

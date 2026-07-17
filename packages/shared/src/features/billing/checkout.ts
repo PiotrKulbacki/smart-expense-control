@@ -11,6 +11,7 @@ export type CheckoutPlan = (typeof CHECKOUT_PLANS)[number];
 export const checkoutRequestSchema = z.object({
   currency: z.enum(BILLING_CURRENCIES),
   plan: z.enum(CHECKOUT_PLANS).default('PRO'),
+  immediateAccessConsent: z.boolean(),
 });
 
 export type CheckoutRequest = z.infer<typeof checkoutRequestSchema>;

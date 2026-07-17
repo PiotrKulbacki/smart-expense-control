@@ -34,7 +34,8 @@ Aplikacja webowa (Next.js) + mobilna (Expo) do zarządzania finansami osobistymi
 │               └── i18n/   # en, de, pl, es
 ├── .github/workflows/  # CI (lint + test na push do dev)
 ├── ARCHITECTURE.md
-└── PROGRESS.md
+├── PROGRESS.md
+└── COMPLIANCE_PHASE_11.md  # Faza 11.0 — analiza prawna / struktury ToS+PP
 ```
 
 ## Path Aliases

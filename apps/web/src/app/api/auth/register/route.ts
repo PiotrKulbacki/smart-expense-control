@@ -16,6 +16,11 @@ import {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
+    if (!body.acceptedLegal) {
+      return jsonError('auth.errors.legalAcceptanceRequired', 400);
+    }
+
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {

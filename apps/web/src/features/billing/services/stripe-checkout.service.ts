@@ -47,6 +47,7 @@ export async function createCheckoutSession(params: {
   stripeCustomerId: string | null;
   currency: BillingCurrency;
   plan: CheckoutPlan;
+  immediateAccessConsent: boolean;
 }): Promise<{ url: string } | { error: string }> {
   const stripe = getStripeClient();
   const priceMap =
@@ -70,12 +71,14 @@ export async function createCheckoutSession(params: {
       userId: params.userId,
       checkoutCurrency: params.currency,
       checkoutPlan: params.plan,
+      immediateAccessConsent: params.immediateAccessConsent ? 'true' : 'false',
     },
     subscription_data: {
       metadata: {
         userId: params.userId,
         checkoutCurrency: params.currency,
         checkoutPlan: params.plan,
+        immediateAccessConsent: params.immediateAccessConsent ? 'true' : 'false',
       },
     },
   });
