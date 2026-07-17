@@ -25,6 +25,52 @@ export function LandingPage() {
     setBillingCurrency(readStoredBillingCurrency() ?? 'PLN');
   }, []);
 
+  // #region agent log
+  useEffect(() => {
+    const hero = document.querySelector('p.text-muted.mt-6.text-lg');
+    const style = hero ? getComputedStyle(hero) : null;
+    const cssResources = performance
+      .getEntriesByType('resource')
+      .filter((r) => String(r.name).includes('.css'))
+      .map((r) => ({
+        name: String(r.name).slice(-48),
+        duration: Math.round(r.duration),
+        transferSize: 'transferSize' in r ? Number(r.transferSize) : 0,
+        renderBlocking: 'renderBlockingStatus' in r ? String(r.renderBlockingStatus) : null,
+      }));
+    const jsResources = performance
+      .getEntriesByType('resource')
+      .filter((r) => String(r.name).includes('.js'));
+    fetch('http://127.0.0.1:7528/ingest/e3c1f8a3-0097-405d-aadf-389a4a28577c', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '0a29fa' },
+      body: JSON.stringify({
+        sessionId: '0a29fa',
+        hypothesisId: 'A',
+        location: 'LandingPage.tsx:hydrate',
+        message: 'landing-hydrated',
+        data: {
+          hydrateMs: Math.round(performance.now()),
+          heroPresent: Boolean(hero),
+          heroOpacity: style?.opacity ?? null,
+          heroVisibility: style?.visibility ?? null,
+          heroDisplay: style?.display ?? null,
+          heroFontFamily: style?.fontFamily?.slice(0, 80) ?? null,
+          fontsStatus: document.fonts?.status ?? null,
+          cssResources,
+          jsResourceCount: jsResources.length,
+          jsTransferApprox: jsResources.reduce(
+            (sum, r) => sum + ('transferSize' in r ? Number(r.transferSize) || 0 : 0),
+            0
+          ),
+        },
+        timestamp: Date.now(),
+        runId: 'pre-fix',
+      }),
+    }).catch(() => {});
+  }, []);
+  // #endregion
+
   const features = [
     {
       title: t('landing.features.scanner.title'),
