@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -96,6 +97,11 @@ export function CookiePreferencesModal() {
               <DialogPrimitive.Description className="text-muted text-sm">
                 {t('cookies.preferences.description')}
               </DialogPrimitive.Description>
+              <div className="text-muted text-xs">
+                <Link href="/privacy" className="hover:text-warm underline">
+                  {t('layout.footer.privacy')}
+                </Link>
+              </div>
             </div>
             <DialogPrimitive.Close className="text-muted hover:bg-elevated focus-visible:ring-warm/30 absolute right-4 top-4 rounded-lg p-1 transition hover:text-[var(--text)] focus-visible:outline-none focus-visible:ring-2">
               <X className="h-5 w-5" />

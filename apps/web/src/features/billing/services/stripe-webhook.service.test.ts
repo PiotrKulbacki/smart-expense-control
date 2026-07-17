@@ -15,10 +15,6 @@ vi.mock('@smart-expense-control/database', () => ({
   },
 }));
 
-vi.mock('@web/features/analytics/posthog-server', () => ({
-  captureServerEvent: vi.fn(),
-}));
-
 vi.mock('@web/features/billing/services/dunning-email.service', () => ({
   sendPastDueDunningEmail: vi.fn(),
 }));
@@ -38,7 +34,6 @@ vi.mock('@web/features/billing/services/stripe-checkout.service', () => ({
   }),
 }));
 
-import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import {
   handleCheckoutSessionCompleted,
   handleSubscriptionDeleted,
@@ -72,7 +67,6 @@ describe('stripe-webhook.service', () => {
         financialMonthStartDay: expect.any(Number),
       }),
     });
-    expect(captureServerEvent).toHaveBeenCalled();
   });
 
   it('upgrades user to PREMIUM when checkoutPlan metadata is set', async () => {

@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useT } from '@web/features/i18n/LocaleProvider';
+import { useCookieConsent } from '@web/features/cookie-consent';
 
 export function PublicFooter() {
   const t = useT();
+  const { openPreferences } = useCookieConsent();
 
   return (
     <footer className="bg-surface/50 border-t border-[var(--border)]">
@@ -17,6 +19,12 @@ export function PublicFooter() {
           <Link href="/privacy" className="hover:text-warm transition">
             {t('layout.footer.privacy')}
           </Link>
+          <Link href="/impressum" className="hover:text-warm transition">
+            {t('layout.footer.impressum')}
+          </Link>
+          <button type="button" onClick={openPreferences} className="hover:text-warm transition">
+            {t('layout.footer.cookieSettings')}
+          </button>
           <a href="mailto:support@smartexpensecontrol.app" className="hover:text-warm transition">
             {t('layout.footer.contact')}
           </a>

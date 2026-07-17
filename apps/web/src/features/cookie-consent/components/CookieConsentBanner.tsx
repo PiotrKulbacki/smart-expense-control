@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Cookie } from 'lucide-react';
 import { useT } from '@web/features/i18n/LocaleProvider';
 import { useCookieConsent } from '../CookieConsentProvider';
@@ -34,6 +35,12 @@ export function CookieConsentBanner() {
               className="text-muted text-xs leading-relaxed sm:text-sm"
             >
               {t('cookies.banner.description')}
+            </p>
+
+            <p className="text-muted mt-2 text-[11px]">
+              <Link href="/privacy" className="hover:text-warm underline">
+                {t('layout.footer.privacy')}
+              </Link>
             </p>
           </div>
         </div>

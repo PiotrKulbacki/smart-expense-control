@@ -387,6 +387,7 @@ export function ReceiptScanner() {
           {t('scanner.labels.scanDocument')}
         </h1>
         <p className="text-muted mt-1 text-sm">{t('scanner.status.readyToConfirm')}</p>
+        <p className="text-muted mt-2 text-xs leading-relaxed">{t('chat.page.disclaimer')}</p>
       </div>
 
       <section

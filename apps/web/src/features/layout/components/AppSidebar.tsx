@@ -36,7 +36,6 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   const t = useT();
   const { locale } = useLocale();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   useEffect(() => {
@@ -71,26 +70,6 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
       toast.error(t('auth.errors.networkError'));
     } finally {
       setIsLoggingOut(false);
-    }
-  }
-
-  async function handleManageSubscription() {
-    setIsPortalLoading(true);
-
-    try {
-      const response = await fetch('/api/billing/portal', { method: 'POST' });
-      const data = (await response.json()) as { url?: string; error?: string };
-
-      if (!response.ok || !data.url) {
-        toast.error(translateError(data.error ?? 'billing.errors.portalUnavailable', locale));
-        return;
-      }
-
-      window.location.href = data.url;
-    } catch {
-      toast.error(t('auth.errors.networkError'));
-    } finally {
-      setIsPortalLoading(false);
     }
   }
 
@@ -162,21 +141,9 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
           <LocaleSwitcher className="auth-input w-full py-2 text-sm" />
         </div>
 
-        {userPlan !== 'FREE' && (
-          <button
-            type="button"
-            disabled={isPortalLoading || isLoggingOut}
-            onClick={() => void handleManageSubscription()}
-            className="btn-ghost mb-2 inline-flex w-full items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isPortalLoading && <LoadingSpinner />}
-            {t('billing.labels.manageSubscription')}
-          </button>
-        )}
-
         <button
           type="button"
-          disabled={isLoggingOut || isPortalLoading}
+          disabled={isLoggingOut}
           onClick={() => void handleLogout()}
           className="text-glow hover:bg-glow/10 inline-flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 font-mono text-sm transition disabled:cursor-not-allowed disabled:opacity-50"
         >

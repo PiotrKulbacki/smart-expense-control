@@ -1,16 +1,33 @@
 'use client';
 
+import { LegalPageShell } from '@web/features/legal/components/LegalPageShell';
+import { LegalSection } from '@web/features/legal/components/LegalSection';
 import { useT } from '@web/features/i18n/LocaleProvider';
 
 export default function TermsPage() {
   const t = useT();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="font-display text-3xl font-bold text-[var(--text)]">
-        {t('legal.terms.title')}
-      </h1>
-      <p className="text-muted mt-6 text-sm leading-7">{t('legal.terms.content')}</p>
-    </div>
+    <LegalPageShell title={t('legal.terms.title')}>
+      <LegalSection
+        paragraphs={[t('legal.terms.sections.overview.p1'), t('legal.terms.sections.overview.p2')]}
+      />
+      <LegalSection
+        title={t('legal.terms.sections.subscription.title')}
+        paragraphs={[t('legal.terms.sections.subscription.p1')]}
+      />
+      <LegalSection
+        title={t('legal.terms.sections.withdrawal.title')}
+        paragraphs={[t('legal.terms.sections.withdrawal.p1')]}
+      />
+      <LegalSection
+        title={t('legal.terms.sections.refund.title')}
+        paragraphs={[t('legal.terms.sections.refund.p1'), t('legal.terms.sections.refund.p2')]}
+      />
+      <LegalSection
+        title={t('legal.terms.sections.complaints.title')}
+        paragraphs={[t('legal.terms.sections.complaints.p1')]}
+      />
+    </LegalPageShell>
   );
 }

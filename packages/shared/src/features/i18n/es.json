@@ -36,7 +36,13 @@
       "sessionExpired": "Tu sesión ha expirado. Inicia sesión de nuevo",
       "oauthFailed": "Error al iniciar sesión con Google. Inténtalo de nuevo",
       "generic": "Algo salió mal. Inténtalo de nuevo",
-      "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo"
+      "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo",
+      "legalAcceptanceRequired": "Para crear una cuenta debes aceptar los Términos de servicio y la Política de privacidad"
+    },
+    "checkboxes": {
+      "legalAcceptancePrefix": "He leído y acepto los ",
+      "legalAcceptanceMiddle": " y ",
+      "legalAcceptanceSuffix": "."
     }
   },
   "transactions": {
@@ -233,8 +239,10 @@
     },
     "footer": {
       "copyright": "© {{year}} Smart Expense Control. Todos los derechos reservados.",
+      "impressum": "Impressum",
       "terms": "Términos de servicio",
       "privacy": "Política de privacidad",
+      "cookieSettings": "Configuración de cookies",
       "contact": "Contacto"
     },
     "aria": {
@@ -529,7 +537,8 @@
       "upgradeToPro": "Actualizar a Pro",
       "upgradeToPremium": "Actualizar a Premium",
       "manageSubscription": "Gestionar suscripción",
-      "paymentCurrency": "Moneda de pago"
+      "paymentCurrency": "Moneda de pago",
+      "immediateAccessConsent": "Entiendo que habilitaré PRO/Premium de inmediato. Esto puede implicar que pierda el derecho legal de desistimiento de 14 días cuando la prestación empiece."
     },
     "success": {
       "upgraded": "¡Bienvenido! Tu suscripción está activa."
@@ -553,23 +562,86 @@
       "invalidCurrency": "Selecciona una moneda de pago válida",
       "invalidPlan": "Selecciona un plan de suscripción válido",
       "priceUnavailable": "El precio no está disponible para la moneda seleccionada",
-      "cycleDayChoiceNotPending": "La elección del día del ciclo ya no es necesaria"
+      "cycleDayChoiceNotPending": "La elección del día del ciclo ya no es necesaria",
+      "immediateAccessConsentRequired": "Confirma el acceso inmediato a PRO/Premium para continuar"
     }
   },
   "legal": {
+    "backToHome": "Volver al inicio",
     "terms": {
       "title": "Términos de servicio",
-      "content": "Al usar Smart Expense Control aceptas utilizar el servicio de forma responsable. Los insights generados por IA son solo informativos y no constituyen asesoramiento financiero."
+      "sections": {
+        "overview": {
+          "p1": "Smart Expense Control es un SaaS de suscripción para ayudarte a gestionar gastos, escanear recibos con IA (OCR), categorizar transacciones y usar el asistente financiero con fines informativos.",
+          "p2": "Al crear una cuenta y usar el Servicio aceptas estos Términos."
+        },
+        "subscription": {
+          "title": "Suscripciones",
+          "p1": "Las suscripciones se facturan mediante Stripe y se renuevan para el periodo elegido. Puedes cancelar en cualquier momento; la cancelación evita la siguiente renovación y se aplica al final del ciclo de facturación actual."
+        },
+        "withdrawal": {
+          "title": "Derecho de desistimiento",
+          "p1": "Como consumidor, generalmente tienes 14 días para desistir en contratos a distancia. Para PRO/Premium, si solicitas acceso inmediato, reconoces que el servicio puede empezar de forma inmediata y pierdes el derecho legal de desistimiento cuando el servicio inicia."
+        },
+        "refund": {
+          "title": "Reembolso voluntario (money-back)",
+          "p1": "Podemos ofrecer reembolsos hasta 7 días después de la compra si no has usado la app y no has enviado escaneos/mensajes con IA.",
+          "p2": "Las funciones de IA pueden ser inexactas y son solo informativas. Tú eres responsable de verificar los datos y de las decisiones que tomes."
+        },
+        "complaints": {
+          "title": "Reclamaciones",
+          "p1": "Para reclamaciones, contacta con nosotros usando los datos del Impressum."
+        }
+      }
     },
     "privacy": {
       "title": "Política de privacidad",
-      "content": "Procesamos tus datos de cuenta y transacciones para ofrecer seguimiento de gastos y funciones IA. Puedes eliminar permanentemente tu cuenta y todos los datos asociados en cualquier momento desde Ajustes."
+      "sections": {
+        "dataProcessing": {
+          "title": "Datos que procesamos",
+          "p1": "Procesamos datos personales para prestar Smart Expense Control, gestionar tu cuenta, gestionar suscripciones y proporcionar las funciones de IA que solicites.",
+          "p2": "Esto incluye datos de cuenta (p. ej. email), transacciones, mensajes del chat y resultados de escaneo de recibos.",
+          "p3": "Guardamos imágenes de recibos solo durante el tiempo necesario según tu plan y las eliminamos según nuestra política de retención. Puedes eliminar tu cuenta y datos en cualquier momento desde Ajustes."
+        },
+        "security": {
+          "title": "Seguridad",
+          "p1": "Usamos medidas de seguridad adecuadas y no vendemos tus datos personales."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "intro": "Usamos las siguientes categorías de cookies:",
+          "list": {
+            "necessary": "Cookies necesarias — requeridas para el funcionamiento seguro de la app.",
+            "analytics": "Cookies de analítica — nos ayudan a entender cómo se usa el producto (por ejemplo, PostHog)."
+          },
+          "outro": "La analítica se activa solo después de que des tu consentimiento. Puedes gestionar tus preferencias desde el enlace de configuración de cookies. Guardamos tu decisión hasta 365 días."
+        }
+      }
+    },
+    "impressum": {
+      "title": "Impressum",
+      "sections": {
+        "provider": {
+          "title": "Proveedor",
+          "name": "Piotr Kulbacki (empresa individual) — Smart Expense Control",
+          "labels": {
+            "address": "Dirección",
+            "email": "Email",
+            "phone": "Teléfono"
+          },
+          "items": {
+            "address": "Bendastr. 11, 12051 Berlín, Alemania",
+            "email": "support@smartexpensecontrol.app",
+            "phone": "+49 30 00000000 (número virtual)"
+          }
+        }
+      }
     }
   },
   "cookies": {
     "banner": {
       "title": "Usamos cookies",
-      "description": "Usamos cookies necesarias para que la app funcione y cookies opcionales de analítica y marketing. Puedes aceptar todas, rechazar las opcionales o elegir categorías.",
+      "description": "Usamos cookies necesarias para que la app funcione y cookies opcionales de analítica. Puedes aceptar todas, rechazar las opcionales o elegir categorías.",
       "acceptAll": "Aceptar todas",
       "rejectOptional": "Rechazar opcionales",
       "managePreferences": "Gestionar preferencias"

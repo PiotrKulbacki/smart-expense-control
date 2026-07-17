@@ -4,8 +4,6 @@ import { isPastDueGraceExpired } from '@shared/features/billing/financial-month'
 import { isPaidPlan, type PaidPlanType } from '@shared/features/billing/plan-limits';
 import { resolvePaidPlanFromStripePriceId } from '@shared/features/billing/stripe-prices';
 import Stripe from 'stripe';
-import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
-import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import { sendPastDueDunningEmail } from '@web/features/billing/services/dunning-email.service';
 import {
   getStripePremiumPriceMap,
@@ -202,13 +200,7 @@ function trackPlanChange(result: PlanUpdateResult): void {
   if (!result || result.previousPlan !== 'FREE' || !isPaidPlan(result.newPlan)) {
     return;
   }
-
-  captureServerEvent(result.userId, ANALYTICS_EVENTS.SUBSCRIPTION_UPGRADED, {
-    userId: result.userId,
-    previousPlan: result.previousPlan,
-    newPlan: result.newPlan,
-    stripeCustomerId: result.stripeCustomerId,
-  });
+  // Analytics are captured client-side only after cookie consent.
 }
 
 function resolveCheckoutPlan(

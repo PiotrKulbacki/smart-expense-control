@@ -36,7 +36,13 @@
       "sessionExpired": "Your session has expired. Please log in again",
       "oauthFailed": "Google sign-in failed. Please try again",
       "generic": "Something went wrong. Please try again",
-      "networkError": "Network error. Check your connection and try again"
+      "networkError": "Network error. Check your connection and try again",
+      "legalAcceptanceRequired": "Please accept the Terms of Service and the Privacy Policy to create an account"
+    },
+    "checkboxes": {
+      "legalAcceptancePrefix": "I have read and agree to the ",
+      "legalAcceptanceMiddle": " and ",
+      "legalAcceptanceSuffix": "."
     }
   },
   "transactions": {
@@ -233,8 +239,10 @@
     },
     "footer": {
       "copyright": "© {{year}} Smart Expense Control. All rights reserved.",
+      "impressum": "Impressum",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
+      "cookieSettings": "Cookie settings",
       "contact": "Contact"
     },
     "aria": {
@@ -529,7 +537,8 @@
       "upgradeToPro": "Upgrade to Pro",
       "upgradeToPremium": "Upgrade to Premium",
       "manageSubscription": "Manage subscription",
-      "paymentCurrency": "Payment currency"
+      "paymentCurrency": "Payment currency",
+      "immediateAccessConsent": "I understand that I will immediately enable PRO/Premium. This may mean I lose the statutory 14-day right of withdrawal once the service starts."
     },
     "success": {
       "upgraded": "Welcome! Your subscription is active."
@@ -553,23 +562,86 @@
       "invalidCurrency": "Please select a valid payment currency",
       "invalidPlan": "Please select a valid subscription plan",
       "priceUnavailable": "Pricing is not available for the selected currency",
-      "cycleDayChoiceNotPending": "Billing cycle day choice is no longer pending"
+      "cycleDayChoiceNotPending": "Billing cycle day choice is no longer pending",
+      "immediateAccessConsentRequired": "Please confirm immediate access to PRO/Premium to continue"
     }
   },
   "legal": {
+    "backToHome": "Back to home",
     "terms": {
       "title": "Terms of Service",
-      "content": "By using Smart Expense Control you agree to use the service responsibly. AI-generated insights are for informational purposes only and do not constitute financial advice."
+      "sections": {
+        "overview": {
+          "p1": "Smart Expense Control is a subscription SaaS that helps you track expenses, scan receipts with AI (OCR), categorize transactions, and use an AI financial assistant for informational insights.",
+          "p2": "By creating an account and using the Service you agree to the Terms."
+        },
+        "subscription": {
+          "title": "Subscriptions",
+          "p1": "Subscriptions are billed via Stripe and renew for the selected billing cycle. You can cancel at any time; cancellation prevents the next renewal and takes effect at the end of the current billing cycle."
+        },
+        "withdrawal": {
+          "title": "Right of withdrawal",
+          "p1": "As a consumer you generally have 14 days to withdraw from a distance contract. For PRO/Premium, when you request immediate access, you acknowledge that the service performance may begin immediately and you waive the statutory right of withdrawal once the service starts."
+        },
+        "refund": {
+          "title": "Voluntary refund (money-back)",
+          "p1": "We may offer refunds for up to 7 days after purchase if you have not used the app and have not sent any AI scans/messages.",
+          "p2": "AI features are informational and may be inaccurate. You remain responsible for verifying extracted data and for any decisions you make."
+        },
+        "complaints": {
+          "title": "Complaints",
+          "p1": "For complaints, contact us using the details in the Impressum."
+        }
+      }
     },
     "privacy": {
       "title": "Privacy Policy",
-      "content": "We process your account and transaction data to provide expense tracking and AI features. You can permanently delete your account and all associated data at any time from Settings."
+      "sections": {
+        "dataProcessing": {
+          "title": "Data we process",
+          "p1": "We process personal data to provide Smart Expense Control, manage your account, process subscriptions, and deliver the AI features you request.",
+          "p2": "This includes account data (e.g. email), transaction data you save, chat messages, and receipt scan results.",
+          "p3": "We store receipt images only for the time needed for your selected plan and delete them according to our retention policy. You can delete your account and data at any time from Settings."
+        },
+        "security": {
+          "title": "Security",
+          "p1": "We use appropriate security measures and we do not sell your personal data."
+        },
+        "cookies": {
+          "title": "Cookies",
+          "intro": "We use the following cookie categories:",
+          "list": {
+            "necessary": "Necessary cookies — required for the app to function securely.",
+            "analytics": "Analytics cookies — help us understand how the product is used (for example via PostHog)."
+          },
+          "outro": "Analytics cookies are enabled only after you give consent. You can manage your preferences using the Cookie settings link. We store your cookie decision for up to 365 days."
+        }
+      }
+    },
+    "impressum": {
+      "title": "Impressum",
+      "sections": {
+        "provider": {
+          "title": "Provider",
+          "name": "Piotr Kulbacki (Einzelunternehmen) — Smart Expense Control",
+          "labels": {
+            "address": "Address",
+            "email": "E-mail",
+            "phone": "Phone"
+          },
+          "items": {
+            "address": "Bendastr. 11, 12051 Berlin, Germany",
+            "email": "support@smartexpensecontrol.app",
+            "phone": "+49 30 00000000 (virtual number)"
+          }
+        }
+      }
     }
   },
   "cookies": {
     "banner": {
       "title": "We use cookies",
-      "description": "We use necessary cookies to keep the app working, and optional cookies for analytics and marketing. You can accept all, reject optional ones, or choose categories.",
+      "description": "We use necessary cookies to keep the app working, and optional cookies for analytics. You can accept all, reject optional ones, or choose categories.",
       "acceptAll": "Accept all",
       "rejectOptional": "Reject optional",
       "managePreferences": "Manage preferences"

@@ -12,8 +12,6 @@ import {
   type ChatRequest,
 } from '@shared/features/ai/schemas';
 import { env } from '@web/env';
-import { ANALYTICS_EVENTS } from '@web/features/analytics/events';
-import { captureServerEvent } from '@web/features/analytics/posthog-server';
 import {
   buildChatSystemPrompt,
   financialContextFromPeriodSnapshot,
@@ -319,12 +317,7 @@ export async function sendChatMessage(
     });
 
     await incrementAiChatCount(userId);
-
-    captureServerEvent(userId, ANALYTICS_EVENTS.AI_CHAT_MESSAGE_SENT, {
-      userId,
-      plan: quota.plan,
-      locale: input.locale,
-    });
+    // Analytics events are captured client-side only after cookie consent.
 
     return { reply };
   } catch (error) {

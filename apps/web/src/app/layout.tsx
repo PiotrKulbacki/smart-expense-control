@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import { MeshBackground } from '@web/components/MeshBackground';
 import { PostHogProvider } from '@web/features/analytics/components/PostHogProvider';
 import { ToastProvider } from '@web/features/auth/components/ToastProvider';
-import { CategoriesProvider } from '@web/features/categories/components/CategoriesProvider';
 import { CookieConsentProvider } from '@web/features/cookie-consent';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
 import { QueryProvider } from '@web/features/query/QueryProvider';
@@ -48,12 +47,10 @@ export default async function RootLayout({
         <LocaleProvider initialLocale={initialLocale}>
           <CookieConsentProvider>
             <QueryProvider>
-              <CategoriesProvider>
-                <PostHogProvider>
-                  {children}
-                  <ToastProvider />
-                </PostHogProvider>
-              </CategoriesProvider>
+              <PostHogProvider>
+                {children}
+                <ToastProvider />
+              </PostHogProvider>
             </QueryProvider>
           </CookieConsentProvider>
         </LocaleProvider>

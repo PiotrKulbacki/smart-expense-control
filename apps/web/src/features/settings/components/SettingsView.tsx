@@ -25,6 +25,7 @@ import { CategoriesSection } from '@web/features/settings/components/CategoriesS
 import { CategoryLimitsSection } from '@web/features/settings/components/CategoryLimitsSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { SettingsLoadingSkeleton } from '@web/features/layout/components/RouteLoadingSkeletons';
+import { useCookieConsent } from '@web/features/cookie-consent';
 
 type SettingsViewProps = {
   initialUser: SafeUser;
@@ -35,6 +36,7 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { locale } = useLocale();
+  const { openPreferences } = useCookieConsent();
   const [user, setUser] = useState<SafeUser | null>(initialUser);
   const [name, setName] = useState(initialUser.name ?? '');
   const [primaryCurrency, setPrimaryCurrency] = useState<CurrencyCode>(initialUser.primaryCurrency);
@@ -59,6 +61,7 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
   } | null>(null);
   const [isCycleDayModalOpen, setIsCycleDayModalOpen] = useState(false);
   const checkoutToastShown = useRef(false);
+  const [immediateAccessConsent, setImmediateAccessConsent] = useState(false);
 
   const loadCycleDayChoiceStatus = useCallback(async (): Promise<boolean> => {
     try {
@@ -204,10 +207,15 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
     setIsBillingLoading(true);
 
     try {
+      if (!immediateAccessConsent) {
+        toast.error(t('billing.errors.immediateAccessConsentRequired'));
+        return;
+      }
+
       const response = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currency: checkoutCurrency, plan }),
+        body: JSON.stringify({ currency: checkoutCurrency, plan, immediateAccessConsent }),
       });
       const data = (await response.json()) as { url?: string; error?: string };
 
@@ -286,6 +294,15 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           {t('settings.title')}
         </h1>
         <p className="text-muted mt-1 text-sm">{t('settings.subtitle')}</p>
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={openPreferences}
+            className="text-muted hover:text-warm underline"
+          >
+            {t('layout.footer.cookieSettings')}
+          </button>
+        </div>
       </div>
 
       <form onSubmit={(event) => void handleSave(event)} className="space-y-6">
@@ -398,13 +415,28 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
               </p>
               <BillingCurrencySwitcher value={checkoutCurrency} onChange={setCheckoutCurrency} />
             </div>
+
+            <div className="relative z-10 mt-4">
+              <label className="flex items-start gap-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={immediateAccessConsent}
+                  onChange={(event) => setImmediateAccessConsent(event.target.checked)}
+                  disabled={isBillingLoading}
+                  className="mt-1"
+                />
+                <span className="text-muted text-xs leading-relaxed">
+                  {t('billing.labels.immediateAccessConsent')}
+                </span>
+              </label>
+            </div>
           </>
         )}
         <div className="relative z-10 mt-4 flex flex-wrap gap-3">
           {user.currentPlan === 'FREE' && (
             <button
               type="button"
-              disabled={isBillingLoading}
+              disabled={isBillingLoading || !immediateAccessConsent}
               onClick={() => void handleUpgrade('PRO')}
               className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
@@ -415,7 +447,7 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           {user.currentPlan !== 'PREMIUM' && (
             <button
               type="button"
-              disabled={isBillingLoading}
+              disabled={isBillingLoading || !immediateAccessConsent}
               onClick={() => void handleUpgrade('PREMIUM')}
               className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >

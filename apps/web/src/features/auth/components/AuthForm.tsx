@@ -7,6 +7,7 @@ import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
 import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { AuthDivider, OAuthGoogleButton } from '@web/features/auth/components/OAuthGoogleButton';
+import Link from 'next/link';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
 type AuthFormProps = {
@@ -23,6 +24,7 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
 
   const oauthError = searchParams.get('error');
 
@@ -37,10 +39,21 @@ export function AuthForm({ mode }: AuthFormProps) {
     setIsLoading(true);
 
     try {
+      if (mode === 'register' && !acceptedLegal) {
+        toast.error(t('auth.errors.legalAcceptanceRequired'));
+        return;
+      }
+
       const payload =
         mode === 'login'
           ? { email, password }
-          : { email, password, confirmPassword, name: name || undefined };
+          : {
+              email,
+              password,
+              confirmPassword,
+              name: name || undefined,
+              acceptedLegal,
+            };
 
       const schema = mode === 'login' ? loginSchema : registerSchema;
       const parsed = schema.safeParse(payload);
@@ -77,7 +90,10 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   return (
     <div className="panel relative z-10 w-full max-w-md p-8">
-      <OAuthGoogleButton label={t('auth.labels.continueWithGoogle')} disabled={isLoading} />
+      <OAuthGoogleButton
+        label={t('auth.labels.continueWithGoogle')}
+        disabled={isLoading || (mode === 'register' && !acceptedLegal)}
+      />
       <div className="mt-3">
         <AuthDivider label={t('auth.labels.or')} />
       </div>
@@ -146,6 +162,29 @@ export function AuthForm({ mode }: AuthFormProps) {
               className="auth-input"
             />
           </div>
+        )}
+
+        {mode === 'register' && (
+          <label className="text-muted flex items-start gap-3 text-xs leading-relaxed">
+            <input
+              type="checkbox"
+              checked={acceptedLegal}
+              onChange={(event) => setAcceptedLegal(event.target.checked)}
+              disabled={isLoading}
+              className="mt-1"
+            />
+            <span>
+              {t('auth.checkboxes.legalAcceptancePrefix')}{' '}
+              <Link href="/terms" className="hover:text-warm underline">
+                {t('layout.footer.terms')}
+              </Link>
+              {t('auth.checkboxes.legalAcceptanceMiddle')}{' '}
+              <Link href="/privacy" className="hover:text-warm underline">
+                {t('layout.footer.privacy')}
+              </Link>
+              {t('auth.checkboxes.legalAcceptanceSuffix')}
+            </span>
+          </label>
         )}
 
         <button
