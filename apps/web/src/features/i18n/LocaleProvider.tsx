@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { DEFAULT_LOCALE, isLocale, t as translate, type Locale } from '@shared/features/i18n';
+import { DEFAULT_LOCALE, t as translate, type Locale } from '@shared/features/i18n';
 
 const LOCALE_COOKIE = 'sec_locale';
 
@@ -12,21 +12,6 @@ type LocaleContextValue = {
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
-
-function readLocaleCookie(): Locale {
-  if (typeof document === 'undefined') {
-    return DEFAULT_LOCALE;
-  }
-
-  const match = document.cookie.match(new RegExp(`(?:^|; )${LOCALE_COOKIE}=([^;]*)`));
-  const value = match?.[1];
-
-  if (value && isLocale(value)) {
-    return value;
-  }
-
-  return DEFAULT_LOCALE;
-}
 
 function writeLocaleCookie(locale: Locale): void {
   document.cookie = `${LOCALE_COOKIE}=${locale};path=/;max-age=31536000;samesite=lax`;

@@ -119,8 +119,8 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
   });
 
   const summary = dashboardQuery.data?.summary ?? null;
-  const transactions = dashboardQuery.data?.recentTransactions ?? [];
-  const chartTransactions = dashboardQuery.data?.chartTransactions ?? [];
+  const recentTransactions = dashboardQuery.data?.recentTransactions;
+  const chartTransactions = dashboardQuery.data?.chartTransactions;
   const scanQuota = scanQuotaQuery.data?.quota ?? null;
   const userPlan = scanQuotaQuery.data?.plan ?? 'FREE';
   const isLoading =
@@ -152,10 +152,12 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
       return [];
     }
 
-    return aggregateCategoryTotals(chartTransactions, appliedFilter, summary.periodStart);
+    return aggregateCategoryTotals(chartTransactions ?? [], appliedFilter, summary.periodStart);
   }, [chartTransactions, appliedFilter, summary]);
 
   const filteredRecentTransactions = useMemo(() => {
+    const transactions = recentTransactions ?? [];
+
     if (!summary) {
       return transactions;
     }
@@ -176,7 +178,7 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
 
       return true;
     });
-  }, [transactions, appliedFilter, summary]);
+  }, [recentTransactions, appliedFilter, summary]);
 
   const displayedTransactionStats = useMemo(() => {
     if (!summary) {
