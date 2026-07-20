@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { deleteReceiptImage } from '@web/features/scanner/services/receipt-storage.service';
 import { env } from '@web/env';
 import { captureServerException } from '@web/lib/sentry-server';

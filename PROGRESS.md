@@ -1,4 +1,4 @@
-# Postęp projektu — Smart Expense Control
+# Postęp projektu — Lyamo
 
 ## Fazy projektu
 

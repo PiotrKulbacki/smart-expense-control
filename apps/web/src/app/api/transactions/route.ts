@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createTransactionSchema, type CurrencyCode } from '@shared/features/transactions/schemas';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';
 import { jsonError } from '@web/features/auth/services/auth.service';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { validateCategoryForUser } from '@web/features/categories/services/category.service';
 import {
   createTransaction,

@@ -150,7 +150,7 @@ export async function deleteReceiptImageIfOrphaned(
     return;
   }
 
-  const { prisma } = await import('@smart-expense-control/database');
+  const { prisma } = await import('@lyamo/database');
   const remaining = await prisma.transaction.count({
     where: {
       userId,

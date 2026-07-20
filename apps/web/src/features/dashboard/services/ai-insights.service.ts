@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { getQuotaPeriodEnd, getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import {
   INSIGHT_ERROR_CODES,
@@ -43,7 +43,7 @@ function parseCachedContent(content: unknown): AiInsightContent | null {
 function buildSystemPrompt(locale: Locale, serverNowIso: string): string {
   const language = LOCALE_LANGUAGE[locale];
 
-  return `You are a concise personal finance assistant for Smart Expense Control.
+  return `You are a concise personal finance assistant for Lyamo.
 Current server datetime (ISO): ${serverNowIso}
 Use this datetime as your temporal anchor when interpreting "today", "this month", remaining days, and streaks.
 

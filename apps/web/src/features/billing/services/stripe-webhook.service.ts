@@ -1,5 +1,5 @@
-import { prisma } from '@smart-expense-control/database';
-import type { Plan } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
+import type { Plan } from '@lyamo/database';
 import { isPastDueGraceExpired } from '@shared/features/billing/financial-month';
 import { isPaidPlan, type PaidPlanType } from '@shared/features/billing/plan-limits';
 import { resolvePaidPlanFromStripePriceId } from '@shared/features/billing/stripe-prices';

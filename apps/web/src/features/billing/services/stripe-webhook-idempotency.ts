@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { Prisma } from '@prisma/client';
 import type Stripe from 'stripe';
 import { handleStripeWebhookEvent } from '@web/features/billing/services/stripe-webhook.service';

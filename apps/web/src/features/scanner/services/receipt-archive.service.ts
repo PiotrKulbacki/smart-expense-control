@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { createReceiptSignedUrl } from '@web/features/scanner/services/receipt-storage.service';
 
 export type ReceiptArchiveDocument = {

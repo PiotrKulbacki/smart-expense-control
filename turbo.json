@@ -74,7 +74,7 @@
       ],
       "passThroughEnv": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
     },
-    "@smart-expense-control/database#build": {
+    "@lyamo/database#build": {
       "cache": false,
       "outputs": []
     },

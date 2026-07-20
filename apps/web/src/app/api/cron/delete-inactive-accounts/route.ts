@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { INACTIVE_ACCOUNT_TTL_MS } from '@shared/features/billing/financial-month';
 import { deleteAllUserReceiptImages } from '@web/features/scanner/services/receipt-storage.service';
 import { env } from '@web/env';

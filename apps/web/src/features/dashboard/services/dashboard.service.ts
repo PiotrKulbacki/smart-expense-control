@@ -1,5 +1,5 @@
 import { endOfDay, startOfDay } from 'date-fns';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { getQuotaPeriodEnd, getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
 import { getInclusiveTransactionPeriodEnd } from '@shared/features/transactions/calendar-date';

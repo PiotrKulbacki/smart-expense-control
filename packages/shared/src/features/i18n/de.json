@@ -226,7 +226,7 @@
   },
   "layout": {
     "brand": "Lyamo",
-    "tagline": "Smart Expense Control",
+    "tagline": "Lyamo",
     "brandLine1": "Lyamo",
     "brandLine2": "",
     "nav": {
@@ -255,7 +255,7 @@
     "hero": {
       "eyebrow": "Schluss mit Ausgeben auf Autopilot",
       "title": "Übernehmen Sie die Kontrolle über Ihr Geld",
-      "subtitle": "Smart Expense Control hilft Ihnen, jeden Einkauf zu verfolgen, Belege mit KI zu scannen und ehrliche Einblicke zu erhalten — damit Sie aufhören, Geld links und rechts auszugeben.",
+      "subtitle": "Lyamo hilft Ihnen, jeden Einkauf zu verfolgen, Belege mit KI zu scannen und ehrliche Einblicke zu erhalten — damit Sie aufhören, Geld links und rechts auszugeben.",
       "ctaPrimary": "Kostenlos starten",
       "ctaSecondary": "Anmelden"
     },
@@ -311,7 +311,7 @@
     },
     "cta": {
       "title": "Bereit, gedankenlos auszugeben aufzuhören?",
-      "subtitle": "Treten Sie Smart Expense Control bei und bauen Sie ein Budget, dem Sie wirklich vertrauen.",
+      "subtitle": "Treten Sie Lyamo bei und bauen Sie ein Budget, dem Sie wirklich vertrauen.",
       "button": "Kostenloses Konto erstellen"
     }
   },
@@ -573,7 +573,7 @@
       "title": "Nutzungsbedingungen",
       "sections": {
         "overview": {
-          "p1": "Smart Expense Control ist ein abonnementbasiertes SaaS, mit dem Sie Ausgaben verwalten, Belege per KI (OCR) scannen, Transaktionen kategorisieren und den KI-Finanzassistenten für Informationszwecke nutzen können.",
+          "p1": "Lyamo ist ein abonnementbasiertes SaaS, mit dem Sie Ausgaben verwalten, Belege per KI (OCR) scannen, Transaktionen kategorisieren und den KI-Finanzassistenten für Informationszwecke nutzen können.",
           "p2": "Durch die Erstellung eines Kontos und die Nutzung der Dienste stimmen Sie den Nutzungsbedingungen zu."
         },
         "subscription": {
@@ -600,7 +600,7 @@
       "sections": {
         "dataProcessing": {
           "title": "Verarbeitete Daten",
-          "p1": "Wir verarbeiten personenbezogene Daten, um Smart Expense Control bereitzustellen, Ihr Konto zu verwalten, Abonnements abzuwickeln und Ihnen die gewünschten KI-Funktionen zur Verfügung zu stellen.",
+          "p1": "Wir verarbeiten personenbezogene Daten, um Lyamo bereitzustellen, Ihr Konto zu verwalten, Abonnements abzuwickeln und Ihnen die gewünschten KI-Funktionen zur Verfügung zu stellen.",
           "p2": "Dazu gehören Kontodaten (z. B. E-Mail), gespeicherte Transaktionsdaten, Chat-Nachrichten und Ergebnisse aus dem Beleg-Scan.",
           "p3": "Wir speichern Belegbilder nur so lange, wie es für Ihren ausgewählten Tarif erforderlich ist, und löschen sie gemäß unserer Aufbewahrungsrichtlinie. Sie können Ihr Konto und die zugehörigen Daten jederzeit in den Einstellungen löschen."
         },
@@ -624,7 +624,7 @@
       "sections": {
         "provider": {
           "title": "Anbieter",
-          "name": "Piotr Kulbacki (Einzelunternehmen) — Smart Expense Control",
+          "name": "Piotr Kulbacki (Einzelunternehmen) — Lyamo",
           "labels": {
             "address": "Adresse",
             "email": "E-Mail",
@@ -632,7 +632,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlin, Deutschland",
-            "email": "support@smartexpensecontrol.app",
+            "email": "support@lyamo.eu",
             "phone": "+49 30 00000000 (virtuelle Nummer)"
           }
         }

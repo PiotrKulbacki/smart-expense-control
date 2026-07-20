@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Smart Expense Control</Text>
+      <Text style={styles.title}>Lyamo</Text>
       <Text style={styles.subtitle}>Default locale: {DEFAULT_LOCALE}</Text>
     </View>
   );

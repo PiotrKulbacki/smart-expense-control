@@ -226,7 +226,7 @@
   },
   "layout": {
     "brand": "Lyamo",
-    "tagline": "Smart Expense Control",
+    "tagline": "Lyamo",
     "brandLine1": "Lyamo",
     "brandLine2": "",
     "nav": {
@@ -255,7 +255,7 @@
     "hero": {
       "eyebrow": "Deja de gastar en piloto automático",
       "title": "Recupera el control de tu dinero",
-      "subtitle": "Smart Expense Control te ayuda a rastrear cada compra, escanear recibos con IA y obtener insights honestos — para dejar de perder dinero a diestra y siniestra.",
+      "subtitle": "Lyamo te ayuda a rastrear cada compra, escanear recibos con IA y obtener insights honestos — para dejar de perder dinero a diestra y siniestra.",
       "ctaPrimary": "Empieza gratis",
       "ctaSecondary": "Iniciar sesión"
     },
@@ -311,7 +311,7 @@
     },
     "cta": {
       "title": "¿Listo para dejar de gastar sin pensar?",
-      "subtitle": "Únete a Smart Expense Control y construye un presupuesto en el que realmente confíes.",
+      "subtitle": "Únete a Lyamo y construye un presupuesto en el que realmente confíes.",
       "button": "Crea tu cuenta gratis"
     }
   },
@@ -573,7 +573,7 @@
       "title": "Términos de servicio",
       "sections": {
         "overview": {
-          "p1": "Smart Expense Control es un SaaS de suscripción para ayudarte a gestionar gastos, escanear recibos con IA (OCR), categorizar transacciones y usar el asistente financiero con fines informativos.",
+          "p1": "Lyamo es un SaaS de suscripción para ayudarte a gestionar gastos, escanear recibos con IA (OCR), categorizar transacciones y usar el asistente financiero con fines informativos.",
           "p2": "Al crear una cuenta y usar el Servicio aceptas estos Términos."
         },
         "subscription": {
@@ -600,7 +600,7 @@
       "sections": {
         "dataProcessing": {
           "title": "Datos que procesamos",
-          "p1": "Procesamos datos personales para prestar Smart Expense Control, gestionar tu cuenta, gestionar suscripciones y proporcionar las funciones de IA que solicites.",
+          "p1": "Procesamos datos personales para prestar Lyamo, gestionar tu cuenta, gestionar suscripciones y proporcionar las funciones de IA que solicites.",
           "p2": "Esto incluye datos de cuenta (p. ej. email), transacciones, mensajes del chat y resultados de escaneo de recibos.",
           "p3": "Guardamos imágenes de recibos solo durante el tiempo necesario según tu plan y las eliminamos según nuestra política de retención. Puedes eliminar tu cuenta y datos en cualquier momento desde Ajustes."
         },
@@ -624,7 +624,7 @@
       "sections": {
         "provider": {
           "title": "Proveedor",
-          "name": "Piotr Kulbacki (empresa individual) — Smart Expense Control",
+          "name": "Piotr Kulbacki (empresa individual) — Lyamo",
           "labels": {
             "address": "Dirección",
             "email": "Email",
@@ -632,7 +632,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlín, Alemania",
-            "email": "support@smartexpensecontrol.app",
+            "email": "support@lyamo.eu",
             "phone": "+49 30 00000000 (número virtual)"
           }
         }

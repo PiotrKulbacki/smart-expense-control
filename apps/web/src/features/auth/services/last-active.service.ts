@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 
 const LAST_ACTIVE_TOUCH_INTERVAL_MS = 60 * 60 * 1000;
 

@@ -6,7 +6,7 @@ const { mockFindUnique, mockUpdate } = vi.hoisted(() => ({
   mockUpdate: vi.fn(),
 }));
 
-vi.mock('@smart-expense-control/database', () => ({
+vi.mock('@lyamo/database', () => ({
   prisma: {
     user: {
       findUnique: mockFindUnique,

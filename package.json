@@ -1,5 +1,5 @@
 {
-  "name": "smart-expense-control",
+  "name": "lyamo",
   "private": true,
   "packageManager": "npm@10.9.2",
   "engines": {
@@ -18,11 +18,11 @@
     "typecheck": "turbo run typecheck",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "db:generate": "npm run generate -w @smart-expense-control/database",
-    "db:migrate": "npm run migrate:dev -w @smart-expense-control/database",
-    "db:migrate:deploy": "dotenv -e .env -- npm run migrate:deploy -w @smart-expense-control/database",
-    "db:status": "npm run migrate:status -w @smart-expense-control/database",
-    "db:seed": "npm run db:seed -w @smart-expense-control/database"
+    "db:generate": "npm run generate -w @lyamo/database",
+    "db:migrate": "npm run migrate:dev -w @lyamo/database",
+    "db:migrate:deploy": "dotenv -e .env -- npm run migrate:deploy -w @lyamo/database",
+    "db:status": "npm run migrate:status -w @lyamo/database",
+    "db:seed": "npm run db:seed -w @lyamo/database"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

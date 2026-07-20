@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@smart-expense-control/shared": "*",
+    "@lyamo/shared": "*",
     "expo": "^53.0.20",
     "expo-router": "^5.1.4",
     "expo-secure-store": "~14.2.3",

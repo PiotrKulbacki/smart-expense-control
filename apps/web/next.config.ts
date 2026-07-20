@@ -6,7 +6,7 @@ import type { NextConfig } from 'next';
 loadEnvConfig(path.resolve(__dirname, '../..'));
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@smart-expense-control/shared', '@smart-expense-control/database'],
+  transpilePackages: ['@lyamo/shared', '@lyamo/database'],
 };
 
 export default withSentryConfig(nextConfig, {

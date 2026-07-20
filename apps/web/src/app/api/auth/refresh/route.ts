@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { hashToken, signAccessToken } from '@web/features/auth/lib/tokens';
 import { jsonError, toSafeUser } from '@web/features/auth/services/auth.service';
 

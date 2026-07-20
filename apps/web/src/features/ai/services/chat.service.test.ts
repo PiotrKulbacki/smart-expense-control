@@ -10,7 +10,7 @@ vi.mock('@web/env', () => ({
   },
 }));
 
-vi.mock('@smart-expense-control/database', () => ({
+vi.mock('@lyamo/database', () => ({
   prisma: {
     user: {
       findUnique: (...args: unknown[]) => mockFindUnique(...args),

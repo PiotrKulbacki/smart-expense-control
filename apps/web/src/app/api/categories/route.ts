@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { buildCustomCategoryKey } from '@shared/features/transactions/categories';
 import { createUserCategorySchema } from '@shared/features/transactions/category-schemas';
 import { getAuthenticatedUser } from '@web/features/auth/lib/request-auth';

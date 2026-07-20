@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-const SEED_USER_EMAIL = 'dev@smart-expense.local';
+const SEED_USER_EMAIL = 'dev@lyamo.local';
 const SEED_USER_PASSWORD = 'Secure1!';
 
 async function main() {

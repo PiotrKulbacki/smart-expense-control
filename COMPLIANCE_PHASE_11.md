@@ -28,7 +28,7 @@
 | **DE — § 312k BGB**                 | **Kündigungsbutton** — łatwe wypowiedzenie subskrypcji (porównywalne z zakupem); Stripe Customer Portal pomaga, ale AGB + UI muszą to jasno opisać                  |
 | **DE — § 356a BGB (od 19.06.2026)** | **Widerrufsbutton** („Vertrag widerrufen”) — elektroniczna funkcja odstąpienia w okresie prawa odstąpienia; potwierdzenie na trwałym nośniku                        |
 
-#### Elementy absolutnie wymagane w Regulaminie SaaS (Smart Expense Control)
+#### Elementy absolutnie wymagane w Regulaminie SaaS (Lyamo)
 
 1. **Identyfikacja usługodawcy** — dane jak Impressum + forma: Einzelunternehmen / DE.
 2. **Definicje** — Konto, Usługa, Plan FREE/PRO/PREMIUM, Treść/usługa cyfrowa, AI, Konsument.
@@ -46,7 +46,7 @@
 
 #### Klasyfikacja SaaS a prawo odstąpienia
 
-Smart Expense Control to **usługa cyfrowa** (nie jednorazowa „treść cyfrowa” typu e-book). Pełna utrata 14-dniowego prawa odstąpienia jest bardziej rygorystyczna niż przy treści cyfrowej.
+Lyamo to **usługa cyfrowa** (nie jednorazowa „treść cyfrowa” typu e-book). Pełna utrata 14-dniowego prawa odstąpienia jest bardziej rygorystyczna niż przy treści cyfrowej.
 
 **Bezpieczny model (rekomendacja do potwierdzenia w kwestionariuszu):**
 
@@ -166,16 +166,16 @@ zgody
 
 ### A. Dane rejestrowe i kontakt (JDG Niemcy)
 
-| #   | Pytanie                                                                                                         | Odpowiedź właściciela                                                                                       |
-| --- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 1   | Pełne imię i nazwisko właściciela oraz nazwa handlowa (np. „Smart Expense Control”)                             | Piotr Kulbacki; zostawiamy nazwę „Smart Expense Control” na start                                           |
-| 2   | Adres doręczeń (ulica, nr, kod, miasto, kraj) — nie samo skrytka                                                | Bendastr. 11, 12051 Berlin, Niemcy                                                                          |
-| 3   | Telefon (z kierunkowym) oraz e-mail obsługi (obecnie w stopce: `support@smartexpensecontrol.app` — potwierdzić) | Telefon wirtualny (na razie przykładowy) + e-mail techniczny (tymczasowo `support@smartexpensecontrol.app`) |
-| 4   | Osobny e-mail RODO / reklamacji? (tak/nie + adres)                                                              | Nie — ten sam e-mail techniczny                                                                             |
-| 5   | USt-IdNr. (VAT UE) — czy nadany? Numer?                                                                         | Na początek bez VAT                                                                                         |
-| 6   | Wpis do Handelsregister / Gewerbeanmeldung — numer i urząd (jeśli dotyczy)                                      | Na razie nieznane — będzie po Gewerbeanmeldung (zostawić miejsce na numer)                                  |
-| 7   | Numer podatkowy (Steuernummer) — publikować w Impressum tylko jeśli wymagane lokalnie                           | Dowiem się, czy wymagane dla Berlina                                                                        |
-| 8   | Języki prawnie wiążące: DE+EN+PL+ES, czy DE/EN jako wiodące?                                                    | Prawnie wiążące: DE i PL (EN/ES do doprecyzowania)                                                          |
+| #   | Pytanie                                                                                          | Odpowiedź właściciela                                                                        |
+| --- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 1   | Pełne imię i nazwisko właściciela oraz nazwa handlowa (np. „Lyamo”)                              | Piotr Kulbacki; zostawiamy nazwę „Lyamo” na start                                            |
+| 2   | Adres doręczeń (ulica, nr, kod, miasto, kraj) — nie samo skrytka                                 | Bendastr. 11, 12051 Berlin, Niemcy                                                           |
+| 3   | Telefon (z kierunkowym) oraz e-mail obsługi (obecnie w stopce: `support@lyamo.eu` — potwierdzić) | Telefon wirtualny (na razie przykładowy) + e-mail techniczny (tymczasowo `support@lyamo.eu`) |
+| 4   | Osobny e-mail RODO / reklamacji? (tak/nie + adres)                                               | Nie — ten sam e-mail techniczny                                                              |
+| 5   | USt-IdNr. (VAT UE) — czy nadany? Numer?                                                          | Na początek bez VAT                                                                          |
+| 6   | Wpis do Handelsregister / Gewerbeanmeldung — numer i urząd (jeśli dotyczy)                       | Na razie nieznane — będzie po Gewerbeanmeldung (zostawić miejsce na numer)                   |
+| 7   | Numer podatkowy (Steuernummer) — publikować w Impressum tylko jeśli wymagane lokalnie            | Dowiem się, czy wymagane dla Berlina                                                         |
+| 8   | Języki prawnie wiążące: DE+EN+PL+ES, czy DE/EN jako wiodące?                                     | Prawnie wiążące: DE i PL (EN/ES do doprecyzowania)                                           |
 
 ### B. Model prawny i jurysdykcja
 

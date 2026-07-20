@@ -10,13 +10,13 @@ function buildDunningCopy(kind: DunningEmailKind, portalUrl: string) {
     return {
       subject: 'Payment failed — update your card within 24 hours',
       text: [
-        'We could not renew your Smart Expense Control subscription.',
+        'We could not renew your Lyamo subscription.',
         'Please update your payment method within 24 hours to keep Pro/Premium access.',
         `Update billing: ${portalUrl}`,
         'If payment succeeds within this window, your plan stays unchanged.',
       ].join('\n\n'),
       html: `
-        <p>We could not renew your <strong>Smart Expense Control</strong> subscription.</p>
+        <p>We could not renew your <strong>Lyamo</strong> subscription.</p>
         <p>Please update your payment method within <strong>24 hours</strong> to keep Pro/Premium access.</p>
         <p><a href="${portalUrl}">Update billing details</a></p>
         <p>If payment succeeds within this window, your plan stays unchanged.</p>
@@ -27,12 +27,12 @@ function buildDunningCopy(kind: DunningEmailKind, portalUrl: string) {
   return {
     subject: 'Final reminder — subscription ends in a few hours',
     text: [
-      'This is a final reminder: your Smart Expense Control payment is still failing.',
+      'This is a final reminder: your Lyamo payment is still failing.',
       'Update your card in the next few hours or your account will be moved to the Free plan.',
       `Update billing: ${portalUrl}`,
     ].join('\n\n'),
     html: `
-      <p>This is a <strong>final reminder</strong>: your Smart Expense Control payment is still failing.</p>
+      <p>This is a <strong>final reminder</strong>: your Lyamo payment is still failing.</p>
       <p>Update your card in the next few hours or your account will be moved to the <strong>Free</strong> plan.</p>
       <p><a href="${portalUrl}">Update billing details</a></p>
     `,

@@ -281,7 +281,7 @@ ${JSON.stringify(context.categoryLimits, null, 2)}
 When the user asks about category budgets or limits, use these values. percentage may exceed 100 when over limit; isOverLimit marks categories past their cap.`
       : '';
 
-  return `You are a helpful personal finance assistant for Smart Expense Control.
+  return `You are a helpful personal finance assistant for Lyamo.
 Always respond in ${language}.
 Use the user's transaction data below to answer spending questions accurately.
 If data is missing, say so clearly and suggest adding transactions.

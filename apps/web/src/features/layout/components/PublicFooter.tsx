@@ -34,7 +34,7 @@ export function PublicFooter() {
           <button type="button" onClick={openPreferences} className="hover:text-warm transition">
             {t('layout.footer.cookieSettings')}
           </button>
-          <a href="mailto:support@smartexpensecontrol.app" className="hover:text-warm transition">
+          <a href="mailto:support@lyamo.eu" className="hover:text-warm transition">
             {t('layout.footer.contact')}
           </a>
         </nav>

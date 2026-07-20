@@ -226,7 +226,7 @@
   },
   "layout": {
     "brand": "Lyamo",
-    "tagline": "Smart Expense Control",
+    "tagline": "Lyamo",
     "brandLine1": "Lyamo",
     "brandLine2": "",
     "nav": {
@@ -255,7 +255,7 @@
     "hero": {
       "eyebrow": "Stop spending on autopilot",
       "title": "Take back control of your money",
-      "subtitle": "Smart Expense Control helps you track every purchase, scan receipts with AI, and get honest insights — so you stop bleeding cash left and right.",
+      "subtitle": "Lyamo helps you track every purchase, scan receipts with AI, and get honest insights — so you stop bleeding cash left and right.",
       "ctaPrimary": "Start for free",
       "ctaSecondary": "Log in"
     },
@@ -311,7 +311,7 @@
     },
     "cta": {
       "title": "Ready to stop mindless spending?",
-      "subtitle": "Join Smart Expense Control and build a budget you actually trust.",
+      "subtitle": "Join Lyamo and build a budget you actually trust.",
       "button": "Create your free account"
     }
   },
@@ -573,7 +573,7 @@
       "title": "Terms of Service",
       "sections": {
         "overview": {
-          "p1": "Smart Expense Control is a subscription SaaS that helps you track expenses, scan receipts with AI (OCR), categorize transactions, and use an AI financial assistant for informational insights.",
+          "p1": "Lyamo is a subscription SaaS that helps you track expenses, scan receipts with AI (OCR), categorize transactions, and use an AI financial assistant for informational insights.",
           "p2": "By creating an account and using the Service you agree to the Terms."
         },
         "subscription": {
@@ -600,7 +600,7 @@
       "sections": {
         "dataProcessing": {
           "title": "Data we process",
-          "p1": "We process personal data to provide Smart Expense Control, manage your account, process subscriptions, and deliver the AI features you request.",
+          "p1": "We process personal data to provide Lyamo, manage your account, process subscriptions, and deliver the AI features you request.",
           "p2": "This includes account data (e.g. email), transaction data you save, chat messages, and receipt scan results.",
           "p3": "We store receipt images only for the time needed for your selected plan and delete them according to our retention policy. You can delete your account and data at any time from Settings."
         },
@@ -624,7 +624,7 @@
       "sections": {
         "provider": {
           "title": "Provider",
-          "name": "Piotr Kulbacki (Einzelunternehmen) — Smart Expense Control",
+          "name": "Piotr Kulbacki (Einzelunternehmen) — Lyamo",
           "labels": {
             "address": "Address",
             "email": "E-mail",
@@ -632,7 +632,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlin, Germany",
-            "email": "support@smartexpensecontrol.app",
+            "email": "support@lyamo.eu",
             "phone": "+49 30 00000000 (virtual number)"
           }
         }

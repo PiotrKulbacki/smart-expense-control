@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import { getFinancialMonthStartDayFromDate } from '@shared/features/billing/financial-month';
 import { env } from '@web/env';
 import { exchangeGoogleCode } from '@web/features/auth/lib/tokens';

@@ -1,4 +1,4 @@
-import type { User } from '@smart-expense-control/database';
+import type { User } from '@lyamo/database';
 
 export type SafeUser = Pick<
   User,

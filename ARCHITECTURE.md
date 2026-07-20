@@ -1,4 +1,4 @@
-# Architektura — Smart Expense Control
+# Architektura — Lyamo
 
 Aplikacja webowa (Next.js) + mobilna (Expo) do zarządzania finansami osobistymi z modułami AI (skaner paragonów, predykcyjny czat asystenta finansowego).
 

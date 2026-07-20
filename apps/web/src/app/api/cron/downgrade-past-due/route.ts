@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import {
   PAST_DUE_GRACE_MS,
   PAST_DUE_REMINDER_AFTER_MS,

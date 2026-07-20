@@ -1,4 +1,4 @@
-import { prisma, type Currency } from '@smart-expense-control/database';
+import { prisma, type Currency } from '@lyamo/database';
 import { getQuotaPeriodEnd, getQuotaPeriodStart } from '@shared/features/billing/financial-month';
 import { convertAmount } from '@shared/features/currency';
 import {

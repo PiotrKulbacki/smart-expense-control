@@ -1,4 +1,4 @@
-import { prisma, type Transaction } from '@smart-expense-control/database';
+import { prisma, type Transaction } from '@lyamo/database';
 import { convertAmount } from '@shared/features/currency';
 import { getReceiptImageExpiresAt, type PlanType } from '@shared/features/billing/plan-limits';
 import type {

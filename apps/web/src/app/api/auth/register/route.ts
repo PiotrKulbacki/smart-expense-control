@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { registerSchema } from '@shared/features/auth/schemas';
 import { getFinancialMonthStartDayFromDate } from '@shared/features/billing/financial-month';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import {
   buildAuthResponse,
   createMobileTokens,

@@ -228,7 +228,7 @@
   },
   "layout": {
     "brand": "Lyamo",
-    "tagline": "Smart Expense Control",
+    "tagline": "Lyamo",
     "brandLine1": "Lyamo",
     "brandLine2": "",
     "nav": {
@@ -257,7 +257,7 @@
     "hero": {
       "eyebrow": "Przestań wydawać na autopilocie",
       "title": "Odzyskaj kontrolę nad swoimi pieniędzmi",
-      "subtitle": "Smart Expense Control pomaga śledzić każdy zakup, skanować paragony AI i dostawać uczciwe wskazówki — żebyś przestał przepuszczać kasę na prawo i lewo.",
+      "subtitle": "Lyamo pomaga śledzić każdy zakup, skanować paragony AI i dostawać uczciwe wskazówki — żebyś przestał przepuszczać kasę na prawo i lewo.",
       "ctaPrimary": "Zacznij za darmo",
       "ctaSecondary": "Zaloguj się"
     },
@@ -313,7 +313,7 @@
     },
     "cta": {
       "title": "Gotowy, by przestać wydawać bezmyślnie?",
-      "subtitle": "Dołącz do Smart Expense Control i zbuduj budżet, któremu naprawdę ufasz.",
+      "subtitle": "Dołącz do Lyamo i zbuduj budżet, któremu naprawdę ufasz.",
       "button": "Utwórz darmowe konto"
     }
   },
@@ -575,7 +575,7 @@
       "title": "Regulamin",
       "sections": {
         "overview": {
-          "p1": "Smart Expense Control to subskrypcyjny SaaS, który pomaga śledzić wydatki, skanować paragony z użyciem AI (OCR), kategoryzować transakcje oraz korzystać z asystenta finansowego AI w celu uzyskania informacji.",
+          "p1": "Lyamo to subskrypcyjny SaaS, który pomaga śledzić wydatki, skanować paragony z użyciem AI (OCR), kategoryzować transakcje oraz korzystać z asystenta finansowego AI w celu uzyskania informacji.",
           "p2": "Tworząc konto i korzystając z Usługi akceptujesz niniejszy Regulamin."
         },
         "subscription": {
@@ -602,7 +602,7 @@
       "sections": {
         "dataProcessing": {
           "title": "Przetwarzane dane",
-          "p1": "Przetwarzamy dane osobowe w celu świadczenia Smart Expense Control, zarządzania Twoim kontem, obsługi subskrypcji oraz dostarczania funkcji AI.",
+          "p1": "Przetwarzamy dane osobowe w celu świadczenia Lyamo, zarządzania Twoim kontem, obsługi subskrypcji oraz dostarczania funkcji AI.",
           "p2": "Obejmuje to dane konta (np. e-mail), dane transakcji, wiadomości czatu oraz wyniki skanowania paragonów.",
           "p3": "Obrazy paragonów przechowujemy tylko przez czas potrzebny dla wybranego planu i usuwamy je zgodnie z polityką retencji. Możesz trwale usunąć konto i dane w dowolnym momencie w Ustawieniach."
         },
@@ -626,7 +626,7 @@
       "sections": {
         "provider": {
           "title": "Dostawca",
-          "name": "Piotr Kulbacki (jednoosobowa działalność) — Smart Expense Control",
+          "name": "Piotr Kulbacki (jednoosobowa działalność) — Lyamo",
           "labels": {
             "address": "Adres",
             "email": "E-mail",
@@ -634,7 +634,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlin, Niemcy",
-            "email": "support@smartexpensecontrol.app",
+            "email": "support@lyamo.eu",
             "phone": "+49 30 00000000 (numer wirtualny)"
           }
         }

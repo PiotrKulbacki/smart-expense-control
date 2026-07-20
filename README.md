@@ -1,4 +1,4 @@
-# Smart Expense Control
+# Lyamo
 
 Mobilno-webowy system do zarządzania finansami osobistymi z automatycznym skanowaniem paragonów przez AI, czatem asystenta finansowego, obsługą wielu walut (PLN, EUR, GBP) oraz subskrypcjami Stripe.
 
@@ -18,7 +18,7 @@ apps/
   web/       # Next.js — frontend + API routes
   mobile/    # Expo — aplikacja mobilna
 packages/
-  shared/    # Wspólny kod (@smart-expense-control/shared)
+  shared/    # Wspólny kod (@lyamo/shared)
     src/
       features/i18n/   # Tłumaczenia (en, de, pl, es)
       schemas/         # Schematy walidacji Zod

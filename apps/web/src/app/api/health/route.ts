@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 
 export async function GET() {
   try {

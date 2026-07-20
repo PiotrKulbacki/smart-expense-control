@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { loginSchema } from '@shared/features/auth/schemas';
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import {
   buildAuthResponse,
   createMobileTokens,

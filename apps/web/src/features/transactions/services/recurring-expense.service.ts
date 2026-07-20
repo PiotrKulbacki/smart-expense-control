@@ -1,4 +1,4 @@
-import { prisma, type RecurringExpense } from '@smart-expense-control/database';
+import { prisma, type RecurringExpense } from '@lyamo/database';
 import type {
   CreateRecurringExpenseInput,
   UpdateRecurringExpenseInput,

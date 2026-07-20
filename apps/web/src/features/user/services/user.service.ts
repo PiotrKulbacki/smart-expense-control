@@ -1,4 +1,4 @@
-import { prisma } from '@smart-expense-control/database';
+import { prisma } from '@lyamo/database';
 import type { UpdateUserInput } from '@shared/features/user/schemas';
 import { toSafeUser, type SafeUser } from '@web/features/auth/types';
 import { clearUserPeriodAggregations } from '@web/features/analytics/services/period-aggregation-cache.service';
