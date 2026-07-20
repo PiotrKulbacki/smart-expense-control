@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" role="img" aria-label="Lyamo  Smart Expense Control">
+  <title>Lyamo</title>
+  <defs>
+    <linearGradient id="lyamo-cool" x1="16" y1="8" x2="40" y2="72" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5eeadb"/>
+      <stop offset="1" stop-color="#3dd6c3"/>
+    </linearGradient>
+    <linearGradient id="lyamo-warm" x1="8" y1="48" x2="64" y2="72" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f0c060"/>
+      <stop offset="1" stop-color="#e8a849"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark: overlapping rounded pills forming "L" (cool + warm = dashboard accents) -->
+  <g transform="translate(4 4)">
+    <!-- Vertical stem (warm) -->
+    <rect x="4" y="2" width="20" height="56" rx="10" fill="url(#lyamo-warm)" opacity="0.92"/>
+    <!-- Horizontal base (cool) -->
+    <rect x="4" y="38" width="52" height="20" rx="10" fill="url(#lyamo-cool)" opacity="0.78"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="78"
+    y="42"
+    fill="#e8e8ed"
+    font-family="Outfit, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="32"
+    font-weight="700"
+    letter-spacing="-0.02em"
+  >Lyamo</text>
+
+  <!-- Tagline (matches dashboard muted + mono feel) -->
+  <text
+    x="78"
+    y="62"
+    fill="#8888a0"
+    font-family="JetBrains Mono, ui-monospace, monospace"
+    font-size="10"
+    font-weight="500"
+    letter-spacing="0.14em"
+  >SMART EXPENSE CONTROL</text>
+</svg>

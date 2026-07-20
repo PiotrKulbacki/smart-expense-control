@@ -23,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Smart Expense Control',
+  title: 'Lyamo',
   description: 'Financial management with AI-powered insights',
 };
 

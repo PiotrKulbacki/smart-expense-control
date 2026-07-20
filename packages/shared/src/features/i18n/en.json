@@ -225,9 +225,10 @@
     }
   },
   "layout": {
-    "brand": "Smart Expense Control",
-    "brandLine1": "Smart Expense",
-    "brandLine2": "Control",
+    "brand": "Lyamo",
+    "tagline": "Smart Expense Control",
+    "brandLine1": "Lyamo",
+    "brandLine2": "",
     "nav": {
       "features": "Features",
       "pricing": "Pricing",
@@ -238,7 +239,7 @@
       "settings": "Settings"
     },
     "footer": {
-      "copyright": "© {{year}} Smart Expense Control. All rights reserved.",
+      "copyright": "© {{year}} Lyamo. All rights reserved.",
       "impressum": "Impressum",
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",

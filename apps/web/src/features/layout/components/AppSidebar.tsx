@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LocaleSwitcher } from '@web/features/layout/components/LocaleSwitcher';
+import { LyamoLogo } from '@web/features/layout/components/LyamoLogo';
 import { fetchDashboard } from '@web/features/query/fetchers';
 import { queryKeys } from '@web/features/query/query-keys';
 import { isAiEnabledOnClient } from '@web/lib/ai-feature';
@@ -80,22 +81,8 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
   return (
     <aside className="bg-surface/80 sticky top-0 flex h-screen w-full shrink-0 flex-col border-r border-[var(--border)] backdrop-blur-md md:w-64">
       <div className="border-b border-[var(--border)] px-4 py-5">
-        <Link href="/dashboard" className="group flex items-center gap-3">
-          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-            <div className="from-warm/20 to-cool/20 absolute inset-0 rounded-lg bg-gradient-to-br" />
-            <div className="text-warm relative font-mono text-sm font-bold">◈</div>
-          </div>
-          <div className="font-display min-w-0 leading-none">
-            <span className="block text-base font-semibold tracking-tight text-[var(--text)]">
-              {t('layout.brandLine1')}
-            </span>
-            <span
-              className="mt-0.5 block w-full text-base font-semibold tracking-tight text-[var(--text)]"
-              style={{ textAlign: 'justify', textAlignLast: 'justify' }}
-            >
-              {t('layout.brandLine2')}
-            </span>
-          </div>
+        <Link href="/dashboard" className="group inline-flex">
+          <LyamoLogo markClassName="h-9 w-9" />
         </Link>
       </div>
 
