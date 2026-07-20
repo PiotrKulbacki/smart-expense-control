@@ -42,7 +42,7 @@ export function CategoriesProvider({ children }: { children: ReactNode }) {
     toast.error(
       translateError(error instanceof Error ? error.message : 'auth.errors.generic', locale)
     );
-  }, [error, isError]);
+  }, [error, isError, locale]);
 
   const loadCategories = useCallback(async () => {
     try {

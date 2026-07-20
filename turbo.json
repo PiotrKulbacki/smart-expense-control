@@ -72,7 +72,13 @@
         "VERCEL_*",
         "CI"
       ],
-      "passThroughEnv": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+      "passThroughEnv": [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT"
+      ]
     },
     "@lyamo/database#build": {
       "cache": false,

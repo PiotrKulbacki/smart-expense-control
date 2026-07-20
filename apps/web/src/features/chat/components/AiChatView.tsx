@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Bot, Send, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
-import type { ChatMessage } from '@shared/features/ai/schemas';
 import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
@@ -14,20 +13,11 @@ import {
   fetchChatHistory,
   fetchChatQuota,
   type ChatHistoryPayload,
-  type ChatQuotaPayload,
   type HistoryMessage,
 } from '@web/features/query/fetchers';
 import { queryKeys } from '@web/features/query/query-keys';
 
 const HISTORY_PAGE_SIZE = 30;
-
-type ChatQuota = {
-  limit: number;
-  used: number;
-  remaining: number;
-  canUse: boolean;
-  isBlocked: boolean;
-};
 
 type ScrollAnchor = {
   scrollHeight: number;
@@ -108,7 +98,6 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
   );
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [historyPage, setHistoryPage] = useState(initialHistoryPage.page);
   const [hasMoreHistory, setHasMoreHistory] = useState(initialHistoryPage.hasMore);
@@ -141,7 +130,7 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
   const userPlan = quotaQuery.data?.plan ?? null;
 
   const loadMoreHistory = useCallback(async () => {
-    if (isLoadingMore || !hasMoreHistory || isLoadingHistory) {
+    if (isLoadingMore || !hasMoreHistory) {
       return;
     }
 
@@ -168,13 +157,13 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [hasMoreHistory, historyPage, isLoadingHistory, isLoadingMore, locale, t]);
+  }, [hasMoreHistory, historyPage, isLoadingMore, t]);
 
   useEffect(() => {
     const sentinel = topSentinelRef.current;
     const container = scrollContainerRef.current;
 
-    if (!sentinel || !container || !hasMoreHistory || isLoadingMore || isLoadingHistory) {
+    if (!sentinel || !container || !hasMoreHistory || isLoadingMore) {
       return;
     }
 
@@ -190,7 +179,7 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
     observer.observe(sentinel);
 
     return () => observer.disconnect();
-  }, [hasMoreHistory, isLoadingHistory, isLoadingMore, loadMoreHistory, messages.length]);
+  }, [hasMoreHistory, isLoadingMore, loadMoreHistory, messages.length]);
 
   useLayoutEffect(() => {
     const container = scrollContainerRef.current;
@@ -313,17 +302,7 @@ export function AiChatView({ initialHistoryPage }: AiChatViewProps) {
             <p className="text-muted py-1 text-center text-xs">{t('chat.history.loadingOlder')}</p>
           )}
 
-          {isLoadingHistory && messages.length === 0 && (
-            <div className="space-y-3">
-              <div className="bg-elevated h-5 w-28 animate-pulse rounded" />
-              <div className="bg-elevated h-10 w-64 animate-pulse rounded-2xl" />
-              <div className="bg-elevated h-10 w-56 animate-pulse rounded-2xl" />
-            </div>
-          )}
-
-          {!isLoadingHistory && messages.length === 0 && (
-            <p className="text-muted text-sm">{t('chat.page.empty')}</p>
-          )}
+          {messages.length === 0 && <p className="text-muted text-sm">{t('chat.page.empty')}</p>}
 
           {sortedMessages.map((message, index) => {
             const currentDayKey = toDayKey(message.createdAt);
