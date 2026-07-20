@@ -32,14 +32,6 @@ import {
 import { fetchScanQuota } from '@web/features/query/fetchers';
 import { queryKeys } from '@web/features/query/query-keys';
 
-type ScanQuota = {
-  limit: number;
-  used: number;
-  remaining: number;
-  canScan: boolean;
-  isBlocked: boolean;
-};
-
 type SplitLine = ReceiptSplitSuggestion;
 
 type ReceiptDraft = {

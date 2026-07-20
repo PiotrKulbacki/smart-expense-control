@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, FolderOpen, ImageIcon, X, ZoomIn } from 'lucide-react';
 import { toast } from 'sonner';
@@ -279,7 +279,7 @@ export function ReceiptArchive({ refreshKey = 0 }: ReceiptArchiveProps) {
     void queryClient.invalidateQueries({ queryKey: queryKeys.receiptArchive(user.id) });
   }, [queryClient, refreshKey, user.id]);
 
-  const documents = archiveQuery.data ?? [];
+  const documents = useMemo(() => archiveQuery.data ?? [], [archiveQuery.data]);
   const isLoading = archiveQuery.isLoading && archiveQuery.data === undefined;
 
   const monthBuckets = useMemo(() => groupDocumentsByMonth(documents), [documents]);
