@@ -24,7 +24,6 @@ import { RecurringExpensesSection } from '@web/features/settings/components/Recu
 import { CategoriesSection } from '@web/features/settings/components/CategoriesSection';
 import { CategoryLimitsSection } from '@web/features/settings/components/CategoryLimitsSection';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
-import { SettingsLoadingSkeleton } from '@web/features/layout/components/RouteLoadingSkeletons';
 import { useCookieConsent } from '@web/features/cookie-consent';
 
 type SettingsViewProps = {
@@ -46,7 +45,6 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
   const [defaultMonthlyBudget, setDefaultMonthlyBudget] = useState(
     initialUser.defaultMonthlyBudget != null ? String(initialUser.defaultMonthlyBudget) : ''
   );
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isBillingLoading, setIsBillingLoading] = useState(false);
@@ -277,10 +275,6 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
     } finally {
       setIsDeleting(false);
     }
-  }
-
-  if (isLoading) {
-    return <SettingsLoadingSkeleton />;
   }
 
   if (!user) {

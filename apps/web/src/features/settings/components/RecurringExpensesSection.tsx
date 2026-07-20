@@ -27,6 +27,9 @@ import {
 } from '@web/features/query/fetchers';
 import { queryKeys } from '@web/features/query/query-keys';
 
+const EMPTY_EXPENSES: RecurringExpenseItem[] = [];
+const EMPTY_RATE_MAP: ExchangeRateMap = {};
+
 type RecurringExpensesSectionProps = {
   primaryCurrency: CurrencyCode;
 };
@@ -80,8 +83,8 @@ export function RecurringExpensesSection({ primaryCurrency }: RecurringExpensesS
     setCurrency(primaryCurrency);
   }, [primaryCurrency]);
 
-  const expenses = expensesQuery.data ?? [];
-  const rateMap: ExchangeRateMap = ratesQuery.data ?? {};
+  const expenses = expensesQuery.data ?? EMPTY_EXPENSES;
+  const rateMap: ExchangeRateMap = ratesQuery.data ?? EMPTY_RATE_MAP;
   const isLoading =
     (expensesQuery.isLoading && expensesQuery.data === undefined) ||
     (ratesQuery.isLoading && ratesQuery.data === undefined);
