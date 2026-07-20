@@ -70,7 +70,7 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     );
   }, [limitsQuery.error, limitsQuery.isError, locale]);
 
-  const limits = limitsQuery.data ?? [];
+  const limits = useMemo(() => limitsQuery.data ?? [], [limitsQuery.data]);
 
   const limitedKeys = useMemo(() => new Set(limits.map((limit) => limit.categoryKey)), [limits]);
 
