@@ -189,6 +189,37 @@
       "aiDisabled": "Funkcje AI są tymczasowo niedostępne"
     }
   },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Napisz do nas — zwykle odpowiadamy w ciągu 1–2 dni roboczych.",
+    "backToSettings": "Wróć do ustawień",
+    "labels": {
+      "name": "Imię i nazwisko",
+      "email": "E-mail",
+      "subject": "Temat (opcjonalnie)",
+      "message": "Wiadomość",
+      "website": "Strona WWW",
+      "submit": "Wyślij wiadomość"
+    },
+    "success": {
+      "sent": "Wiadomość wysłana. Wkrótce się odezwiemy."
+    },
+    "errors": {
+      "nameRequired": "Podaj imię i nazwisko (min. 2 znaki)",
+      "invalidEmail": "Podaj poprawny adres e-mail",
+      "messageRequired": "Wpisz wiadomość (min. 10 znaków)",
+      "messageTooLong": "Wiadomość jest za długa",
+      "subjectTooLong": "Temat jest za długi",
+      "networkError": "Błąd sieci. Spróbuj ponownie",
+      "generic": "Nie udało się wysłać wiadomości. Spróbuj ponownie"
+    }
+  },
+  "email": {
+    "errors": {
+      "notConfigured": "Usługa e-mail nie jest skonfigurowana",
+      "sendFailed": "Nie udało się wysłać e-maila. Spróbuj później"
+    }
+  },
   "globalError": {
     "title": "Coś poszło nie tak",
     "message": "Wystąpił nieoczekiwany błąd.",
@@ -515,6 +546,9 @@
       "updateFailed": "Nie udało się zapisać ustawień. Spróbuj ponownie",
       "confirmEmailMismatch": "Potwierdzenie e-maila nie pasuje"
     },
+    "help": {
+      "contactLink": "Kontakt"
+    },
     "danger": {
       "title": "Strefa niebezpieczna",
       "description": "Trwale usuń konto i wszystkie powiązane dane. Tej operacji nie można cofnąć.",
@@ -634,7 +668,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlin, Niemcy",
-            "email": "support@lyamo.eu",
+            "email": "kontakt@lyamo.eu",
             "phone": "+49 30 00000000 (numer wirtualny)"
           }
         }

@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const AUTH_COOKIE_NAME = 'sec_session';
 
 const AUTH_ONLY_PUBLIC_PATHS = ['/login', '/register'];
-const PUBLIC_PATHS = ['/', '/login', '/register', '/terms', '/privacy', '/impressum'];
+const PUBLIC_PATHS = ['/', '/login', '/register', '/terms', '/privacy', '/impressum', '/contact'];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) {
@@ -36,6 +36,13 @@ export function middleware(request: NextRequest) {
     dashboardUrl.pathname = '/dashboard';
     dashboardUrl.search = '';
     return NextResponse.redirect(dashboardUrl);
+  }
+
+  if (isAuthenticated && pathname === '/contact') {
+    const appContactUrl = request.nextUrl.clone();
+    appContactUrl.pathname = '/settings/contact';
+    appContactUrl.search = '';
+    return NextResponse.redirect(appContactUrl);
   }
 
   if (isAuthenticated && pathname === '/') {

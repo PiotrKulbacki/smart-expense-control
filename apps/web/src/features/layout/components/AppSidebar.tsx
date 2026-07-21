@@ -88,7 +88,9 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
 
       <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
         {visibleNavItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/dashboard' && pathname.startsWith(`${item.href}/`));
           const isPending = pendingHref === item.href;
           return (
             <Link
@@ -97,15 +99,15 @@ export function AppSidebar({ userName, userEmail, userPlan }: AppSidebarProps) {
               onClick={() => setPendingHref(item.href)}
               onMouseEnter={() => prefetchRoute(item.href)}
               onFocus={() => prefetchRoute(item.href)}
-              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 font-mono text-sm transition ${
+              className={`inline-flex items-center justify-between gap-2 rounded-lg px-3 py-2 font-mono text-sm transition ${
                 isActive
                   ? 'bg-warm/10 text-warm'
                   : 'text-muted hover:bg-elevated/50 hover:text-[var(--text)]'
               } ${isPending ? 'pointer-events-none opacity-70' : ''}`}
               aria-busy={isPending || undefined}
             >
-              {isPending && <LoadingSpinner className="h-3.5 w-3.5" />}
-              {t(item.key)}
+              <span>{t(item.key)}</span>
+              {isPending ? <LoadingSpinner className="h-3.5 w-3.5 shrink-0" /> : null}
             </Link>
           );
         })}

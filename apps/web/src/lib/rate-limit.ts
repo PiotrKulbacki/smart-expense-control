@@ -3,6 +3,8 @@ import { Redis } from '@upstash/redis';
 import { env } from '@web/env';
 
 const AI_RATE_LIMIT_WINDOW = '1 m';
+const CONTACT_RATE_LIMIT_WINDOW = '1 h';
+const CONTACT_RATE_LIMIT_MAX = 5;
 
 /** Per-minute burst caps for PRO abuse protection (monthly quota is enforced in DB). */
 const AI_RATE_LIMIT_MAX: Record<AiRateLimitScope, number> = {
@@ -23,8 +25,11 @@ const AI_RATE_LIMIT_PREFIX: Record<AiRateLimitScope, string> = {
   chat: `${UPSTASH_KEY_PREFIX}:ai:chat`,
 };
 
+const CONTACT_RATE_LIMIT_PREFIX = `${UPSTASH_KEY_PREFIX}:contact`;
+
 let redisClient: Redis | null | undefined;
 const aiRateLimiters: Partial<Record<AiRateLimitScope, Ratelimit>> = {};
+let contactRateLimiter: Ratelimit | null | undefined;
 
 function getRedisClient(): Redis | null {
   if (redisClient !== undefined) {
@@ -66,6 +71,27 @@ function getAiRateLimiter(scope: AiRateLimitScope): Ratelimit | null {
   return limiter;
 }
 
+function getContactRateLimiter(): Ratelimit | null {
+  if (contactRateLimiter !== undefined) {
+    return contactRateLimiter;
+  }
+
+  const redis = getRedisClient();
+  if (!redis) {
+    contactRateLimiter = null;
+    return null;
+  }
+
+  contactRateLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(CONTACT_RATE_LIMIT_MAX, CONTACT_RATE_LIMIT_WINDOW),
+    prefix: CONTACT_RATE_LIMIT_PREFIX,
+    analytics: true,
+  });
+
+  return contactRateLimiter;
+}
+
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
@@ -99,6 +125,36 @@ function isStrictProduction(): boolean {
   );
 }
 
+function resolveMissingLimiter(key: string, limit: number): RateLimitResult {
+  const failOpen = shouldFailOpenWithoutRedis();
+
+  if (isStrictProduction() && !failOpen) {
+    console.log(`Rate Limit Check: Key: ${key}, Remaining: 0, Total: ${limit} (no Redis, blocked)`);
+    return { allowed: false, remaining: 0, reset: 0, limit, key };
+  }
+
+  console.log(
+    `Rate Limit Check: Key: ${key}, Remaining: ${limit}, Total: ${limit} (no Redis, fail-open)`
+  );
+  return { allowed: true, remaining: limit, reset: 0, limit, key };
+}
+
+function resolveLimiterError(key: string, limit: number): RateLimitResult {
+  const failOpen = shouldFailOpenWithoutRedis();
+
+  if (isStrictProduction() && !failOpen) {
+    console.log(
+      `Rate Limit Check: Key: ${key}, Remaining: 0, Total: ${limit} (Redis error, blocked)`
+    );
+    return { allowed: false, remaining: 0, reset: 0, limit, key };
+  }
+
+  console.log(
+    `Rate Limit Check: Key: ${key}, Remaining: ${limit}, Total: ${limit} (Redis error, fail-open)`
+  );
+  return { allowed: true, remaining: limit, reset: 0, limit, key };
+}
+
 export async function checkAiRateLimit(
   request: Request,
   scope: AiRateLimitScope,
@@ -110,19 +166,7 @@ export async function checkAiRateLimit(
   const limiter = getAiRateLimiter(scope);
 
   if (!limiter) {
-    const failOpen = shouldFailOpenWithoutRedis();
-
-    if (isStrictProduction() && !failOpen) {
-      console.log(
-        `Rate Limit Check: Key: ${key}, Remaining: 0, Total: ${limit} (no Redis, blocked)`
-      );
-      return { allowed: false, remaining: 0, reset: 0, limit, key };
-    }
-
-    console.log(
-      `Rate Limit Check: Key: ${key}, Remaining: ${limit}, Total: ${limit} (no Redis, fail-open)`
-    );
-    return { allowed: true, remaining: limit, reset: 0, limit, key };
+    return resolveMissingLimiter(key, limit);
   }
 
   try {
@@ -138,18 +182,34 @@ export async function checkAiRateLimit(
       key,
     };
   } catch {
-    const failOpen = shouldFailOpenWithoutRedis();
+    return resolveLimiterError(key, limit);
+  }
+}
 
-    if (isStrictProduction() && !failOpen) {
-      console.log(
-        `Rate Limit Check: Key: ${key}, Remaining: 0, Total: ${limit} (Redis error, blocked)`
-      );
-      return { allowed: false, remaining: 0, reset: 0, limit, key };
-    }
+export async function checkContactRateLimit(request: Request): Promise<RateLimitResult> {
+  const identifier = `ip:${getClientIp(request)}`;
+  const key = `${CONTACT_RATE_LIMIT_PREFIX}:${identifier}`;
+  const limiter = getContactRateLimiter();
+
+  if (!limiter) {
+    return resolveMissingLimiter(key, CONTACT_RATE_LIMIT_MAX);
+  }
+
+  try {
+    const result = await limiter.limit(identifier);
 
     console.log(
-      `Rate Limit Check: Key: ${key}, Remaining: ${limit}, Total: ${limit} (Redis error, fail-open)`
+      `Rate Limit Check: Key: ${key}, Remaining: ${result.remaining}, Total: ${CONTACT_RATE_LIMIT_MAX}`
     );
-    return { allowed: true, remaining: limit, reset: 0, limit, key };
+
+    return {
+      allowed: result.success,
+      remaining: result.remaining,
+      reset: result.reset,
+      limit: CONTACT_RATE_LIMIT_MAX,
+      key,
+    };
+  } catch {
+    return resolveLimiterError(key, CONTACT_RATE_LIMIT_MAX);
   }
 }

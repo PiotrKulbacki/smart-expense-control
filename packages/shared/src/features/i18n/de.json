@@ -187,6 +187,37 @@
       "aiDisabled": "KI-Funktionen sind vorübergehend nicht verfügbar"
     }
   },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Schreiben Sie uns — wir antworten in der Regel innerhalb von 1–2 Werktagen.",
+    "backToSettings": "Zurück zu den Einstellungen",
+    "labels": {
+      "name": "Name",
+      "email": "E-Mail",
+      "subject": "Betreff (optional)",
+      "message": "Nachricht",
+      "website": "Website",
+      "submit": "Nachricht senden"
+    },
+    "success": {
+      "sent": "Nachricht gesendet. Wir melden uns bald."
+    },
+    "errors": {
+      "nameRequired": "Bitte geben Sie Ihren Namen ein (mind. 2 Zeichen)",
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "messageRequired": "Bitte geben Sie eine Nachricht ein (mind. 10 Zeichen)",
+      "messageTooLong": "Nachricht ist zu lang",
+      "subjectTooLong": "Betreff ist zu lang",
+      "networkError": "Netzwerkfehler. Bitte erneut versuchen",
+      "generic": "Nachricht konnte nicht gesendet werden. Bitte erneut versuchen"
+    }
+  },
+  "email": {
+    "errors": {
+      "notConfigured": "E-Mail-Dienst ist nicht konfiguriert",
+      "sendFailed": "E-Mail konnte nicht gesendet werden. Bitte später erneut versuchen"
+    }
+  },
   "globalError": {
     "title": "Etwas ist schiefgelaufen",
     "message": "Ein unerwarteter Fehler ist aufgetreten.",
@@ -513,6 +544,9 @@
       "updateFailed": "Einstellungen konnten nicht gespeichert werden. Bitte erneut versuchen",
       "confirmEmailMismatch": "E-Mail-Bestätigung stimmt nicht überein"
     },
+    "help": {
+      "contactLink": "Kontakt"
+    },
     "danger": {
       "title": "Gefahrenzone",
       "description": "Konto und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
@@ -632,7 +666,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlin, Deutschland",
-            "email": "support@lyamo.eu",
+            "email": "kontakt@lyamo.eu",
             "phone": "+49 30 00000000 (virtuelle Nummer)"
           }
         }

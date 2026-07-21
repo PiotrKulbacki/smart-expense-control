@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
@@ -288,14 +289,13 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           {t('settings.title')}
         </h1>
         <p className="text-muted mt-1 text-sm">{t('settings.subtitle')}</p>
-        <div className="mt-3">
-          <button
-            type="button"
-            onClick={openPreferences}
-            className="text-muted hover:text-warm underline"
-          >
+        <div className="text-muted mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <button type="button" onClick={openPreferences} className="hover:text-warm underline">
             {t('layout.footer.cookieSettings')}
           </button>
+          <Link href="/settings/contact" className="hover:text-warm underline">
+            {t('settings.help.contactLink')}
+          </Link>
         </div>
       </div>
 

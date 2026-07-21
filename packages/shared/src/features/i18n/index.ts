@@ -76,7 +76,9 @@ export function translateError(code: string, locale: Locale = DEFAULT_LOCALE): s
     code.startsWith('settings.') ||
     code.startsWith('billing.') ||
     code.startsWith('dashboard.') ||
-    code.startsWith('api.')
+    code.startsWith('api.') ||
+    code.startsWith('contact.') ||
+    code.startsWith('email.')
   ) {
     return t(code, locale);
   }

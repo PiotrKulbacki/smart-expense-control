@@ -187,6 +187,37 @@
       "aiDisabled": "Las funciones de IA no están disponibles temporalmente"
     }
   },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Envíanos un mensaje — solemos responder en 1–2 días laborables.",
+    "backToSettings": "Volver a ajustes",
+    "labels": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "subject": "Asunto (opcional)",
+      "message": "Mensaje",
+      "website": "Sitio web",
+      "submit": "Enviar mensaje"
+    },
+    "success": {
+      "sent": "Mensaje enviado. Te responderemos pronto."
+    },
+    "errors": {
+      "nameRequired": "Introduce tu nombre (mín. 2 caracteres)",
+      "invalidEmail": "Introduce un correo electrónico válido",
+      "messageRequired": "Escribe un mensaje (mín. 10 caracteres)",
+      "messageTooLong": "El mensaje es demasiado largo",
+      "subjectTooLong": "El asunto es demasiado largo",
+      "networkError": "Error de red. Inténtalo de nuevo",
+      "generic": "No se pudo enviar el mensaje. Inténtalo de nuevo"
+    }
+  },
+  "email": {
+    "errors": {
+      "notConfigured": "El servicio de correo no está configurado",
+      "sendFailed": "No se pudo enviar el correo. Inténtalo más tarde"
+    }
+  },
   "globalError": {
     "title": "Algo salió mal",
     "message": "Ocurrió un error inesperado.",
@@ -513,6 +544,9 @@
       "updateFailed": "No se pudieron guardar los ajustes. Inténtalo de nuevo",
       "confirmEmailMismatch": "La confirmación del email no coincide"
     },
+    "help": {
+      "contactLink": "Contacto"
+    },
     "danger": {
       "title": "Zona de peligro",
       "description": "Elimina permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer.",
@@ -632,7 +666,7 @@
           },
           "items": {
             "address": "Bendastr. 11, 12051 Berlín, Alemania",
-            "email": "support@lyamo.eu",
+            "email": "kontakt@lyamo.eu",
             "phone": "+49 30 00000000 (número virtual)"
           }
         }

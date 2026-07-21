@@ -1,5 +1,5 @@
 import { createBillingPortalSession } from '@web/features/billing/services/stripe-checkout.service';
-import { sendTransactionalEmail } from '@web/features/email/services/resend.service';
+import { sendTransactionalEmail } from '@web/features/email/services/brevo.service';
 import { env } from '@web/env';
 import { captureServerException } from '@web/lib/sentry-server';
 
