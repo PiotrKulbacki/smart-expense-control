@@ -33,6 +33,7 @@
 29. **Faza 11.0: analiza prawna i struktury Regulaminu / Polityki Prywatności (RODO/UŚUDE/DE)** — [✅ Zrobione]
 30. **Faza 11.1: wdrożenie elementów compliance w UI + Impressum + drafty legal (bez pełnej treści prawnej)** — [✅ Zrobione]
 31. **Faza 11.1.1: poprawki UX i compliance po Fazie 11.1** — [✅ Zrobione]
+32. **Faza 11.2: Brevo + formularz kontaktowy (publiczny i w app)** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -72,7 +73,7 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
    - **ciche odświeżenie** (`silent: true`, `isRefreshing`) → szkielety / spinnery **w obrębie sekcji**, bez przeładowania całej strony.
    - Przekazuj `isRefreshing` do kart, list i filtrów; blokuj interakcję (select, toggle) na czas fetchu.
 
-3. **Nawigacja (sidebar, linki do wolnych widoków)** — spinner przy klikniętej pozycji menu do momentu zmiany `pathname` (`pendingHref` + `LoadingSpinner`).
+3. **Nawigacja (sidebar, linki do wolnych widoków)** — spinner po prawej przy nazwie klikniętej pozycji menu do momentu zmiany `pathname` (`pendingHref` + `LoadingSpinner`), żeby etykiety nie przesuwały się w poziomie.
 
 4. **Komponenty wspólne** — nie wymyślaj nowych spinnerów:
    - `LoadingSpinner` z `@web/components/ui/loading-spinner`,
@@ -85,6 +86,21 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-21 — Faza 11.2: Brevo + formularz kontaktowy.**
+
+### Faza 11.2 — E-mail (Brevo) i kontakt
+
+- **Resend → Brevo:** usunięto `resend`; transakcyjne maile (w tym dunning) przez `brevo.service.ts` (API `POST /v3/smtp/email`). Env: `BREVO_API_KEY`, `BREVO_FROM_EMAIL=Lyamo <kontakt@lyamo.eu>`, opcjonalnie `CONTACT_INBOX_EMAIL`.
+- **Publiczny adres:** `kontakt@lyamo.eu` (Impressum / i18n); odbiór przez Cloudflare Email Routing → Gmail (ops poza kodem).
+- **Formularz kontaktowy:** wspólny `ContactForm` + `ContactPageView`; Zod w `@shared/features/contact/schemas`; `POST /api/contact` z rate limitem (5/h/IP), honeypot, Reply-To = e-mail nadawcy; czerwone `*` przy polach wymaganych.
+- **Dwa wejścia (UX):**
+  - gość: `/contact` (layout publiczny, stopka),
+  - zalogowany: `/settings/contact` (app shell + sidebar); link w Settings; zalogowany na `/contact` → redirect na `/settings/contact`.
+- **Sidebar:** loader nawigacji po prawej od nazwy zakładki; aktywny stan Settings także na `/settings/contact`.
+- **Ops (Vercel):** ustawić `BREVO_API_KEY` + `BREVO_FROM_EMAIL` (usunąć stare `RESEND_*` w projekcie Lyamo). SMTP Brevo — tylko do Gmail „Wyślij jako”, nie do aplikacji.
+
+---
 
 **2026-07-21 — Vercel Web Analytics (`@vercel/analytics`).**
 
