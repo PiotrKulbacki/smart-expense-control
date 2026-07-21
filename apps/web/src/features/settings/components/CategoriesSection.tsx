@@ -18,7 +18,7 @@ import {
 import { Button } from '@web/components/ui/button';
 import { Input } from '@web/components/ui/input';
 import { Label } from '@web/components/ui/label';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@web/components/ui/sheet';
+import { Sheet, SheetBody, SheetContent, SheetHeader, SheetTitle } from '@web/components/ui/sheet';
 import {
   getCategoryOptionLabel,
   useCategories,
@@ -222,11 +222,12 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
           </div>
           <Button
             type="button"
-            size="default"
+            size="icon"
             onClick={openCreateForm}
             aria-label={t('settings.categories.add')}
+            className="h-11 w-11 shrink-0 md:h-10 md:w-10"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
         </div>
 
@@ -299,7 +300,7 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
       </section>
 
       <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <SheetContent className="w-full sm:max-w-md">
+        <SheetContent className="w-full overflow-x-hidden sm:max-w-md">
           <SheetHeader>
             <SheetTitle>
               {t(
@@ -307,7 +308,7 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
               )}
             </SheetTitle>
           </SheetHeader>
-          <div className="mt-6 space-y-4">
+          <SheetBody className="space-y-4">
             <div>
               <Label htmlFor="category-name">{t('settings.categories.nameLabel')}</Label>
               <Input
@@ -345,7 +346,7 @@ export function CategoriesSection({ onCategoriesChanged }: CategoriesSectionProp
             >
               {t('settings.labels.saveChanges')}
             </Button>
-          </div>
+          </SheetBody>
         </SheetContent>
       </Sheet>
 

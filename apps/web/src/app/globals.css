@@ -78,7 +78,7 @@ body {
   }
 
   .auth-input {
-    @apply bg-elevated/50 font-display placeholder:text-muted focus:border-warm/30 focus:ring-warm/20 mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2.5 text-sm text-[var(--text)] transition-colors focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply bg-elevated/50 font-display placeholder:text-muted focus:border-warm/30 focus:ring-warm/20 mt-1 w-full rounded-lg border border-[var(--border)] px-3 py-2.5 text-base text-[var(--text)] transition-colors focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm;
   }
 
   .auth-label {

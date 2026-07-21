@@ -29,7 +29,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <CategoriesProvider>
           <div className="flex h-screen flex-col overflow-hidden md:flex-row">
             <AppSidebar userName={user.name} userEmail={user.email} userPlan={user.currentPlan} />
-            <main className="bg-void/50 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+            <main className="bg-void/50 flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+              {children}
+            </main>
           </div>
         </CategoriesProvider>
       </AppUserProvider>

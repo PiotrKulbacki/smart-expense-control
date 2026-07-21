@@ -6,17 +6,34 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { translateError } from '@shared/features/i18n';
 import type { CategoryLimitRecord } from '@shared/features/transactions/category-limit-schemas';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@web/components/ui/alert-dialog';
 import { Button } from '@web/components/ui/button';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@web/components/ui/drawer';
 import { Input } from '@web/components/ui/input';
 import { Label } from '@web/components/ui/label';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@web/components/ui/sheet';
+import { LoadingSpinner } from '@web/components/ui/loading-spinner';
+import { Sheet, SheetBody, SheetContent, SheetHeader, SheetTitle } from '@web/components/ui/sheet';
+import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import {
   getCategoryOptionLabel,
   useSortedCategoriesForSelect,
 } from '@web/features/categories/hooks/useCategories';
-import { useAppUser } from '@web/features/auth/components/AppUserProvider';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
-import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 import { fetchCategoryLimits } from '@web/features/query/fetchers';
 import { queryKeys } from '@web/features/query/query-keys';
 import {
@@ -24,6 +41,7 @@ import {
   resolveCategoryLabel,
   type CategoryDisplayContext,
 } from '@web/features/transactions/lib/category-config';
+import { useMediaQuery } from '@web/features/transactions/hooks/useMediaQuery';
 
 type CategoryLimitsSectionProps = {
   primaryCurrency: string;
@@ -34,6 +52,7 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
   const { locale } = useLocale();
   const user = useAppUser();
   const queryClient = useQueryClient();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
   const {
     categories,
     colorMap,
@@ -45,7 +64,8 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
   const [categoryKey, setCategoryKey] = useState('');
   const [limitAmount, setLimitAmount] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+  const [deleteTargetKey, setDeleteTargetKey] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const displayContext: CategoryDisplayContext = useMemo(
     () => ({ colorMap, nameMap }),
@@ -83,6 +103,13 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     return categories.filter((category) => !limitedKeys.has(category.key));
   }, [categories, limitedKeys, editingKey]);
 
+  const deleteTargetLabel = useMemo(() => {
+    if (!deleteTargetKey) {
+      return '';
+    }
+    return resolveCategoryLabel(deleteTargetKey, t, displayContext);
+  }, [deleteTargetKey, displayContext, t]);
+
   function openCreateForm() {
     setEditingKey(null);
     setCategoryKey(availableCategories[0]?.key ?? '');
@@ -95,6 +122,13 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     setCategoryKey(limit.categoryKey);
     setLimitAmount(String(limit.limitAmount));
     setIsFormOpen(true);
+  }
+
+  function handleFormOpenChange(open: boolean) {
+    setIsFormOpen(open);
+    if (!open) {
+      setEditingKey(null);
+    }
   }
 
   async function handleSaveLimit() {
@@ -148,8 +182,13 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
     }
   }
 
-  async function handleDeleteLimit(key: string) {
-    setDeletingKey(key);
+  async function handleDeleteLimit() {
+    if (!deleteTargetKey) {
+      return;
+    }
+
+    const key = deleteTargetKey;
+    setIsDeleting(true);
 
     try {
       const response = await fetch('/api/category-limits', {
@@ -170,12 +209,65 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
         (current = []) => current.filter((item) => item.categoryKey !== key)
       );
       toast.success(t('settings.categoryLimits.success.deleted'));
+      setDeleteTargetKey(null);
     } catch {
       toast.error(t('auth.errors.networkError'));
     } finally {
-      setDeletingKey(null);
+      setIsDeleting(false);
     }
   }
+
+  const formTitle = t(
+    editingKey ? 'settings.categoryLimits.editTitle' : 'settings.categoryLimits.addTitle'
+  );
+
+  const formFields = (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="category-limit-key">{t('settings.categoryLimits.categoryLabel')}</Label>
+        <select
+          id="category-limit-key"
+          value={categoryKey}
+          disabled={isSaving || Boolean(editingKey)}
+          onChange={(event) => setCategoryKey(event.target.value)}
+          className="auth-input mt-2 flex h-11 w-full md:h-10"
+        >
+          {availableCategories.map((category) => (
+            <option key={category.key} value={category.key}>
+              {getCategoryOptionLabel(category, t)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <Label htmlFor="category-limit-amount">
+          {t('settings.categoryLimits.amountLabel', { currency: primaryCurrency })}
+        </Label>
+        <Input
+          id="category-limit-amount"
+          type="number"
+          min={1}
+          step="0.01"
+          inputMode="decimal"
+          value={limitAmount}
+          disabled={isSaving}
+          onChange={(event) => setLimitAmount(event.target.value)}
+          placeholder={t('settings.categoryLimits.amountPlaceholder')}
+          className="mt-2"
+        />
+        <p className="text-muted mt-1 text-xs">{t('settings.categoryLimits.amountHint')}</p>
+      </div>
+      <Button
+        type="button"
+        className="w-full"
+        loading={isSaving}
+        disabled={isSaving || !categoryKey}
+        onClick={() => void handleSaveLimit()}
+      >
+        {t('settings.labels.saveChanges')}
+      </Button>
+    </div>
+  );
 
   if ((limitsQuery.isLoading && limitsQuery.data === undefined) || isCategoriesLoading) {
     return <div className="bg-elevated h-48 animate-pulse rounded-2xl" />;
@@ -195,12 +287,13 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
           </div>
           <Button
             type="button"
-            size="default"
+            size="icon"
             disabled={availableCategories.length === 0 && !editingKey}
             onClick={openCreateForm}
             aria-label={t('settings.categoryLimits.add')}
+            className="h-11 w-11 shrink-0 md:h-10 md:w-10"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-6 w-6 md:h-5 md:w-5" />
           </Button>
         </div>
 
@@ -237,23 +330,19 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
                   <button
                     type="button"
                     onClick={() => openEditForm(limit)}
-                    className="text-muted hover:text-warm rounded p-1 transition"
+                    className="text-muted hover:text-warm rounded p-1.5 transition"
                     aria-label={t('settings.categoryLimits.edit')}
                   >
-                    <Pencil className="h-3.5 w-3.5" />
+                    <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     type="button"
-                    disabled={deletingKey === limit.categoryKey}
-                    onClick={() => void handleDeleteLimit(limit.categoryKey)}
-                    className="text-muted hover:text-glow inline-flex items-center justify-center rounded p-1 transition disabled:opacity-50"
+                    disabled={isDeleting && deleteTargetKey === limit.categoryKey}
+                    onClick={() => setDeleteTargetKey(limit.categoryKey)}
+                    className="text-muted hover:text-glow inline-flex items-center justify-center rounded p-1.5 transition disabled:opacity-50"
                     aria-label={t('settings.categoryLimits.delete')}
                   >
-                    {deletingKey === limit.categoryKey ? (
-                      <LoadingSpinner className="h-3.5 w-3.5" />
-                    ) : (
-                      <Trash2 className="h-3.5 w-3.5" />
-                    )}
+                    <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
               </li>
@@ -262,73 +351,59 @@ export function CategoryLimitsSection({ primaryCurrency }: CategoryLimitsSection
         )}
       </section>
 
-      <Sheet
-        open={isFormOpen}
+      {isDesktop ? (
+        <Sheet open={isFormOpen} onOpenChange={handleFormOpenChange}>
+          <SheetContent className="w-full overflow-x-hidden sm:max-w-md">
+            <SheetHeader>
+              <SheetTitle>{formTitle}</SheetTitle>
+            </SheetHeader>
+            <SheetBody>{formFields}</SheetBody>
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Drawer open={isFormOpen} onOpenChange={handleFormOpenChange}>
+          <DrawerContent className="overflow-x-hidden">
+            <DrawerHeader>
+              <DrawerTitle>{formTitle}</DrawerTitle>
+            </DrawerHeader>
+            <DrawerBody>{formFields}</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      <AlertDialog
+        open={Boolean(deleteTargetKey)}
         onOpenChange={(open) => {
-          setIsFormOpen(open);
-          if (!open) {
-            setEditingKey(null);
+          if (!open && !isDeleting) {
+            setDeleteTargetKey(null);
           }
         }}
       >
-        <SheetContent className="w-full sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle>
-              {t(
-                editingKey
-                  ? 'settings.categoryLimits.editTitle'
-                  : 'settings.categoryLimits.addTitle'
-              )}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="mt-6 space-y-4">
-            <div>
-              <Label htmlFor="category-limit-key">
-                {t('settings.categoryLimits.categoryLabel')}
-              </Label>
-              <select
-                id="category-limit-key"
-                value={categoryKey}
-                disabled={isSaving || Boolean(editingKey)}
-                onChange={(event) => setCategoryKey(event.target.value)}
-                className="auth-input mt-2 flex h-10 w-full"
-              >
-                {availableCategories.map((category) => (
-                  <option key={category.key} value={category.key}>
-                    {getCategoryOptionLabel(category, t)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <Label htmlFor="category-limit-amount">
-                {t('settings.categoryLimits.amountLabel', { currency: primaryCurrency })}
-              </Label>
-              <Input
-                id="category-limit-amount"
-                type="number"
-                min={1}
-                step="0.01"
-                value={limitAmount}
-                disabled={isSaving}
-                onChange={(event) => setLimitAmount(event.target.value)}
-                placeholder={t('settings.categoryLimits.amountPlaceholder')}
-                className="mt-2"
-              />
-              <p className="text-muted mt-1 text-xs">{t('settings.categoryLimits.amountHint')}</p>
-            </div>
-            <Button
-              type="button"
-              className="w-full"
-              loading={isSaving}
-              disabled={isSaving || !categoryKey}
-              onClick={() => void handleSaveLimit()}
+        <AlertDialogContent className="mx-4 max-w-[calc(100vw-2rem)] sm:mx-0 sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('settings.categoryLimits.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('settings.categoryLimits.deleteConfirm', { category: deleteTargetLabel })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              {t('dashboard.form.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              className="bg-glow/90 text-void hover:bg-glow inline-flex items-center gap-2"
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDeleteLimit();
+              }}
             >
-              {t('settings.labels.saveChanges')}
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+              {isDeleting ? <LoadingSpinner className="h-4 w-4" /> : null}
+              {t('settings.categoryLimits.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

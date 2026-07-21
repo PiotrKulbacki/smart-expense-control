@@ -603,6 +603,8 @@
       "amountPlaceholder": "p. ej. 200",
       "amountHint": "Se aplica al gasto del ciclo de facturación actual en tu moneda principal.",
       "delete": "Eliminar límite",
+      "deleteTitle": "¿Eliminar límite de categoría?",
+      "deleteConfirm": "Se eliminará el límite de gasto de «{{category}}». Las transacciones no se borran.",
       "empty": "Aún no hay límites de categoría. Añade uno para seguir el gasto.",
       "success": {
         "saved": "Límite de categoría guardado",

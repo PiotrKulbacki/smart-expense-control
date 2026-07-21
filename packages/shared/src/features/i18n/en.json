@@ -603,6 +603,8 @@
       "amountPlaceholder": "e.g. 200",
       "amountHint": "Applies to the current billing cycle spend in your primary currency.",
       "delete": "Remove limit",
+      "deleteTitle": "Remove category limit?",
+      "deleteConfirm": "The spending limit for „{{category}}” will be removed. This does not delete transactions.",
       "empty": "No category limits yet. Add one to track spending against a cap.",
       "success": {
         "saved": "Category limit saved",

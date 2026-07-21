@@ -41,6 +41,7 @@
 37. **Faza 12.4: UX Settings + blokada rejestracji bez zgody legal** — [✅ Zrobione]
 38. **Faza 12.5: Branded email templates (i18n) + reset link w Settings** — [✅ Zrobione]
 39. **Faza 12.6: Mobile nav — menu rozwijane (landing + app sidebar)** — [✅ Zrobione]
+40. **Faza 12.6.2: Settings mobile — limity, sheety, anti-zoom** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -93,6 +94,17 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-21 — Faza 12.6.2: Settings mobile — limity, sheety, anti-zoom.**
+
+### Poprawki UX Settings / mobile
+
+- **Limity kategorii:** `AlertDialog` przed usunięciem; większy przycisk `+` (icon `h-11` na mobile); formularz Sheet (desktop) / Drawer (mobile) — lepsze natywne selecty na iOS; `SheetBody`/`DrawerBody` z `px-6`.
+- **Kategorie własne:** `SheetBody` + padding; większy `+` jak przy limitach.
+- **Anti-zoom iOS:** `Input` i `.auth-input` → `text-base md:text-sm` (≥16px na mobile); `overflow-x-hidden` na `main` w `(app)/layout`.
+- **i18n:** `settings.categoryLimits.deleteTitle` / `deleteConfirm` (en/pl/de/es).
+
+---
 
 **2026-07-21 — Faza 12.6.1: Mobile UX polish (menu A, chat composer, CTA).**
 

@@ -605,6 +605,8 @@
       "amountPlaceholder": "np. 200",
       "amountHint": "Dotyczy wydatków w bieżącym cyklu rozliczeniowym w walucie głównej.",
       "delete": "Usuń limit",
+      "deleteTitle": "Usunąć limit kategorii?",
+      "deleteConfirm": "Limit wydatków dla „{{category}}” zostanie usunięty. Transakcje nie zostaną skasowane.",
       "empty": "Brak limitów kategorii. Dodaj jeden, aby śledzić wydatki względem limitu.",
       "success": {
         "saved": "Limit kategorii zapisany",

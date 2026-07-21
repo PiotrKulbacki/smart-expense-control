@@ -603,6 +603,8 @@
       "amountPlaceholder": "z. B. 200",
       "amountHint": "Gilt für Ausgaben im aktuellen Abrechnungszyklus in Ihrer Hauptwährung.",
       "delete": "Limit entfernen",
+      "deleteTitle": "Kategorielimit entfernen?",
+      "deleteConfirm": "Das Ausgabenlimit für „{{category}}” wird entfernt. Transaktionen bleiben erhalten.",
       "empty": "Noch keine Kategorielimits. Fügen Sie eines hinzu, um Ausgaben zu verfolgen.",
       "success": {
         "saved": "Kategorielimit gespeichert",
