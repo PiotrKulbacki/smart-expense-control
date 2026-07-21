@@ -755,6 +755,28 @@
       }
     }
   },
+  "seo": {
+    "home": {
+      "title": "Lyamo — control de gastos con IA",
+      "description": "Controla tus gastos, escanea recibos con IA y obtén insights financieros honestos. Soporte multidivisa para PLN, EUR, GBP y USD."
+    },
+    "contact": {
+      "title": "Contacto",
+      "description": "Contacta con el equipo de Lyamo. Suele responder en 1–2 días laborables."
+    },
+    "terms": {
+      "title": "Términos del servicio",
+      "description": "Términos del servicio de Lyamo — suscripciones, derecho de desistimiento y política de reembolsos."
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "description": "Cómo Lyamo trata datos personales, cookies y seguridad según el RGPD."
+    },
+    "impressum": {
+      "title": "Impressum",
+      "description": "Aviso legal (Impressum) de Lyamo — datos del proveedor e información de contacto."
+    }
+  },
   "cookies": {
     "banner": {
       "title": "Usamos cookies",

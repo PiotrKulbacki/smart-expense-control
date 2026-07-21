@@ -757,6 +757,28 @@
       }
     }
   },
+  "seo": {
+    "home": {
+      "title": "Lyamo — śledzenie wydatków z AI",
+      "description": "Śledź wydatki, skanuj paragony AI i otrzymuj uczciwe wskazówki finansowe. Wsparcie wielowalutowe: PLN, EUR, GBP i USD."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "description": "Skontaktuj się z zespołem Lyamo. Zwykle odpowiadamy w ciągu 1–2 dni roboczych."
+    },
+    "terms": {
+      "title": "Regulamin",
+      "description": "Regulamin Lyamo — subskrypcje, prawo odstąpienia i polityka zwrotów."
+    },
+    "privacy": {
+      "title": "Polityka prywatności",
+      "description": "Jak Lyamo przetwarza dane osobowe, pliki cookie i zabezpieczenia zgodnie z RODO."
+    },
+    "impressum": {
+      "title": "Impressum",
+      "description": "Impressum Lyamo — dane usługodawcy i dane kontaktowe."
+    }
+  },
   "cookies": {
     "banner": {
       "title": "Używamy plików cookie",

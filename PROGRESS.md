@@ -93,6 +93,29 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 
 ## Latest Handoff Log
 
+**2026-07-21 — SEO: metadata, canonical, noindex (public + auth + app).**
+
+### Metadata i indeksacja
+
+- **`metadataBase` + template tytułu** w root layout (`%s | Lyamo`); opis domyślny z i18n `seo.home.description` (locale z cookie `sec_locale`).
+- **Per-page metadata:** landing, `/contact`, `/terms`, `/privacy`, `/impressum` — title/description/Open Graph/Twitter + **canonical** na `NEXT_PUBLIC_APP_URL` (`https://lyamo.eu`).
+- **`noindex, nofollow`:** auth (`/login`, `/register`, forgot/reset/verify) oraz cała strefa `(app)` (dashboard, settings, …).
+- **i18n:** `seo.*` w en/pl/de/es.
+- **Helpery:** `features/seo/build-page-metadata.ts`, `get-request-locale.ts`.
+- **Ops (poza kodem):** Google Search Console — zweryfikować domenę i zgłosić `https://lyamo.eu/sitemap.xml`.
+
+---
+
+**2026-07-21 — SEO: sitemap.xml + robots.txt (Next.js Metadata Routes).**
+
+### Sitemap i robots
+
+- **`apps/web/src/app/sitemap.ts`:** publiczne URL-e `/`, `/contact`, `/terms`, `/privacy`, `/impressum`; baza `NEXT_PUBLIC_APP_URL` (produkcja: `https://lyamo.eu`). Bez login/register i stron auth flow (niska wartość SEO).
+- **`apps/web/src/app/robots.ts`:** `Allow: /`; `Disallow` dla `/api/`, strefy app (`/dashboard`, `/history`, `/settings`, `/chat`, `/scanner`) oraz `/forgot-password`, `/reset-password`, `/verify-email`; `Sitemap: {APP_URL}/sitemap.xml`.
+- **Endpointy po deployu:** `https://lyamo.eu/sitemap.xml`, `https://lyamo.eu/robots.txt`.
+
+---
+
 **2026-07-21 — Faza 12.5: Branded email templates + reset z Settings.**
 
 ### Faza 12.5 — Spójne szablony e-mail (Brevo HTML) i reset hasła z Settings
@@ -775,6 +798,14 @@ _(Brak zaplanowanych faz — każda nowa funkcja wymaga zatwierdzenia przez uży
 ---
 
 ## Ostatnie zmiany
+
+**2026-07-21 — SEO: metadata + canonical + noindex**
+
+- Per-page metadata (i18n `seo.*`), canonical na `lyamo.eu`, `noindex` na auth i `(app)`; Search Console = ops po deployu.
+
+**2026-07-21 — SEO: sitemap + robots**
+
+- Next.js Metadata Routes: `sitemap.ts` (landing + contact + legal), `robots.ts` (disallow API/app/auth-flow); baza `https://lyamo.eu`.
 
 **2026-07-21 — Vercel Web Analytics**
 
