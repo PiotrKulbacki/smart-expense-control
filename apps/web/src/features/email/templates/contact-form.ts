@@ -19,27 +19,27 @@ export function buildContactFormEmail(params: ContactFormEmailParams): {
   html: string;
   text: string;
 } {
-  const subjectLine = params.subject.trim() || 'General inquiry';
+  const subjectLine = params.subject.trim() || 'Zapytanie ogólne';
   const subject = `[Kontakt] ${subjectLine}`;
 
   const text = [
-    'New contact form message from Lyamo',
+    'Nowa wiadomość z formularza kontaktowego Lyamo',
     '',
-    `Name: ${params.name}`,
-    `Email: ${params.email}`,
-    `Subject: ${subjectLine}`,
+    `Imię i nazwisko: ${params.name}`,
+    `E-mail: ${params.email}`,
+    `Temat: ${subjectLine}`,
     '',
-    'Message:',
+    'Wiadomość:',
     params.message,
   ].join('\n');
 
   const html = `
     <div style="font-family: system-ui, sans-serif; line-height: 1.5; color: #111;">
-      <h2 style="margin: 0 0 16px;">New contact form message</h2>
-      <p style="margin: 0 0 8px;"><strong>Name:</strong> ${escapeHtml(params.name)}</p>
-      <p style="margin: 0 0 8px;"><strong>Email:</strong> ${escapeHtml(params.email)}</p>
-      <p style="margin: 0 0 16px;"><strong>Subject:</strong> ${escapeHtml(subjectLine)}</p>
-      <p style="margin: 0 0 8px;"><strong>Message:</strong></p>
+      <h2 style="margin: 0 0 16px;">Nowa wiadomość z formularza kontaktowego</h2>
+      <p style="margin: 0 0 8px;"><strong>Imię i nazwisko:</strong> ${escapeHtml(params.name)}</p>
+      <p style="margin: 0 0 8px;"><strong>E-mail:</strong> ${escapeHtml(params.email)}</p>
+      <p style="margin: 0 0 16px;"><strong>Temat:</strong> ${escapeHtml(subjectLine)}</p>
+      <p style="margin: 0 0 8px;"><strong>Wiadomość:</strong></p>
       <p style="margin: 0; white-space: pre-wrap;">${escapeHtml(params.message)}</p>
     </div>
   `.trim();

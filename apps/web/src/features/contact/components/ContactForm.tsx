@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { contactFormSchema } from '@shared/features/contact/schemas';
 import { translateError } from '@shared/features/i18n';
@@ -14,6 +15,7 @@ type ContactFormProps = {
 
 export function ContactForm({ defaultName = '', defaultEmail = '' }: ContactFormProps) {
   const t = useT();
+  const router = useRouter();
   const { locale } = useLocale();
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(defaultName);
@@ -56,11 +58,8 @@ export function ContactForm({ defaultName = '', defaultEmail = '' }: ContactForm
       }
 
       toast.success(t('contact.success.sent'));
-      setName(defaultName);
-      setEmail(defaultEmail);
-      setSubject('');
-      setMessage('');
-      setWebsite('');
+      router.push('/');
+      router.refresh();
     } catch {
       toast.error(t('contact.errors.networkError'));
     } finally {
