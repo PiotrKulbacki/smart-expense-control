@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { registerSchema } from '@shared/features/auth/schemas';
 import { getFinancialMonthStartDayFromDate } from '@shared/features/billing/financial-month';
 import { prisma } from '@lyamo/database';
-import { hashPassword, isMobileClient, jsonError } from '@web/features/auth/services/auth.service';
+import { hashPassword, jsonError } from '@web/features/auth/services/auth.service';
 import { createAndSendEmailVerification } from '@web/features/auth/services/password-reset.service';
 import { checkAuthRateLimit } from '@web/lib/rate-limit';
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    if (!body.acceptedLegal && !isMobileClient(request)) {
+    if (!body.acceptedLegal) {
       return jsonError('auth.errors.legalAcceptanceRequired', 400);
     }
 

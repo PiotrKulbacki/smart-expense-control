@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Linking } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
 import { DEFAULT_LOCALE, t, translateError } from '@shared/features/i18n';
+import { env } from '@mobile/env';
 import { loginUser, registerUser } from '@mobile/features/auth/services/auth.service';
 import { useAuth } from '@mobile/features/auth/hooks/useAuth';
 import { PasswordField } from '@mobile/features/auth/components/PasswordField';
@@ -22,17 +23,23 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
+
+  const isRegisterBlocked = mode === 'register' && !acceptedLegal;
 
   async function handleSubmit() {
+    if (isRegisterBlocked) {
+      return;
+    }
+
     setIsLoading(true);
 
-    const payload =
+    const schema = mode === 'login' ? loginSchema : registerSchema;
+    const parsed = schema.safeParse(
       mode === 'login'
         ? { email, password }
-        : { email, password, confirmPassword, name: name || undefined };
-
-    const schema = mode === 'login' ? loginSchema : registerSchema;
-    const parsed = schema.safeParse(payload);
+        : { email, password, confirmPassword, name: name || undefined }
+    );
 
     if (!parsed.success) {
       const code = parsed.error.errors[0]?.message ?? 'auth.errors.generic';
@@ -60,6 +67,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       password,
       confirmPassword,
       name: name || undefined,
+      acceptedLegal,
     });
 
     setIsLoading(false);
@@ -125,6 +133,34 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             editable={!isLoading}
             autoComplete="new-password"
           />
+          <Pressable
+            style={styles.legalRow}
+            onPress={() => setAcceptedLegal((current) => !current)}
+            disabled={isLoading}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: acceptedLegal }}
+          >
+            <View style={[styles.checkbox, acceptedLegal && styles.checkboxChecked]}>
+              {acceptedLegal ? <Text style={styles.checkboxMark}>✓</Text> : null}
+            </View>
+            <Text style={styles.legalText}>
+              {t('auth.checkboxes.legalAcceptancePrefix', locale)}
+              <Text
+                style={styles.legalLink}
+                onPress={() => void Linking.openURL(`${env.EXPO_PUBLIC_API_URL}/terms`)}
+              >
+                {t('layout.footer.terms', locale)}
+              </Text>
+              {t('auth.checkboxes.legalAcceptanceMiddle', locale)}
+              <Text
+                style={styles.legalLink}
+                onPress={() => void Linking.openURL(`${env.EXPO_PUBLIC_API_URL}/privacy`)}
+              >
+                {t('layout.footer.privacy', locale)}
+              </Text>
+              {t('auth.checkboxes.legalAcceptanceSuffix', locale)}
+            </Text>
+          </Pressable>
         </>
       )}
 
@@ -139,9 +175,9 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       )}
 
       <Pressable
-        style={[styles.button, isLoading && styles.buttonDisabled]}
+        style={[styles.button, (isLoading || isRegisterBlocked) && styles.buttonDisabled]}
         onPress={handleSubmit}
-        disabled={isLoading}
+        disabled={isLoading || isRegisterBlocked}
       >
         <Text style={styles.buttonText}>
           {t(mode === 'login' ? 'auth.labels.login' : 'auth.labels.register', locale)}
@@ -187,6 +223,43 @@ const styles = StyleSheet.create({
   forgotLink: {
     alignSelf: 'flex-end',
     marginBottom: 4,
+  },
+  legalRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 8,
+    marginTop: 4,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 4,
+    marginTop: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  checkboxChecked: {
+    borderColor: '#2563eb',
+    backgroundColor: '#2563eb',
+  },
+  checkboxMark: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  legalText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#6b7280',
+  },
+  legalLink: {
+    color: '#2563eb',
+    textDecorationLine: 'underline',
   },
   button: {
     backgroundColor: '#2563eb',

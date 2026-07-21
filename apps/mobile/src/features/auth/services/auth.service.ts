@@ -93,6 +93,7 @@ export async function registerUser(payload: {
   password: string;
   confirmPassword: string;
   name?: string;
+  acceptedLegal: boolean;
 }): Promise<RegisterResult | null> {
   const result = await apiRequest<
     AuthResponse & { requiresEmailVerification?: boolean; email?: string }

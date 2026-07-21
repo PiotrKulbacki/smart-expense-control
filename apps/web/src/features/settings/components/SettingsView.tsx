@@ -373,8 +373,6 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
         </section>
       </form>
 
-      <ChangePasswordSection hasPassword={user.hasPassword} />
-
       <CategoriesSection />
 
       <CategoryLimitsSection primaryCurrency={primaryCurrency} />
@@ -465,6 +463,8 @@ export function SettingsView({ initialUser }: SettingsViewProps) {
           )}
         </div>
       </section>
+
+      <ChangePasswordSection hasPassword={user.hasPassword} />
 
       <section className="panel border-glow/30 relative z-10 p-6">
         <h2 className="font-display text-glow relative z-10 text-lg font-semibold">
