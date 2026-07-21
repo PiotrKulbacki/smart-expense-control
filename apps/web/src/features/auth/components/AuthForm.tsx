@@ -50,6 +50,7 @@ export function AuthForm({ mode }: AuthFormProps) {
               confirmPassword,
               name: name || undefined,
               acceptedLegal,
+              locale,
             };
 
       const schema = mode === 'login' ? loginSchema : registerSchema;

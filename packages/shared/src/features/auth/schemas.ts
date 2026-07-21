@@ -56,6 +56,7 @@ export const registerSchema = z
     password: passwordSchema,
     confirmPassword: z.string().min(1, AUTH_ERROR_CODES.PASSWORDS_MISMATCH),
     name: z.string().min(2, AUTH_ERROR_CODES.NAME_TOO_SHORT).max(100).optional(),
+    locale: z.enum(['en', 'de', 'pl', 'es']).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: AUTH_ERROR_CODES.PASSWORDS_MISMATCH,
@@ -75,6 +76,7 @@ export const changePasswordSchema = z
 
 export const forgotPasswordSchema = z.object({
   email: emailSchema,
+  locale: z.enum(['en', 'de', 'pl', 'es']).optional(),
 });
 
 export const resetPasswordSchema = z

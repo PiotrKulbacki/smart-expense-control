@@ -23,6 +23,7 @@ export const contactFormSchema = z.object({
     .max(5000, CONTACT_ERROR_CODES.MESSAGE_TOO_LONG),
   /** Honeypot — ignored by humans; non-empty values are discarded server-side. */
   website: z.string().optional(),
+  locale: z.enum(['en', 'de', 'pl', 'es']).optional(),
 });
 
 export type ContactFormInput = z.infer<typeof contactFormSchema>;

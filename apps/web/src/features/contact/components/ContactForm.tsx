@@ -35,6 +35,7 @@ export function ContactForm({ defaultName = '', defaultEmail = '' }: ContactForm
         subject: subject || undefined,
         message,
         website,
+        locale,
       };
 
       const parsed = contactFormSchema.safeParse(payload);

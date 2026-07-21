@@ -11,15 +11,17 @@ import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 type ChangePasswordSectionProps = {
   hasPassword: boolean;
+  email: string;
 };
 
-export function ChangePasswordSection({ hasPassword }: ChangePasswordSectionProps) {
+export function ChangePasswordSection({ hasPassword, email }: ChangePasswordSectionProps) {
   const t = useT();
   const { locale } = useLocale();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,6 +64,33 @@ export function ChangePasswordSection({ hasPassword }: ChangePasswordSectionProp
     }
   }
 
+  async function handleSendResetLink() {
+    setIsSendingReset(true);
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, locale }),
+      });
+
+      const data = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
+        return;
+      }
+
+      toast.success(t('auth.forgot.success'));
+    } catch {
+      toast.error(t('auth.errors.networkError'));
+    } finally {
+      setIsSendingReset(false);
+    }
+  }
+
+  const isBusy = isSaving || isSendingReset;
+
   return (
     <section className="panel relative z-10 p-6">
       <h2 className="font-display relative z-10 text-lg font-semibold text-[var(--text)]">
@@ -88,7 +117,7 @@ export function ChangePasswordSection({ hasPassword }: ChangePasswordSectionProp
                 autoComplete="current-password"
                 value={currentPassword}
                 onChange={(event) => setCurrentPassword(event.target.value)}
-                disabled={isSaving}
+                disabled={isBusy}
                 required
               />
             </div>
@@ -101,7 +130,7 @@ export function ChangePasswordSection({ hasPassword }: ChangePasswordSectionProp
                 autoComplete="new-password"
                 value={newPassword}
                 onChange={(event) => setNewPassword(event.target.value)}
-                disabled={isSaving}
+                disabled={isBusy}
                 required
               />
               <PasswordRequirementsList
@@ -119,19 +148,34 @@ export function ChangePasswordSection({ hasPassword }: ChangePasswordSectionProp
                 autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                disabled={isSaving}
+                disabled={isBusy}
                 required
               />
             </div>
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isBusy}
               className="btn-primary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
               {isSaving && <LoadingSpinner />}
               {t('auth.labels.savePassword')}
             </button>
           </form>
+
+          <div className="relative z-10 mt-6 border-t border-[var(--border)] pt-5">
+            <p className="text-muted text-sm leading-relaxed">
+              {t('settings.security.forgotHint')}
+            </p>
+            <button
+              type="button"
+              onClick={() => void handleSendResetLink()}
+              disabled={isBusy}
+              className="btn-ghost mt-3 inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSendingReset && <LoadingSpinner />}
+              {t('auth.labels.sendResetLink')}
+            </button>
+          </div>
         </>
       )}
     </section>

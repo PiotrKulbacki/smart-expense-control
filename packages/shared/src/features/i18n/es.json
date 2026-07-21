@@ -259,6 +259,39 @@
     "errors": {
       "notConfigured": "El servicio de correo no está configurado",
       "sendFailed": "No se pudo enviar el correo. Inténtalo más tarde"
+    },
+    "layout": {
+      "greeting": "Hola,",
+      "greetingWithName": "Hola {{name}},",
+      "fallbackHint": "Si el botón no funciona, copia y pega esta URL:",
+      "footerContact": "¿Necesitas ayuda? Escríbenos a"
+    },
+    "reset": {
+      "subject": "Restablece tu contraseña de Lyamo",
+      "intro": "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de Lyamo.",
+      "ctaHint": "Haz clic en el botón de abajo para elegir una nueva contraseña.",
+      "cta": "Establecer nueva contraseña",
+      "expires": "Este enlace caduca en 1 hora.",
+      "ignore": "Si no solicitaste esto, puedes ignorar este correo."
+    },
+    "verify": {
+      "subject": "Verifica tu correo de Lyamo",
+      "intro": "Bienvenido a Lyamo. Verifica tu correo para activar tu cuenta.",
+      "ctaHint": "Haz clic en el botón de abajo para confirmar tu dirección de correo.",
+      "cta": "Verificar correo",
+      "expires": "Este enlace caduca en 24 horas.",
+      "ignore": "Si no creaste una cuenta, puedes ignorar este correo."
+    },
+    "contact": {
+      "subject": "[Contacto] {{subject}}",
+      "defaultSubject": "Consulta general",
+      "title": "Nuevo mensaje del formulario de contacto de Lyamo",
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "subjectLabel": "Asunto",
+      "messageLabel": "Mensaje",
+      "replyHint": "Puedes responder al remitente directamente con el botón de abajo.",
+      "cta": "Responder al remitente"
     }
   },
   "globalError": {
@@ -510,6 +543,7 @@
     "security": {
       "title": "Seguridad",
       "subtitle": "Cambia la contraseña de tu cuenta de correo.",
+      "forgotHint": "Si olvidaste tu contraseña actual, puedes enviar un enlace de restablecimiento a tu correo.",
       "oauthOnly": "Esta cuenta usa el inicio de sesión de Google. No se puede cambiar la contraseña aquí — gestiona el acceso en tu cuenta de Google."
     },
     "labels": {

@@ -8,7 +8,10 @@ import {
 const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
 const EMAIL_VERIFICATION_TTL_MS = 24 * 60 * 60 * 1000;
 
-export async function createAndSendPasswordReset(email: string): Promise<void> {
+export async function createAndSendPasswordReset(
+  email: string,
+  options?: { locale?: string | null }
+): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
 
   // Always no-op outwardly; only send when the account has a local password.
@@ -31,7 +34,12 @@ export async function createAndSendPasswordReset(email: string): Promise<void> {
     },
   });
 
-  await sendPasswordResetEmail({ email: user.email, token });
+  await sendPasswordResetEmail({
+    email: user.email,
+    token,
+    locale: options?.locale,
+    name: user.name,
+  });
 }
 
 export async function resetPasswordWithToken(
@@ -64,7 +72,11 @@ export async function resetPasswordWithToken(
   return true;
 }
 
-export async function createAndSendEmailVerification(userId: string, email: string): Promise<void> {
+export async function createAndSendEmailVerification(
+  userId: string,
+  email: string,
+  options?: { locale?: string | null; name?: string | null }
+): Promise<void> {
   await prisma.emailVerificationToken.deleteMany({
     where: { userId, usedAt: null },
   });
@@ -80,7 +92,12 @@ export async function createAndSendEmailVerification(userId: string, email: stri
     },
   });
 
-  await sendEmailVerificationEmail({ email, token });
+  await sendEmailVerificationEmail({
+    email,
+    token,
+    locale: options?.locale,
+    name: options?.name,
+  });
 }
 
 export async function verifyEmailWithToken(token: string): Promise<boolean> {
@@ -110,12 +127,18 @@ export async function verifyEmailWithToken(token: string): Promise<boolean> {
   return true;
 }
 
-export async function resendEmailVerification(email: string): Promise<void> {
+export async function resendEmailVerification(
+  email: string,
+  options?: { locale?: string | null }
+): Promise<void> {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || user.emailVerifiedAt || !user.passwordHash) {
     return;
   }
 
-  await createAndSendEmailVerification(user.id, user.email);
+  await createAndSendEmailVerification(user.id, user.email, {
+    locale: options?.locale,
+    name: user.name,
+  });
 }

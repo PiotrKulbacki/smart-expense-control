@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { changePasswordSchema } from '@shared/features/auth/schemas';
 import { DEFAULT_LOCALE, t, translateError } from '@shared/features/i18n';
-import { changePassword } from '@mobile/features/auth/services/auth.service';
+import { changePassword, requestPasswordReset } from '@mobile/features/auth/services/auth.service';
 import { useAuth } from '@mobile/features/auth/hooks/useAuth';
 import { PasswordField } from '@mobile/features/auth/components/PasswordField';
 import { PasswordRequirementsList } from '@mobile/features/auth/components/PasswordRequirementsList';
@@ -14,6 +14,7 @@ export function ChangePasswordScreen() {
   const { user } = useAuth();
   const locale = DEFAULT_LOCALE;
   const [isLoading, setIsLoading] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -53,6 +54,18 @@ export function ChangePasswordScreen() {
     }
   }
 
+  async function handleSendResetLink() {
+    if (!user?.email) {
+      return;
+    }
+
+    setIsSendingReset(true);
+    await requestPasswordReset(user.email);
+    setIsSendingReset(false);
+  }
+
+  const isBusy = isLoading || isSendingReset;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('settings.security.title', locale)}</Text>
@@ -66,14 +79,14 @@ export function ChangePasswordScreen() {
             label={t('auth.labels.currentPassword', locale)}
             value={currentPassword}
             onChangeText={setCurrentPassword}
-            editable={!isLoading}
+            editable={!isBusy}
             autoComplete="password"
           />
           <PasswordField
             label={t('auth.labels.newPassword', locale)}
             value={newPassword}
             onChangeText={setNewPassword}
-            editable={!isLoading}
+            editable={!isBusy}
             autoComplete="new-password"
           />
           <PasswordRequirementsList
@@ -85,20 +98,29 @@ export function ChangePasswordScreen() {
             label={t('auth.labels.confirmPassword', locale)}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            editable={!isLoading}
+            editable={!isBusy}
             autoComplete="new-password"
           />
           <Pressable
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+            style={[styles.button, isBusy && styles.buttonDisabled]}
             onPress={handleSubmit}
-            disabled={isLoading}
+            disabled={isBusy}
           >
             <Text style={styles.buttonText}>{t('auth.labels.savePassword', locale)}</Text>
+          </Pressable>
+
+          <Text style={styles.forgotHint}>{t('settings.security.forgotHint', locale)}</Text>
+          <Pressable
+            style={[styles.secondaryButton, isBusy && styles.buttonDisabled]}
+            onPress={() => void handleSendResetLink()}
+            disabled={isBusy}
+          >
+            <Text style={styles.secondaryButtonText}>{t('auth.labels.sendResetLink', locale)}</Text>
           </Pressable>
         </>
       )}
 
-      <Pressable onPress={() => router.back()} disabled={isLoading}>
+      <Pressable onPress={() => router.back()} disabled={isBusy}>
         <Text style={styles.link}>{t('auth.labels.backToLogin', locale)}</Text>
       </Pressable>
     </View>
@@ -132,6 +154,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  forgotHint: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginTop: 20,
+    marginBottom: 8,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
   button: {
     backgroundColor: '#2563eb',
     borderRadius: 8,
@@ -139,11 +169,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
+  secondaryButton: {
+    backgroundColor: '#e5e7eb',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+  },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#111827',
     fontSize: 16,
     fontWeight: '600',
   },

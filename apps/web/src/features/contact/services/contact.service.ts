@@ -32,6 +32,7 @@ export async function sendContactFormEmail(
     email: input.email,
     subject: input.subject ?? '',
     message: input.message,
+    locale: input.locale,
   });
 
   return sendTransactionalEmail({

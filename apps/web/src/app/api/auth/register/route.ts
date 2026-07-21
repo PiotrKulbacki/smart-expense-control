@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       return jsonError(firstError, 400);
     }
 
-    const { email, password, name } = parsed.data;
+    const { email, password, name, locale } = parsed.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -49,7 +49,10 @@ export async function POST(request: Request) {
       },
     });
 
-    await createAndSendEmailVerification(user.id, user.email);
+    await createAndSendEmailVerification(user.id, user.email, {
+      locale,
+      name: user.name,
+    });
 
     // Hard gate (D1): no session / tokens until email is verified.
     return NextResponse.json(

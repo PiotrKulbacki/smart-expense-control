@@ -259,6 +259,39 @@
     "errors": {
       "notConfigured": "Email service is not configured",
       "sendFailed": "Could not send the email. Please try again later"
+    },
+    "layout": {
+      "greeting": "Hi,",
+      "greetingWithName": "Hi {{name}},",
+      "fallbackHint": "If the button doesn't work, copy and paste this URL:",
+      "footerContact": "Need help? Contact us at"
+    },
+    "reset": {
+      "subject": "Reset your Lyamo password",
+      "intro": "We received a request to reset the password for your Lyamo account.",
+      "ctaHint": "Click the button below to choose a new password.",
+      "cta": "Set a new password",
+      "expires": "This link expires in 1 hour.",
+      "ignore": "If you didn't request this, you can ignore this email."
+    },
+    "verify": {
+      "subject": "Verify your Lyamo email",
+      "intro": "Welcome to Lyamo. Please verify your email to activate your account.",
+      "ctaHint": "Click the button below to confirm your email address.",
+      "cta": "Verify email",
+      "expires": "This link expires in 24 hours.",
+      "ignore": "If you didn't create an account, you can ignore this email."
+    },
+    "contact": {
+      "subject": "[Contact] {{subject}}",
+      "defaultSubject": "General inquiry",
+      "title": "New message from the Lyamo contact form",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "subjectLabel": "Subject",
+      "messageLabel": "Message",
+      "replyHint": "You can reply directly to the sender using the button below.",
+      "cta": "Reply to sender"
     }
   },
   "globalError": {
@@ -510,6 +543,7 @@
     "security": {
       "title": "Security",
       "subtitle": "Change the password for your email account.",
+      "forgotHint": "If you forgot your current password, you can send a reset link to your email.",
       "oauthOnly": "This account uses Google sign-in. Password cannot be changed here — manage access in your Google account."
     },
     "labels": {

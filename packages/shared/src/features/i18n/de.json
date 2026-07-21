@@ -259,6 +259,39 @@
     "errors": {
       "notConfigured": "E-Mail-Dienst ist nicht konfiguriert",
       "sendFailed": "E-Mail konnte nicht gesendet werden. Bitte später erneut versuchen"
+    },
+    "layout": {
+      "greeting": "Hallo,",
+      "greetingWithName": "Hallo {{name}},",
+      "fallbackHint": "Wenn die Schaltfläche nicht funktioniert, kopieren Sie diese URL und fügen Sie sie ein:",
+      "footerContact": "Brauchen Sie Hilfe? Schreiben Sie uns an"
+    },
+    "reset": {
+      "subject": "Lyamo-Passwort zurücksetzen",
+      "intro": "Wir haben eine Anfrage erhalten, das Passwort für Ihr Lyamo-Konto zurückzusetzen.",
+      "ctaHint": "Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu wählen.",
+      "cta": "Neues Passwort festlegen",
+      "expires": "Dieser Link läuft in 1 Stunde ab.",
+      "ignore": "Wenn Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren."
+    },
+    "verify": {
+      "subject": "Lyamo-E-Mail bestätigen",
+      "intro": "Willkommen bei Lyamo. Bitte bestätigen Sie Ihre E-Mail, um Ihr Konto zu aktivieren.",
+      "ctaHint": "Klicken Sie auf die Schaltfläche unten, um Ihre E-Mail-Adresse zu bestätigen.",
+      "cta": "E-Mail bestätigen",
+      "expires": "Dieser Link läuft in 24 Stunden ab.",
+      "ignore": "Wenn Sie kein Konto erstellt haben, können Sie diese E-Mail ignorieren."
+    },
+    "contact": {
+      "subject": "[Kontakt] {{subject}}",
+      "defaultSubject": "Allgemeine Anfrage",
+      "title": "Neue Nachricht über das Lyamo-Kontaktformular",
+      "nameLabel": "Name",
+      "emailLabel": "E-Mail",
+      "subjectLabel": "Betreff",
+      "messageLabel": "Nachricht",
+      "replyHint": "Sie können dem Absender direkt über die Schaltfläche unten antworten.",
+      "cta": "Absender antworten"
     }
   },
   "globalError": {
@@ -510,6 +543,7 @@
     "security": {
       "title": "Sicherheit",
       "subtitle": "Ändern Sie das Passwort für Ihr E-Mail-Konto.",
+      "forgotHint": "Wenn Sie Ihr aktuelles Passwort vergessen haben, können Sie einen Reset-Link an Ihre E-Mail senden.",
       "oauthOnly": "Dieses Konto nutzt die Google-Anmeldung. Das Passwort kann hier nicht geändert werden — verwalten Sie den Zugang in Ihrem Google-Konto."
     },
     "labels": {

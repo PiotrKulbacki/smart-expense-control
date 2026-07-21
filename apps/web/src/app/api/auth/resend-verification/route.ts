@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return jsonError(firstError, 400);
     }
 
-    await resendEmailVerification(parsed.data.email);
+    await resendEmailVerification(parsed.data.email, { locale: parsed.data.locale });
 
     // Always succeed to avoid email enumeration.
     return NextResponse.json({ ok: true });

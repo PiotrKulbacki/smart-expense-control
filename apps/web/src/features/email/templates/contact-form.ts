@@ -1,17 +1,21 @@
-type ContactFormEmailParams = {
+import { DEFAULT_LOCALE, isLocale, t, type Locale } from '@shared/features/i18n';
+import {
+  EMAIL_BRAND,
+  escapeHtml,
+  mutedParagraphHtml,
+  wrapEmailHtml,
+} from '@web/features/email/templates/layout';
+
+export type ContactFormEmailParams = {
   name: string;
   email: string;
   subject: string;
   message: string;
+  locale?: string | null;
 };
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+function resolveLocale(locale?: string | null): Locale {
+  return locale && isLocale(locale) ? locale : DEFAULT_LOCALE;
 }
 
 export function buildContactFormEmail(params: ContactFormEmailParams): {
@@ -19,30 +23,37 @@ export function buildContactFormEmail(params: ContactFormEmailParams): {
   html: string;
   text: string;
 } {
-  const subjectLine = params.subject.trim() || 'Zapytanie ogólne';
-  const subject = `[Kontakt] ${subjectLine}`;
+  const locale = resolveLocale(params.locale);
+  const subjectLine = params.subject.trim() || t('email.contact.defaultSubject', locale);
+  const subject = t('email.contact.subject', locale, { subject: subjectLine });
+  const replyUrl = `mailto:${encodeURIComponent(params.email)}`;
 
   const text = [
-    'Nowa wiadomość z formularza kontaktowego Lyamo',
+    t('email.contact.title', locale),
     '',
-    `Imię i nazwisko: ${params.name}`,
-    `E-mail: ${params.email}`,
-    `Temat: ${subjectLine}`,
+    `${t('email.contact.nameLabel', locale)}: ${params.name}`,
+    `${t('email.contact.emailLabel', locale)}: ${params.email}`,
+    `${t('email.contact.subjectLabel', locale)}: ${subjectLine}`,
     '',
-    'Wiadomość:',
+    `${t('email.contact.messageLabel', locale)}:`,
     params.message,
   ].join('\n');
 
-  const html = `
-    <div style="font-family: system-ui, sans-serif; line-height: 1.5; color: #111;">
-      <h2 style="margin: 0 0 16px;">Nowa wiadomość z formularza kontaktowego</h2>
-      <p style="margin: 0 0 8px;"><strong>Imię i nazwisko:</strong> ${escapeHtml(params.name)}</p>
-      <p style="margin: 0 0 8px;"><strong>E-mail:</strong> ${escapeHtml(params.email)}</p>
-      <p style="margin: 0 0 16px;"><strong>Temat:</strong> ${escapeHtml(subjectLine)}</p>
-      <p style="margin: 0 0 8px;"><strong>Wiadomość:</strong></p>
-      <p style="margin: 0; white-space: pre-wrap;">${escapeHtml(params.message)}</p>
-    </div>
-  `.trim();
+  const bodyHtml = [
+    `<h2 style="margin:0 0 20px;font-size:18px;font-weight:700;color:${EMAIL_BRAND.text};">${escapeHtml(t('email.contact.title', locale))}</h2>`,
+    `<p style="margin:0 0 8px;"><strong>${escapeHtml(t('email.contact.nameLabel', locale))}:</strong> ${escapeHtml(params.name)}</p>`,
+    `<p style="margin:0 0 8px;"><strong>${escapeHtml(t('email.contact.emailLabel', locale))}:</strong> ${escapeHtml(params.email)}</p>`,
+    `<p style="margin:0 0 16px;"><strong>${escapeHtml(t('email.contact.subjectLabel', locale))}:</strong> ${escapeHtml(subjectLine)}</p>`,
+    `<p style="margin:0 0 8px;"><strong>${escapeHtml(t('email.contact.messageLabel', locale))}:</strong></p>`,
+    `<p style="margin:0;white-space:pre-wrap;">${escapeHtml(params.message)}</p>`,
+    mutedParagraphHtml(t('email.contact.replyHint', locale)),
+  ].join('');
+
+  const html = wrapEmailHtml({
+    locale,
+    bodyHtml,
+    cta: { label: t('email.contact.cta', locale), url: replyUrl },
+  });
 
   return { subject, html, text };
 }

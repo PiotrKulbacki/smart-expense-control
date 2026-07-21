@@ -261,6 +261,39 @@
     "errors": {
       "notConfigured": "Usługa e-mail nie jest skonfigurowana",
       "sendFailed": "Nie udało się wysłać e-maila. Spróbuj później"
+    },
+    "layout": {
+      "greeting": "Cześć,",
+      "greetingWithName": "Cześć {{name}},",
+      "fallbackHint": "Jeśli przycisk nie działa, skopiuj i wklej ten adres URL:",
+      "footerContact": "Potrzebujesz pomocy? Napisz do nas na"
+    },
+    "reset": {
+      "subject": "Zresetuj hasło do Lyamo",
+      "intro": "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta Lyamo.",
+      "ctaHint": "Kliknij przycisk poniżej, aby wybrać nowe hasło.",
+      "cta": "Ustaw nowe hasło",
+      "expires": "Ten link wygasa za 1 godzinę.",
+      "ignore": "Jeśli to nie Ty, możesz zignorować tę wiadomość."
+    },
+    "verify": {
+      "subject": "Potwierdź adres e-mail w Lyamo",
+      "intro": "Witamy w Lyamo. Potwierdź swój e-mail, aby aktywować konto.",
+      "ctaHint": "Kliknij przycisk poniżej, aby potwierdzić adres e-mail.",
+      "cta": "Potwierdź e-mail",
+      "expires": "Ten link wygasa za 24 godziny.",
+      "ignore": "Jeśli nie zakładałeś konta, możesz zignorować tę wiadomość."
+    },
+    "contact": {
+      "subject": "[Kontakt] {{subject}}",
+      "defaultSubject": "Zapytanie ogólne",
+      "title": "Nowa wiadomość z formularza kontaktowego Lyamo",
+      "nameLabel": "Imię i nazwisko",
+      "emailLabel": "E-mail",
+      "subjectLabel": "Temat",
+      "messageLabel": "Wiadomość",
+      "replyHint": "Możesz odpowiedzieć nadawcy bezpośrednio przyciskiem poniżej.",
+      "cta": "Odpowiedz nadawcy"
     }
   },
   "globalError": {
@@ -512,6 +545,7 @@
     "security": {
       "title": "Bezpieczeństwo",
       "subtitle": "Zmień hasło do konta e-mail.",
+      "forgotHint": "Jeśli nie pamiętasz obecnego hasła, możesz wysłać link resetujący na swój e-mail.",
       "oauthOnly": "To konto korzysta z logowania Google. Hasła nie można zmienić tutaj — zarządzaj dostępem w koncie Google."
     },
     "labels": {
