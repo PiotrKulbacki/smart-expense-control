@@ -55,6 +55,7 @@ describe('chat-context', () => {
           category: 'CoffeeShop',
           description: 'Cafe',
           date: new Date('2026-07-05T10:00:00.000Z'),
+          receiptGroupId: null,
         },
       ]
     );
@@ -66,8 +67,52 @@ describe('chat-context', () => {
         currency: 'PLN',
         category: 'CoffeeShop',
         description: 'Cafe',
+        receiptGroupId: null,
       },
     ]);
+  });
+
+  it('preserves receiptGroupId so split receipt rows stay linked', () => {
+    const receiptGroupId = '11111111-1111-4111-8111-111111111111';
+    const context = aggregateFinancialContext(
+      '2026-07',
+      [],
+      [
+        {
+          amount: 20.03,
+          currency: 'EUR',
+          category: 'Groceries',
+          description: 'Kaufland',
+          date: new Date('2026-07-21T10:00:00.000Z'),
+          receiptGroupId,
+        },
+        {
+          amount: 16.49,
+          currency: 'EUR',
+          category: 'Household',
+          description: 'Kaufland',
+          date: new Date('2026-07-21T10:00:00.000Z'),
+          receiptGroupId,
+        },
+      ]
+    );
+
+    expect(context.recentTransactions).toEqual([
+      expect.objectContaining({ amount: 20.03, category: 'Groceries', receiptGroupId }),
+      expect.objectContaining({ amount: 16.49, category: 'Household', receiptGroupId }),
+    ]);
+
+    const prompt = buildChatSystemPrompt(context, 'pl', {
+      todayIso: '2026-07-21',
+      financialMonthStartDay: 21,
+      cycleStartIso: '2026-07-21',
+      cycleEndIso: '2026-08-20',
+      daysRemainingInCycle: 30,
+    });
+
+    expect(prompt).toContain(receiptGroupId);
+    expect(prompt).toContain('Receipt grouping rules');
+    expect(prompt).toContain('ONE physical document');
   });
 
   it('returns empty-state labels when user has no transactions', () => {

@@ -105,6 +105,7 @@ async function fetchFinancialContext(userId: string): Promise<{
         category: true,
         description: true,
         date: true,
+        receiptGroupId: true,
       },
     }),
   ]);
@@ -127,6 +128,7 @@ async function fetchFinancialContext(userId: string): Promise<{
       category: transaction.category,
       description: transaction.description,
       date: transaction.date,
+      receiptGroupId: transaction.receiptGroupId,
     })),
     {
       currentMonthBudget: user.currentMonthBudget,

@@ -274,6 +274,11 @@ async function upsertInsightCache(
   return { content: parsed, updatedAt: row.updatedAt };
 }
 
+/** Drop cached insight so the next dashboard load regenerates from fresh spending data. */
+export async function invalidateDashboardInsightCache(userId: string): Promise<void> {
+  await prisma.aiInsight.deleteMany({ where: { userId } });
+}
+
 export async function getDashboardInsight(
   userId: string,
   options: { locale: Locale; forceRefresh?: boolean } = { locale: 'en' }

@@ -10,10 +10,21 @@ import type {
 import { TRANSACTION_ERROR_CODES } from '@shared/features/transactions/schemas';
 import { getExchangeRates } from '@web/features/currency/services/currency.service';
 import { invalidateAggregationForTransactionDates } from '@web/features/analytics/services/period-aggregation-cache.service';
+import { invalidateDashboardInsightCache } from '@web/features/dashboard/services/ai-insights.service';
 import {
   deleteReceiptImage,
   deleteReceiptImageIfOrphaned,
 } from '@web/features/scanner/services/receipt-storage.service';
+
+async function invalidateCachesAfterTransactionMutation(
+  userId: string,
+  dates: Date[]
+): Promise<void> {
+  await Promise.all([
+    invalidateAggregationForTransactionDates(userId, dates),
+    invalidateDashboardInsightCache(userId),
+  ]);
+}
 
 export type TransactionDto = {
   id: string;
@@ -158,7 +169,7 @@ export async function createTransaction(
     },
   });
 
-  await invalidateAggregationForTransactionDates(userId, [input.date]);
+  await invalidateCachesAfterTransactionMutation(userId, [input.date]);
 
   return toTransactionDto(transaction);
 }
@@ -190,7 +201,7 @@ export async function createTransactionBatch(
     )
   );
 
-  await invalidateAggregationForTransactionDates(userId, [shared.date]);
+  await invalidateCachesAfterTransactionMutation(userId, [shared.date]);
 
   return transactions.map(toTransactionDto);
 }
@@ -229,7 +240,7 @@ export async function updateTransaction(
     affectedDates.push(input.date);
   }
 
-  await invalidateAggregationForTransactionDates(userId, affectedDates);
+  await invalidateCachesAfterTransactionMutation(userId, affectedDates);
 
   return toTransactionDto(transaction);
 }
@@ -250,7 +261,7 @@ export async function deleteTransaction(userId: string, transactionId: string): 
   const { receiptGroupId, receiptImageUrl } = existing;
 
   await prisma.transaction.delete({ where: { id: transactionId } });
-  await invalidateAggregationForTransactionDates(userId, [existing.date]);
+  await invalidateCachesAfterTransactionMutation(userId, [existing.date]);
 
   if (receiptGroupId) {
     await deleteReceiptImageIfOrphaned(userId, receiptGroupId, receiptImageUrl);
@@ -279,7 +290,7 @@ export async function deleteTransactionGroup(
     transactions.map((transaction) => prisma.transaction.delete({ where: { id: transaction.id } }))
   );
 
-  await invalidateAggregationForTransactionDates(
+  await invalidateCachesAfterTransactionMutation(
     userId,
     transactions.map((transaction) => transaction.date)
   );
@@ -323,7 +334,7 @@ export async function updateTransactionGroupShared(
     affectedDates.push(input.date);
   }
 
-  await invalidateAggregationForTransactionDates(userId, affectedDates);
+  await invalidateCachesAfterTransactionMutation(userId, affectedDates);
 
   return updated.map(toTransactionDto);
 }

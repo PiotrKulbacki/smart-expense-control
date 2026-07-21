@@ -30,6 +30,8 @@ export type FinancialContext = {
     currency: string;
     category: string;
     description: string | null;
+    /** Shared across split rows from one scanned receipt; null for manual/single entries */
+    receiptGroupId: string | null;
   }>;
   budgetSummary: DashboardBudgetSummary | null;
   categoryLimits: Array<{
@@ -84,6 +86,7 @@ export type MonthlyTransactionSnapshot = {
 export type RecentTransactionSnapshot = MonthlyTransactionSnapshot & {
   description: string | null;
   date: Date;
+  receiptGroupId?: string | null;
 };
 
 const LOCALE_NAMES: Record<Locale, string> = {
@@ -171,6 +174,7 @@ export function aggregateFinancialContext(
       currency: transaction.currency,
       category: transaction.category,
       description: transaction.description,
+      receiptGroupId: transaction.receiptGroupId ?? null,
     })),
     budgetSummary: null,
     categoryLimits: [],
@@ -198,6 +202,7 @@ export function financialContextFromPeriodSnapshot(
       currency: transaction.currency,
       category: transaction.category,
       description: transaction.description,
+      receiptGroupId: transaction.receiptGroupId ?? null,
     })),
     budgetSummary: buildDashboardBudgetSummary({
       snapshot,
@@ -298,5 +303,10 @@ ${budgetSection}${dashboardSummarySection}${spentLine}
 ${categorySection}
 ${categoryLimitsSection ? `\n${categoryLimitsSection}\n` : ''}
 Recent transactions (newest first):
-${context.recentTransactions.length > 0 ? JSON.stringify(context.recentTransactions, null, 2) : 'No transactions on record.'}`;
+${context.recentTransactions.length > 0 ? JSON.stringify(context.recentTransactions, null, 2) : 'No transactions on record.'}
+
+Receipt grouping rules:
+- receiptGroupId links rows that came from one scanned receipt/invoice split into multiple categories.
+- Rows sharing the same receiptGroupId are ONE physical document, not separate purchases — sum their amounts for the receipt total.
+- receiptGroupId is null for manual entries or single-category scans that were not split.`;
 }
