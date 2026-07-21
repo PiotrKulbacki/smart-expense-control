@@ -20,6 +20,8 @@ export type {
   Account,
   Session,
   RefreshToken,
+  PasswordResetToken,
+  EmailVerificationToken,
   Transaction,
   RecurringExpense,
   ExchangeRate,

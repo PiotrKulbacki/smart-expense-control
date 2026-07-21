@@ -34,6 +34,10 @@
 30. **Faza 11.1: wdrożenie elementów compliance w UI + Impressum + drafty legal (bez pełnej treści prawnej)** — [✅ Zrobione]
 31. **Faza 11.1.1: poprawki UX i compliance po Fazie 11.1** — [✅ Zrobione]
 32. **Faza 11.2: Brevo + formularz kontaktowy (publiczny i w app)** — [✅ Zrobione]
+33. **Faza 12.0: Auth UX — wymagania hasła, toggle widoczności (web + mobile)** — [✅ Zrobione]
+34. **Faza 12.1: Zmiana hasła w Settings (konto e-mail; Google-only = info)** — [✅ Zrobione]
+35. **Faza 12.2: Odzyskiwanie hasła (forgot/reset + Brevo)** — [✅ Zrobione]
+36. **Faza 12.3: Twarda weryfikacja e-mail przy rejestracji (D1 + Brevo)** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -86,6 +90,54 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-21 — Faza 12.3: Twarda weryfikacja e-mail (D1 + Brevo).**
+
+### Faza 12.3 — Email verification (hard gate)
+
+- **Rejestracja:** tworzy konto z `emailVerifiedAt = null`, wysyła mail Brevo, **bez** sesji/tokenów (`requiresEmailVerification: true`).
+- **Login:** 403 `emailNotVerified` → redirect `/verify-email?email=…`.
+- **API:** `POST /api/auth/verify-email`, `POST /api/auth/resend-verification` (rate limit, brak enumeracji).
+- **Google OAuth:** ustawia `emailVerifiedAt` przy create/link.
+- **Web/Mobile:** `/verify-email` (auto-verify z `?token=`, resend).
+- **Middleware:** publiczne ścieżki forgot/reset/verify.
+- **Ops:** uruchomić migrację `20260721160000_auth_password_reset_and_email_verification` (`npm run migrate:deploy` w `packages/database` / pipeline Vercel).
+
+---
+
+**2026-07-21 — Faza 12.2: Odzyskiwanie hasła (Brevo).**
+
+### Faza 12.2 — Forgot / reset password
+
+- **Migracja:** `emailVerifiedAt` + tabele `password_reset_tokens` / `email_verification_tokens` (backfill verified dla istniejących userów); plik `20260721160000_auth_password_reset_and_email_verification`.
+- **API:** `POST /api/auth/forgot-password`, `POST /api/auth/reset-password` (rate limit, brak enumeracji e-maili, token hash SHA-256, TTL 1 h, Google-only bez maila).
+- **Brevo:** `auth-email.service.ts` — maile reset (i szablon verify pod Fazę 12.3).
+- **Web:** `/forgot-password`, `/reset-password?token=…`.
+- **Mobile:** te same ekrany + AuthGuard whitelista tras publicznych.
+
+---
+
+**2026-07-21 — Faza 12.1: Zmiana hasła w Settings.**
+
+### Faza 12.1 — Change password
+
+- **SafeUser:** `hasPassword` (z `passwordHash != null`), bez ekspozycji hasha.
+- **API:** `POST /api/auth/change-password` (Zod `changePasswordSchema`, rate limit auth 10/h, odmowa dla kont Google-only).
+- **Web:** sekcja `ChangePasswordSection` w Settings (formularz albo komunikat oauthOnly).
+- **Mobile:** ekran `/change-password` + link z home; ten sam API.
+
+---
+
+**2026-07-21 — Faza 12.0: Auth UX (hasło).**
+
+### Faza 12.0 — Wymagania hasła + toggle widoczności
+
+- **Zod:** `getPasswordRequirements` / `arePasswordRequirementsMet`; `loginSchema` nie wymusza złożoności (tylko niepuste hasło); przygotowane schematy `changePassword` / `forgotPassword` / `resetPassword`.
+- **Web:** `PasswordInput` (Eye/EyeOff), `PasswordRequirementsList` (live checklist przy rejestracji), link „Zapomniałem hasła?” → `/forgot-password`.
+- **Mobile:** `PasswordField` (toggle tekstowy), checklista wymagań, link forgot.
+- **i18n:** en/pl/de/es — wymagania hasła, show/hide, forgot/reset/verify (klucze pod kolejne fazy), `settings.security`.
+
+---
 
 **2026-07-21 — Faza 11.2: Brevo + formularz kontaktowy.**
 

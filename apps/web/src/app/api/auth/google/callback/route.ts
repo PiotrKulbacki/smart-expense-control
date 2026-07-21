@@ -58,6 +58,12 @@ export async function GET(request: Request) {
             providerAccountId: googleProfile.providerAccountId,
           },
         });
+        if (!user.emailVerifiedAt) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { emailVerifiedAt: new Date() },
+          });
+        }
       } else {
         const now = new Date();
         user = await prisma.user.create({
@@ -67,6 +73,7 @@ export async function GET(request: Request) {
             avatarUrl: googleProfile.avatarUrl,
             financialMonthStartDay: getFinancialMonthStartDayFromDate(now),
             lastQuotaResetAt: now,
+            emailVerifiedAt: now,
             accounts: {
               create: {
                 provider: 'google',
@@ -76,6 +83,11 @@ export async function GET(request: Request) {
           },
         });
       }
+    } else if (!user.emailVerifiedAt) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { emailVerifiedAt: new Date() },
+      });
     }
 
     const sessionToken = await createWebSession(user.id);

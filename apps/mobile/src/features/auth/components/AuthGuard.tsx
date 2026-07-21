@@ -3,7 +3,13 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useRouter, useSegments, type Href } from 'expo-router';
 import { useAuth } from '@mobile/features/auth/hooks/useAuth';
 
-const AUTH_ROUTES = new Set(['login', 'register']);
+const AUTH_ROUTES = new Set([
+  'login',
+  'register',
+  'forgot-password',
+  'reset-password',
+  'verify-email',
+]);
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();

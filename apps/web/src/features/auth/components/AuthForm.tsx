@@ -7,6 +7,8 @@ import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
 import { translateError } from '@shared/features/i18n';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 import { AuthDivider, OAuthGoogleButton } from '@web/features/auth/components/OAuthGoogleButton';
+import { PasswordInput } from '@web/features/auth/components/PasswordInput';
+import { PasswordRequirementsList } from '@web/features/auth/components/PasswordRequirementsList';
 import Link from 'next/link';
 import { LoadingSpinner } from '@web/components/ui/loading-spinner';
 
@@ -70,10 +72,27 @@ export function AuthForm({ mode }: AuthFormProps) {
         body: JSON.stringify(payload),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as {
+        error?: string;
+        email?: string;
+        requiresEmailVerification?: boolean;
+      };
 
       if (!response.ok) {
+        if (mode === 'login' && data.error === 'auth.errors.emailNotVerified') {
+          toast.error(translateError(data.error, locale));
+          const verifyEmail = encodeURIComponent(data.email ?? email);
+          router.push(`/verify-email?email=${verifyEmail}`);
+          return;
+        }
         toast.error(translateError(data.error ?? 'auth.errors.generic', locale));
+        return;
+      }
+
+      if (mode === 'register' && data.requiresEmailVerification) {
+        toast.success(t('auth.success.register'));
+        const verifyEmail = encodeURIComponent(data.email ?? email);
+        router.push(`/verify-email?email=${verifyEmail}`);
         return;
       }
 
@@ -134,16 +153,21 @@ export function AuthForm({ mode }: AuthFormProps) {
           <label htmlFor="password" className="auth-label">
             {t('auth.labels.password')}
           </label>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
-            className="auth-input"
           />
+          {mode === 'register' && (
+            <PasswordRequirementsList
+              password={password}
+              confirmPassword={confirmPassword}
+              showMatch
+            />
+          )}
         </div>
 
         {mode === 'register' && (
@@ -151,16 +175,22 @@ export function AuthForm({ mode }: AuthFormProps) {
             <label htmlFor="confirmPassword" className="auth-label">
               {t('auth.labels.confirmPassword')}
             </label>
-            <input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               autoComplete="new-password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={isLoading}
-              className="auth-input"
             />
+          </div>
+        )}
+
+        {mode === 'login' && (
+          <div className="flex justify-end">
+            <Link href="/forgot-password" className="text-cool hover:text-warm text-xs font-medium">
+              {t('auth.labels.forgotPassword')}
+            </Link>
           </div>
         )}
 

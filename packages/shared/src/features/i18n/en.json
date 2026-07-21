@@ -7,6 +7,8 @@
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
       "name": "Full name",
       "login": "Log in",
       "register": "Create account",
@@ -16,19 +18,60 @@
       "noAccount": "Don't have an account?",
       "hasAccount": "Already have an account?",
       "signUp": "Sign up",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "resetPassword": "Reset password",
+      "sendResetLink": "Send reset link",
+      "backToLogin": "Back to log in",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "changePassword": "Change password",
+      "savePassword": "Save new password",
+      "resendVerification": "Resend verification email",
+      "verifyEmail": "Verify email"
+    },
+    "passwordRequirements": {
+      "title": "Password must contain:",
+      "minLength": "At least 8 characters",
+      "digit": "At least one digit",
+      "special": "At least one special character",
+      "match": "Passwords match"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we will send you a reset link.",
+      "success": "If an account with that email exists, we sent a reset link."
+    },
+    "reset": {
+      "title": "Set a new password",
+      "subtitle": "Choose a strong password for your account.",
+      "success": "Password updated. You can log in now."
+    },
+    "verify": {
+      "title": "Verify your email",
+      "checkInbox": "We sent a verification link to {{email}}. Open it to activate your account.",
+      "success": "Email verified. You can log in now.",
+      "resent": "Verification email sent again."
     },
     "success": {
       "login": "Successfully logged in",
       "register": "Account created successfully",
-      "logout": "Successfully logged out"
+      "logout": "Successfully logged out",
+      "passwordChanged": "Password changed successfully"
     },
     "errors": {
       "invalidEmail": "Please enter a valid email address",
+      "passwordRequired": "Please enter your password",
       "passwordTooShort": "Password must be at least 8 characters",
       "passwordNeedsDigit": "Password must contain at least one digit",
       "passwordNeedsSpecial": "Password must contain at least one special character",
       "passwordsMismatch": "Passwords do not match",
+      "currentPasswordRequired": "Please enter your current password",
+      "currentPasswordIncorrect": "Current password is incorrect",
+      "invalidResetToken": "This reset link is invalid or has expired",
+      "invalidVerificationToken": "This verification link is invalid or has expired",
+      "emailNotVerified": "Please verify your email before logging in",
+      "oauthPasswordChangeUnavailable": "This account uses Google sign-in. Password cannot be changed here.",
       "nameTooShort": "Name must be at least 2 characters",
       "invalidCredentials": "Invalid email or password",
       "userExists": "An account with this email already exists",
@@ -463,6 +506,11 @@
     "subtitle": "Manage your profile, currency, and subscription",
     "profile": {
       "title": "Profile & preferences"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Change the password for your email account.",
+      "oauthOnly": "This account uses Google sign-in. Password cannot be changed here — manage access in your Google account."
     },
     "labels": {
       "primaryCurrency": "Primary currency",

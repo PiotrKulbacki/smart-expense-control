@@ -6,6 +6,8 @@ import { loginSchema, registerSchema } from '@shared/features/auth/schemas';
 import { DEFAULT_LOCALE, t, translateError } from '@shared/features/i18n';
 import { loginUser, registerUser } from '@mobile/features/auth/services/auth.service';
 import { useAuth } from '@mobile/features/auth/hooks/useAuth';
+import { PasswordField } from '@mobile/features/auth/components/PasswordField';
+import { PasswordRequirementsList } from '@mobile/features/auth/components/PasswordRequirementsList';
 
 type AuthScreenProps = {
   mode: 'login' | 'register';
@@ -39,20 +41,36 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       return;
     }
 
-    const user =
-      mode === 'login'
-        ? await loginUser({ email, password })
-        : await registerUser({
-            email,
-            password,
-            confirmPassword,
-            name: name || undefined,
-          });
+    if (mode === 'login') {
+      const result = await loginUser({ email, password });
+      setIsLoading(false);
+      if (result.ok) {
+        setUser(result.user);
+        router.replace('/');
+        return;
+      }
+      if (result.emailNotVerified) {
+        router.push(`/verify-email?email=${encodeURIComponent(result.email ?? email)}` as Href);
+      }
+      return;
+    }
+
+    const result = await registerUser({
+      email,
+      password,
+      confirmPassword,
+      name: name || undefined,
+    });
 
     setIsLoading(false);
 
-    if (user) {
-      setUser(user);
+    if (result?.requiresEmailVerification) {
+      router.push(`/verify-email?email=${encodeURIComponent(result.email ?? email)}` as Href);
+      return;
+    }
+
+    if (result?.user) {
+      setUser(result.user);
       router.replace('/');
     }
   }
@@ -85,26 +103,39 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         autoComplete="email"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder={t('auth.labels.password', locale)}
+      <PasswordField
+        label={t('auth.labels.password', locale)}
         value={password}
         onChangeText={setPassword}
         editable={!isLoading}
-        secureTextEntry
         autoComplete={mode === 'login' ? 'password' : 'new-password'}
       />
 
       {mode === 'register' && (
-        <TextInput
-          style={styles.input}
-          placeholder={t('auth.labels.confirmPassword', locale)}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          editable={!isLoading}
-          secureTextEntry
-          autoComplete="new-password"
-        />
+        <>
+          <PasswordRequirementsList
+            password={password}
+            confirmPassword={confirmPassword}
+            showMatch
+          />
+          <PasswordField
+            label={t('auth.labels.confirmPassword', locale)}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            editable={!isLoading}
+            autoComplete="new-password"
+          />
+        </>
+      )}
+
+      {mode === 'login' && (
+        <Pressable
+          onPress={() => router.push('/forgot-password' as Href)}
+          disabled={isLoading}
+          style={styles.forgotLink}
+        >
+          <Text style={styles.link}>{t('auth.labels.forgotPassword', locale)}</Text>
+        </Pressable>
       )}
 
       <Pressable
@@ -152,6 +183,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: '#fff',
     fontSize: 16,
+  },
+  forgotLink: {
+    alignSelf: 'flex-end',
+    marginBottom: 4,
   },
   button: {
     backgroundColor: '#2563eb',

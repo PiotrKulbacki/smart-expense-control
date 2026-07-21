@@ -53,6 +53,9 @@ if (directMeta?.isDirectDb && process.env.VERCEL) {
 
 if (!databaseUrl || !directUrl) {
   console.error('[migrate-env-check] MISSING required env vars for prisma migrate deploy');
+  console.error(
+    '[migrate-env-check] Local tip: from repo root run `npm run db:migrate:deploy` (loads .env), or ensure DATABASE_URL and DIRECT_DATABASE_URL are exported.'
+  );
   process.exit(1);
 }
 

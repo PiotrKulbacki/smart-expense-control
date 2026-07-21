@@ -7,6 +7,8 @@
       "email": "Correo electrónico",
       "password": "Contraseña",
       "confirmPassword": "Confirmar contraseña",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
       "name": "Nombre y apellidos",
       "login": "Iniciar sesión",
       "register": "Crear cuenta",
@@ -16,19 +18,60 @@
       "noAccount": "¿No tienes cuenta?",
       "hasAccount": "¿Ya tienes cuenta?",
       "signUp": "Registrarse",
-      "signIn": "Iniciar sesión"
+      "signIn": "Iniciar sesión",
+      "forgotPassword": "¿Olvidaste la contraseña?",
+      "resetPassword": "Restablecer contraseña",
+      "sendResetLink": "Enviar enlace de restablecimiento",
+      "backToLogin": "Volver al inicio de sesión",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña",
+      "changePassword": "Cambiar contraseña",
+      "savePassword": "Guardar nueva contraseña",
+      "resendVerification": "Reenviar correo de verificación",
+      "verifyEmail": "Verificar correo"
+    },
+    "passwordRequirements": {
+      "title": "La contraseña debe contener:",
+      "minLength": "Al menos 8 caracteres",
+      "digit": "Al menos un dígito",
+      "special": "Al menos un carácter especial",
+      "match": "Las contraseñas coinciden"
+    },
+    "forgot": {
+      "title": "¿Olvidaste la contraseña?",
+      "subtitle": "Introduce tu correo y te enviaremos un enlace de restablecimiento.",
+      "success": "Si existe una cuenta con ese correo, enviamos un enlace de restablecimiento."
+    },
+    "reset": {
+      "title": "Establece una nueva contraseña",
+      "subtitle": "Elige una contraseña segura para tu cuenta.",
+      "success": "Contraseña actualizada. Ya puedes iniciar sesión."
+    },
+    "verify": {
+      "title": "Verifica tu correo",
+      "checkInbox": "Enviamos un enlace de verificación a {{email}}. Ábrelo para activar tu cuenta.",
+      "success": "Correo verificado. Ya puedes iniciar sesión.",
+      "resent": "Correo de verificación enviado de nuevo."
     },
     "success": {
       "login": "Sesión iniciada correctamente",
       "register": "Cuenta creada correctamente",
-      "logout": "Sesión cerrada correctamente"
+      "logout": "Sesión cerrada correctamente",
+      "passwordChanged": "Contraseña cambiada correctamente"
     },
     "errors": {
       "invalidEmail": "Introduce un correo electrónico válido",
+      "passwordRequired": "Introduce tu contraseña",
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
       "passwordNeedsDigit": "La contraseña debe contener al menos un dígito",
       "passwordNeedsSpecial": "La contraseña debe contener al menos un carácter especial",
       "passwordsMismatch": "Las contraseñas no coinciden",
+      "currentPasswordRequired": "Introduce tu contraseña actual",
+      "currentPasswordIncorrect": "La contraseña actual es incorrecta",
+      "invalidResetToken": "Este enlace de restablecimiento no es válido o ha caducado",
+      "invalidVerificationToken": "Este enlace de verificación no es válido o ha caducado",
+      "emailNotVerified": "Verifica tu correo antes de iniciar sesión",
+      "oauthPasswordChangeUnavailable": "Esta cuenta usa el inicio de sesión de Google. No se puede cambiar la contraseña aquí.",
       "nameTooShort": "El nombre debe tener al menos 2 caracteres",
       "invalidCredentials": "Correo o contraseña incorrectos",
       "userExists": "Ya existe una cuenta con este correo electrónico",
@@ -463,6 +506,11 @@
     "subtitle": "Gestiona tu perfil, moneda y suscripción",
     "profile": {
       "title": "Perfil y preferencias"
+    },
+    "security": {
+      "title": "Seguridad",
+      "subtitle": "Cambia la contraseña de tu cuenta de correo.",
+      "oauthOnly": "Esta cuenta usa el inicio de sesión de Google. No se puede cambiar la contraseña aquí — gestiona el acceso en tu cuenta de Google."
     },
     "labels": {
       "primaryCurrency": "Moneda principal",

@@ -14,12 +14,14 @@ async function main() {
     update: {
       name: 'Dev User',
       passwordHash,
+      emailVerifiedAt: new Date(),
     },
     create: {
       email: SEED_USER_EMAIL,
       name: 'Dev User',
       passwordHash,
       currentPlan: 'FREE',
+      emailVerifiedAt: new Date(),
     },
   });
 

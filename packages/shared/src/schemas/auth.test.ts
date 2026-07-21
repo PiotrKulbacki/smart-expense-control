@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loginSchema, registerSchema } from '../features/auth/schemas';
+import { loginSchema, passwordSchema, registerSchema } from '../features/auth/schemas';
 
 describe('loginSchema', () => {
   it('accepts valid credentials', () => {
@@ -18,27 +18,41 @@ describe('loginSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects short password', () => {
+  it('rejects empty password', () => {
     const result = loginSchema.safeParse({
       email: 'user@example.com',
-      password: 'Sh0rt!',
+      password: '',
     });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts non-empty password without complexity checks', () => {
+    const weakPasswords = ['Sh0rt!', 'Secure!!', 'Secure12'];
+    for (const password of weakPasswords) {
+      const loginResult = loginSchema.safeParse({
+        email: 'user@example.com',
+        password,
+      });
+      const strength = passwordSchema.safeParse(password);
+      expect(loginResult.success).toBe(true);
+      expect(strength.success).toBe(false);
+    }
+  });
+});
+
+describe('passwordSchema', () => {
+  it('rejects short password', () => {
+    const result = passwordSchema.safeParse('Sh0rt!');
     expect(result.success).toBe(false);
   });
 
   it('rejects password without digit', () => {
-    const result = loginSchema.safeParse({
-      email: 'user@example.com',
-      password: 'Secure!!',
-    });
+    const result = passwordSchema.safeParse('Secure!!');
     expect(result.success).toBe(false);
   });
 
   it('rejects password without special character', () => {
-    const result = loginSchema.safeParse({
-      email: 'user@example.com',
-      password: 'Secure12',
-    });
+    const result = passwordSchema.safeParse('Secure12');
     expect(result.success).toBe(false);
   });
 });

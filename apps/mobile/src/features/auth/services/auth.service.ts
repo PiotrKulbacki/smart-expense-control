@@ -15,6 +15,7 @@ export type SafeUser = {
   avatarUrl: string | null;
   currentPlan: 'FREE' | 'PRO' | 'PREMIUM';
   createdAt: string;
+  hasPassword: boolean;
 };
 
 type AuthResponse = {
@@ -68,7 +69,11 @@ async function apiRequest<T>(
     const data = (await response.json()) as T & ErrorResponse;
 
     if (!response.ok) {
-      return { error: data.error ?? 'auth.errors.generic', status: response.status };
+      return {
+        error: data.error ?? 'auth.errors.generic',
+        status: response.status,
+        data,
+      };
     }
 
     return { data, status: response.status };
@@ -77,13 +82,21 @@ async function apiRequest<T>(
   }
 }
 
+export type RegisterResult = {
+  user?: SafeUser;
+  requiresEmailVerification?: boolean;
+  email?: string;
+};
+
 export async function registerUser(payload: {
   email: string;
   password: string;
   confirmPassword: string;
   name?: string;
-}): Promise<SafeUser | null> {
-  const result = await apiRequest<AuthResponse>('/api/auth/register', {
+}): Promise<RegisterResult | null> {
+  const result = await apiRequest<
+    AuthResponse & { requiresEmailVerification?: boolean; email?: string }
+  >('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -91,28 +104,100 @@ export async function registerUser(payload: {
   if (result.error) {
     showError(result.error);
     return null;
+  }
+
+  showSuccess('auth.success.register');
+
+  if (result.data?.requiresEmailVerification) {
+    return {
+      requiresEmailVerification: true,
+      email: result.data.email ?? payload.email,
+    };
   }
 
   if (result.data?.accessToken && result.data.refreshToken) {
     await saveTokens(result.data.accessToken, result.data.refreshToken);
   }
 
-  showSuccess('auth.success.register');
-  return result.data?.user ?? null;
+  return { user: result.data?.user };
 }
 
-export async function loginUser(payload: {
-  email: string;
-  password: string;
-}): Promise<SafeUser | null> {
-  const result = await apiRequest<AuthResponse>('/api/auth/login', {
+export async function changePassword(payload: {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<boolean> {
+  const result = await apiRequest<{ ok?: boolean }>('/api/auth/change-password', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 
   if (result.error) {
     showError(result.error);
-    return null;
+    return false;
+  }
+
+  showSuccess('auth.success.passwordChanged');
+  return true;
+}
+
+export async function requestPasswordReset(email: string): Promise<boolean> {
+  const result = await apiRequest<{ ok?: boolean }>('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+
+  if (result.error) {
+    showError(result.error);
+    return false;
+  }
+
+  showSuccess('auth.forgot.success');
+  return true;
+}
+
+export async function resetPassword(payload: {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}): Promise<boolean> {
+  const result = await apiRequest<{ ok?: boolean }>('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  if (result.error) {
+    showError(result.error);
+    return false;
+  }
+
+  showSuccess('auth.reset.success');
+  return true;
+}
+
+export type LoginResult =
+  { ok: true; user: SafeUser } | { ok: false; emailNotVerified?: boolean; email?: string };
+
+export async function loginUser(payload: {
+  email: string;
+  password: string;
+}): Promise<LoginResult> {
+  const result = await apiRequest<AuthResponse & { email?: string }>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+  if (result.error) {
+    if (result.error === 'auth.errors.emailNotVerified') {
+      showError(result.error);
+      return {
+        ok: false,
+        emailNotVerified: true,
+        email: result.data?.email ?? payload.email,
+      };
+    }
+    showError(result.error);
+    return { ok: false };
   }
 
   if (result.data?.accessToken && result.data.refreshToken) {
@@ -120,7 +205,40 @@ export async function loginUser(payload: {
   }
 
   showSuccess('auth.success.login');
-  return result.data?.user ?? null;
+  if (!result.data?.user) {
+    return { ok: false };
+  }
+  return { ok: true, user: result.data.user };
+}
+
+export async function verifyEmailToken(token: string): Promise<boolean> {
+  const result = await apiRequest<{ ok?: boolean }>('/api/auth/verify-email', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
+
+  if (result.error) {
+    showError(result.error);
+    return false;
+  }
+
+  showSuccess('auth.verify.success');
+  return true;
+}
+
+export async function resendVerificationEmail(email: string): Promise<boolean> {
+  const result = await apiRequest<{ ok?: boolean }>('/api/auth/resend-verification', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+
+  if (result.error) {
+    showError(result.error);
+    return false;
+  }
+
+  showSuccess('auth.verify.resent');
+  return true;
 }
 
 export async function logoutUser(): Promise<void> {

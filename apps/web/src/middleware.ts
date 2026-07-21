@@ -3,8 +3,25 @@ import type { NextRequest } from 'next/server';
 
 const AUTH_COOKIE_NAME = 'sec_session';
 
-const AUTH_ONLY_PUBLIC_PATHS = ['/login', '/register'];
-const PUBLIC_PATHS = ['/', '/login', '/register', '/terms', '/privacy', '/impressum', '/contact'];
+const AUTH_ONLY_PUBLIC_PATHS = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+];
+const PUBLIC_PATHS = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/terms',
+  '/privacy',
+  '/impressum',
+  '/contact',
+];
 
 function isPublicPath(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) {

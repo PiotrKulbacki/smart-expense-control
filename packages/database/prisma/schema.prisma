@@ -48,10 +48,13 @@ model User {
   pastDueFirstEmailSentAt DateTime?
   pastDueReminderSentAt  DateTime?
   lastActiveAt           DateTime  @default(now())
+  emailVerifiedAt        DateTime?
 
   accounts          Account[]
   sessions          Session[]
   refreshTokens     RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   transactions      Transaction[]
   recurringExpenses RecurringExpense[]
   chatMessages           ChatMessage[]
@@ -128,6 +131,36 @@ model RefreshToken {
   @@index([token])
   @@index([userId])
   @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
 }
 
 model Transaction {

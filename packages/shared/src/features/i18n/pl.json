@@ -7,6 +7,8 @@
       "email": "E-mail",
       "password": "Hasło",
       "confirmPassword": "Potwierdź hasło",
+      "currentPassword": "Obecne hasło",
+      "newPassword": "Nowe hasło",
       "name": "Imię i nazwisko",
       "login": "Zaloguj się",
       "register": "Utwórz konto",
@@ -16,19 +18,60 @@
       "noAccount": "Nie masz konta?",
       "hasAccount": "Masz już konto?",
       "signUp": "Zarejestruj się",
-      "signIn": "Zaloguj się"
+      "signIn": "Zaloguj się",
+      "forgotPassword": "Nie pamiętasz hasła?",
+      "resetPassword": "Zresetuj hasło",
+      "sendResetLink": "Wyślij link resetujący",
+      "backToLogin": "Wróć do logowania",
+      "showPassword": "Pokaż hasło",
+      "hidePassword": "Ukryj hasło",
+      "changePassword": "Zmień hasło",
+      "savePassword": "Zapisz nowe hasło",
+      "resendVerification": "Wyślij ponownie e-mail weryfikacyjny",
+      "verifyEmail": "Zweryfikuj e-mail"
+    },
+    "passwordRequirements": {
+      "title": "Hasło musi zawierać:",
+      "minLength": "Co najmniej 8 znaków",
+      "digit": "Co najmniej jedną cyfrę",
+      "special": "Co najmniej jeden znak specjalny",
+      "match": "Hasła są identyczne"
+    },
+    "forgot": {
+      "title": "Nie pamiętasz hasła?",
+      "subtitle": "Podaj e-mail, a wyślemy link do resetu hasła.",
+      "success": "Jeśli konto z tym adresem istnieje, wysłaliśmy link resetujący."
+    },
+    "reset": {
+      "title": "Ustaw nowe hasło",
+      "subtitle": "Wybierz silne hasło do swojego konta.",
+      "success": "Hasło zaktualizowane. Możesz się zalogować."
+    },
+    "verify": {
+      "title": "Zweryfikuj e-mail",
+      "checkInbox": "Wysłaliśmy link weryfikacyjny na {{email}}. Otwórz go, aby aktywować konto.",
+      "success": "E-mail zweryfikowany. Możesz się zalogować.",
+      "resent": "E-mail weryfikacyjny został wysłany ponownie."
     },
     "success": {
       "login": "Zalogowano pomyślnie",
       "register": "Konto utworzone pomyślnie",
-      "logout": "Wylogowano pomyślnie"
+      "logout": "Wylogowano pomyślnie",
+      "passwordChanged": "Hasło zostało zmienione"
     },
     "errors": {
       "invalidEmail": "Podaj prawidłowy adres e-mail",
+      "passwordRequired": "Podaj hasło",
       "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
       "passwordNeedsDigit": "Hasło musi zawierać co najmniej jedną cyfrę",
       "passwordNeedsSpecial": "Hasło musi zawierać co najmniej jeden znak specjalny",
       "passwordsMismatch": "Hasła nie są identyczne",
+      "currentPasswordRequired": "Podaj obecne hasło",
+      "currentPasswordIncorrect": "Obecne hasło jest nieprawidłowe",
+      "invalidResetToken": "Link resetujący jest nieprawidłowy lub wygasł",
+      "invalidVerificationToken": "Link weryfikacyjny jest nieprawidłowy lub wygasł",
+      "emailNotVerified": "Zweryfikuj e-mail przed zalogowaniem",
+      "oauthPasswordChangeUnavailable": "To konto korzysta z logowania Google. Hasła nie można zmienić tutaj.",
       "nameTooShort": "Imię musi mieć co najmniej 2 znaki",
       "invalidCredentials": "Nieprawidłowy e-mail lub hasło",
       "userExists": "Konto z tym adresem e-mail już istnieje",
@@ -465,6 +508,11 @@
     "subtitle": "Zarządzaj profilem, walutą i subskrypcją",
     "profile": {
       "title": "Profil i preferencje"
+    },
+    "security": {
+      "title": "Bezpieczeństwo",
+      "subtitle": "Zmień hasło do konta e-mail.",
+      "oauthOnly": "To konto korzysta z logowania Google. Hasła nie można zmienić tutaj — zarządzaj dostępem w koncie Google."
     },
     "labels": {
       "primaryCurrency": "Główna waluta",

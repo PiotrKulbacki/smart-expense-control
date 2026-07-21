@@ -13,7 +13,9 @@ export type SafeUser = Pick<
   | 'currentMonthBudget'
   | 'stripeCustomerId'
   | 'createdAt'
->;
+> & {
+  hasPassword: boolean;
+};
 
 export function toSafeUser(user: User): SafeUser {
   return {
@@ -28,6 +30,7 @@ export function toSafeUser(user: User): SafeUser {
     currentMonthBudget: user.currentMonthBudget,
     stripeCustomerId: user.stripeCustomerId,
     createdAt: user.createdAt,
+    hasPassword: Boolean(user.passwordHash),
   };
 }
 

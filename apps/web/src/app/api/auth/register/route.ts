@@ -2,22 +2,22 @@ import { NextResponse } from 'next/server';
 import { registerSchema } from '@shared/features/auth/schemas';
 import { getFinancialMonthStartDayFromDate } from '@shared/features/billing/financial-month';
 import { prisma } from '@lyamo/database';
-import {
-  buildAuthResponse,
-  createMobileTokens,
-  createWebSession,
-  hashPassword,
-  isMobileClient,
-  jsonError,
-  setSessionCookie,
-  toSafeUser,
-} from '@web/features/auth/services/auth.service';
+import { hashPassword, isMobileClient, jsonError } from '@web/features/auth/services/auth.service';
+import { createAndSendEmailVerification } from '@web/features/auth/services/password-reset.service';
+import { checkAuthRateLimit } from '@web/lib/rate-limit';
+
+const RATE_LIMIT_ERROR = 'api.errors.rateLimitExceeded';
 
 export async function POST(request: Request) {
   try {
+    const rateLimit = await checkAuthRateLimit(request, 'register');
+    if (!rateLimit.allowed) {
+      return jsonError(RATE_LIMIT_ERROR, 429);
+    }
+
     const body = await request.json();
 
-    if (!body.acceptedLegal) {
+    if (!body.acceptedLegal && !isMobileClient(request)) {
       return jsonError('auth.errors.legalAcceptanceRequired', 400);
     }
 
@@ -45,21 +45,20 @@ export async function POST(request: Request) {
         name: name ?? null,
         financialMonthStartDay: getFinancialMonthStartDayFromDate(now),
         lastQuotaResetAt: now,
+        emailVerifiedAt: null,
       },
     });
 
-    const safeUser = toSafeUser(user);
-    const mobile = isMobileClient(request);
+    await createAndSendEmailVerification(user.id, user.email);
 
-    if (mobile) {
-      const tokens = await createMobileTokens(user.id);
-      return NextResponse.json(buildAuthResponse(safeUser, tokens), { status: 201 });
-    }
-
-    const sessionToken = await createWebSession(user.id);
-    const response = NextResponse.json(buildAuthResponse(safeUser), { status: 201 });
-    setSessionCookie(response, sessionToken);
-    return response;
+    // Hard gate (D1): no session / tokens until email is verified.
+    return NextResponse.json(
+      {
+        requiresEmailVerification: true,
+        email: user.email,
+      },
+      { status: 201 }
+    );
   } catch {
     return jsonError('auth.errors.generic', 500);
   }

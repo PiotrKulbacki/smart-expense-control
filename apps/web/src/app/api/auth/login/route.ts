@@ -11,9 +11,17 @@ import {
   toSafeUser,
   verifyPassword,
 } from '@web/features/auth/services/auth.service';
+import { checkAuthRateLimit } from '@web/lib/rate-limit';
+
+const RATE_LIMIT_ERROR = 'api.errors.rateLimitExceeded';
 
 export async function POST(request: Request) {
   try {
+    const rateLimit = await checkAuthRateLimit(request, 'login');
+    if (!rateLimit.allowed) {
+      return jsonError(RATE_LIMIT_ERROR, 429);
+    }
+
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
 
@@ -33,6 +41,13 @@ export async function POST(request: Request) {
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
       return jsonError('auth.errors.invalidCredentials', 401);
+    }
+
+    if (!user.emailVerifiedAt) {
+      return NextResponse.json(
+        { error: 'auth.errors.emailNotVerified', email: user.email },
+        { status: 403 }
+      );
     }
 
     const safeUser = toSafeUser(user);

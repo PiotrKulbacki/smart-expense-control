@@ -26,10 +26,14 @@ const AI_RATE_LIMIT_PREFIX: Record<AiRateLimitScope, string> = {
 };
 
 const CONTACT_RATE_LIMIT_PREFIX = `${UPSTASH_KEY_PREFIX}:contact`;
+const AUTH_RATE_LIMIT_PREFIX = `${UPSTASH_KEY_PREFIX}:auth`;
+const AUTH_RATE_LIMIT_WINDOW = '1 h';
+const AUTH_RATE_LIMIT_MAX = 10;
 
 let redisClient: Redis | null | undefined;
 const aiRateLimiters: Partial<Record<AiRateLimitScope, Ratelimit>> = {};
 let contactRateLimiter: Ratelimit | null | undefined;
+let authRateLimiter: Ratelimit | null | undefined;
 
 function getRedisClient(): Redis | null {
   if (redisClient !== undefined) {
@@ -90,6 +94,27 @@ function getContactRateLimiter(): Ratelimit | null {
   });
 
   return contactRateLimiter;
+}
+
+function getAuthRateLimiter(): Ratelimit | null {
+  if (authRateLimiter !== undefined) {
+    return authRateLimiter;
+  }
+
+  const redis = getRedisClient();
+  if (!redis) {
+    authRateLimiter = null;
+    return null;
+  }
+
+  authRateLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(AUTH_RATE_LIMIT_MAX, AUTH_RATE_LIMIT_WINDOW),
+    prefix: AUTH_RATE_LIMIT_PREFIX,
+    analytics: true,
+  });
+
+  return authRateLimiter;
 }
 
 export function getClientIp(request: Request): string {
@@ -211,5 +236,37 @@ export async function checkContactRateLimit(request: Request): Promise<RateLimit
     };
   } catch {
     return resolveLimiterError(key, CONTACT_RATE_LIMIT_MAX);
+  }
+}
+
+export async function checkAuthRateLimit(
+  request: Request,
+  scope: string,
+  userId?: string
+): Promise<RateLimitResult> {
+  const identifier = userId ? `user:${userId}` : `ip:${getClientIp(request)}`;
+  const key = `${AUTH_RATE_LIMIT_PREFIX}:${scope}:${identifier}`;
+  const limiter = getAuthRateLimiter();
+
+  if (!limiter) {
+    return resolveMissingLimiter(key, AUTH_RATE_LIMIT_MAX);
+  }
+
+  try {
+    const result = await limiter.limit(`${scope}:${identifier}`);
+
+    console.log(
+      `Rate Limit Check: Key: ${key}, Remaining: ${result.remaining}, Total: ${AUTH_RATE_LIMIT_MAX}`
+    );
+
+    return {
+      allowed: result.success,
+      remaining: result.remaining,
+      reset: result.reset,
+      limit: AUTH_RATE_LIMIT_MAX,
+      key,
+    };
+  } catch {
+    return resolveLimiterError(key, AUTH_RATE_LIMIT_MAX);
   }
 }
