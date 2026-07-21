@@ -7,7 +7,9 @@ import { ToastProvider } from '@web/features/auth/components/ToastProvider';
 import { CookieConsentProvider } from '@web/features/cookie-consent';
 import { LocaleProvider } from '@web/features/i18n/LocaleProvider';
 import { QueryProvider } from '@web/features/query/QueryProvider';
-import { DEFAULT_LOCALE, isLocale } from '@shared/features/i18n';
+import { DEFAULT_LOCALE, isLocale, t } from '@shared/features/i18n';
+import { env } from '@web/env';
+import { getRequestLocale } from '@web/features/seo/get-request-locale';
 import type { Metadata } from 'next';
 import './globals.css';
 
@@ -23,10 +25,18 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
-  title: 'Lyamo',
-  description: 'Financial management with AI-powered insights',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+
+  return {
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')),
+    title: {
+      default: 'Lyamo',
+      template: '%s | Lyamo',
+    },
+    description: t('seo.home.description', locale),
+  };
+}
 
 export default async function RootLayout({
   children,

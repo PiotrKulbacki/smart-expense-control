@@ -755,6 +755,28 @@
       }
     }
   },
+  "seo": {
+    "home": {
+      "title": "Lyamo — AI expense tracking",
+      "description": "Track spending, scan receipts with AI, and get honest financial insights. Multi-currency support for PLN, EUR, GBP, and USD."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Contact the Lyamo team. We usually reply within 1–2 business days."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Terms of Service for Lyamo — subscriptions, withdrawal rights, and refund policy."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How Lyamo processes personal data, cookies, and security under GDPR."
+    },
+    "impressum": {
+      "title": "Impressum",
+      "description": "Legal imprint (Impressum) for Lyamo — provider details and contact information."
+    }
+  },
   "cookies": {
     "banner": {
       "title": "We use cookies",

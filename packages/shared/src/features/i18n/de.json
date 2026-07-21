@@ -755,6 +755,28 @@
       }
     }
   },
+  "seo": {
+    "home": {
+      "title": "Lyamo — KI-Ausgabenkontrolle",
+      "description": "Verfolgen Sie Ausgaben, scannen Sie Belege mit KI und erhalten Sie ehrliche Finanzeinblicke. Mehrwährungsunterstützung für PLN, EUR, GBP und USD."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "description": "Kontaktieren Sie das Lyamo-Team. Wir antworten in der Regel innerhalb von 1–2 Werktagen."
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen",
+      "description": "Nutzungsbedingungen für Lyamo — Abonnements, Widerrufsrecht und Rückerstattungsrichtlinie."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "description": "Wie Lyamo personenbezogene Daten, Cookies und Sicherheit gemäß DSGVO verarbeitet."
+    },
+    "impressum": {
+      "title": "Impressum",
+      "description": "Impressum für Lyamo — Anbieterangaben und Kontaktdaten."
+    }
+  },
   "cookies": {
     "banner": {
       "title": "Wir verwenden Cookies",
