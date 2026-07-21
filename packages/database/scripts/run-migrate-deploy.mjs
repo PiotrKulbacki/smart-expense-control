@@ -16,15 +16,11 @@ const selfPath = fileURLToPath(import.meta.url);
 const hasDbUrls = Boolean(process.env.DATABASE_URL && process.env.DIRECT_DATABASE_URL);
 
 if (!hasDbUrls && existsSync(rootEnv) && process.env.__MIGRATE_DEPLOY_REEXEC !== '1') {
-  const result = spawnSync(
-    'npx',
-    ['dotenv', '-e', rootEnv, '--', 'node', selfPath],
-    {
-      stdio: 'inherit',
-      cwd: pkgRoot,
-      env: { ...process.env, __MIGRATE_DEPLOY_REEXEC: '1' },
-    }
-  );
+  const result = spawnSync('npx', ['dotenv', '-e', rootEnv, '--', 'node', selfPath], {
+    stdio: 'inherit',
+    cwd: pkgRoot,
+    env: { ...process.env, __MIGRATE_DEPLOY_REEXEC: '1' },
+  });
   process.exit(result.status ?? 1);
 }
 
