@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { forgotPasswordSchema } from '@shared/features/auth/schemas';
@@ -12,6 +13,7 @@ import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 export default function ForgotPasswordPage() {
   const t = useT();
   const { locale } = useLocale();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,6 +43,7 @@ export default function ForgotPasswordPage() {
       }
 
       toast.success(t('auth.forgot.success'));
+      router.push('/');
     } catch {
       toast.error(t('auth.errors.networkError'));
     } finally {

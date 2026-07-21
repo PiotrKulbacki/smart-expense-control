@@ -6,11 +6,14 @@ export const EMAIL_BRAND = {
   surface: '#111118',
   text: '#1a1a22',
   muted: '#5c5c72',
+  warm: '#e8a849',
+  warmMid: '#f0c060',
   cool: '#3dd6c3',
   coolDark: '#2bb8a8',
   pageBg: '#f0f0f5',
   white: '#ffffff',
   border: '#e4e4ec',
+  wordmark: '#e8e8ed',
 } as const;
 
 export const CONTACT_EMAIL = 'kontakt@lyamo.eu';
@@ -31,31 +34,43 @@ export function getAppUrl(): string {
 type WrapEmailHtmlParams = {
   locale: Locale;
   bodyHtml: string;
-  /** Optional primary CTA (green button). */
+  /** Optional primary CTA (warm→cool gradient, matches app btn-primary). */
   cta?: { label: string; url: string };
   /** Plain URL shown under the button when CTA is present. */
   fallbackUrl?: string;
 };
 
 /**
- * Shared Lyamo transactional email chrome: dark header + logo mark, body, green CTA, footer.
- * Logo uses inline HTML (not SVG img) for Gmail/Outlook compatibility.
+ * Shared Lyamo transactional email chrome: dark header + logo mark, body, CTA, footer.
+ * Used by reset-password, verify-email, and contact-form templates.
+ * Logo: hosted PNG of the app mark (Outlook/Gmail-safe); CTA matches .btn-primary.
  */
 export function wrapEmailHtml(params: WrapEmailHtmlParams): string {
   const { locale, bodyHtml, cta, fallbackUrl } = params;
   const brand = escapeHtml(t('layout.brand', locale));
   const footerLead = escapeHtml(t('email.layout.footerContact', locale));
-  const appUrl = escapeHtml(getAppUrl());
+  const appUrl = getAppUrl();
+  const appUrlEscaped = escapeHtml(appUrl);
+  const markUrl = escapeHtml(`${appUrl}/lyamo-mark.png`);
+  const fontSans = "system-ui,-apple-system,'Segoe UI',sans-serif";
+  const fontMono = 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
+  const ctaGradient = `linear-gradient(135deg, ${EMAIL_BRAND.warm} 0%, ${EMAIL_BRAND.warmMid} 50%, ${EMAIL_BRAND.cool} 100%)`;
 
   const ctaBlock = cta
     ? `
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:28px 0 8px;">
         <tr>
-          <td align="center" style="border-radius:8px;background:${EMAIL_BRAND.cool};">
-            <a href="${escapeHtml(cta.url)}"
-               style="display:inline-block;padding:14px 28px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;font-weight:600;line-height:1.2;color:${EMAIL_BRAND.void};text-decoration:none;border-radius:8px;">
-              ${escapeHtml(cta.label)}
-            </a>
+          <td align="left">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="border-radius:8px;background:${EMAIL_BRAND.cool};background-image:${ctaGradient};">
+                  <a href="${escapeHtml(cta.url)}"
+                     style="display:inline-block;padding:14px 28px;font-family:${fontMono};font-size:14px;font-weight:500;line-height:1.2;color:${EMAIL_BRAND.void};text-decoration:none;border-radius:8px;">
+                    ${escapeHtml(cta.label)}
+                  </a>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
@@ -65,10 +80,10 @@ export function wrapEmailHtml(params: WrapEmailHtmlParams): string {
   const fallbackBlock =
     cta && fallbackUrl
       ? `
-      <p style="margin:16px 0 0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:13px;line-height:1.5;color:${EMAIL_BRAND.muted};">
+      <p style="margin:16px 0 0;font-family:${fontSans};font-size:13px;line-height:1.5;color:${EMAIL_BRAND.muted};">
         ${escapeHtml(t('email.layout.fallbackHint', locale))}
       </p>
-      <p style="margin:8px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;word-break:break-all;">
+      <p style="margin:8px 0 0;font-family:${fontMono};font-size:12px;line-height:1.5;word-break:break-all;">
         <a href="${escapeHtml(fallbackUrl)}" style="color:${EMAIL_BRAND.coolDark};text-decoration:underline;">
           ${escapeHtml(fallbackUrl)}
         </a>
@@ -77,20 +92,19 @@ export function wrapEmailHtml(params: WrapEmailHtmlParams): string {
       : '';
 
   const headerHtml = `
-    <a href="${appUrl}" style="text-decoration:none;">
+    <a href="${appUrlEscaped}" style="text-decoration:none;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="vertical-align:middle;padding-right:12px;width:36px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="36" height="36" style="width:36px;height:36px;">
-              <tr>
-                <td style="width:12px;height:36px;background:#e8a849;border-radius:6px 0 0 6px;"></td>
-                <td style="width:24px;height:36px;vertical-align:bottom;background:${EMAIL_BRAND.surface};">
-                  <div style="height:12px;background:#3dd6c3;border-radius:0 6px 6px 0;"></div>
-                </td>
-              </tr>
-            </table>
+          <td style="vertical-align:middle;padding-right:12px;line-height:0;">
+            <img
+              src="${markUrl}"
+              width="36"
+              height="36"
+              alt="${brand}"
+              style="display:block;width:36px;height:36px;border:0;outline:none;text-decoration:none;"
+            />
           </td>
-          <td style="vertical-align:middle;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.02em;color:#e8e8ed;">
+          <td style="vertical-align:middle;font-family:${fontSans};font-size:20px;font-weight:700;letter-spacing:-0.02em;color:${EMAIL_BRAND.wordmark};">
             ${brand}
           </td>
         </tr>
@@ -112,19 +126,19 @@ export function wrapEmailHtml(params: WrapEmailHtmlParams): string {
       <td align="center" style="padding:32px 16px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background:${EMAIL_BRAND.white};border-radius:12px;overflow:hidden;border:1px solid ${EMAIL_BRAND.border};">
           <tr>
-            <td style="background:${EMAIL_BRAND.surface};padding:24px 28px;">
+            <td style="background:${EMAIL_BRAND.void};padding:24px 28px;border-bottom:2px solid ${EMAIL_BRAND.cool};">
               ${headerHtml}
             </td>
           </tr>
           <tr>
-            <td style="padding:32px 28px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.55;color:${EMAIL_BRAND.text};">
+            <td style="padding:32px 28px;font-family:${fontSans};font-size:16px;line-height:1.55;color:${EMAIL_BRAND.text};">
               ${bodyHtml}
               ${ctaBlock}
               ${fallbackBlock}
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 28px 28px;border-top:1px solid ${EMAIL_BRAND.border};font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:13px;line-height:1.5;color:${EMAIL_BRAND.muted};text-align:center;">
+            <td style="padding:20px 28px 28px;border-top:1px solid ${EMAIL_BRAND.border};font-family:${fontSans};font-size:13px;line-height:1.5;color:${EMAIL_BRAND.muted};text-align:center;">
               <p style="margin:0 0 4px;">${footerLead}</p>
               <p style="margin:0;">
                 <a href="mailto:${CONTACT_EMAIL}" style="color:${EMAIL_BRAND.coolDark};text-decoration:none;">${CONTACT_EMAIL}</a>
