@@ -479,9 +479,14 @@
       "overLimit": "{{amount}} por encima del límite"
     },
     "daily": {
+      "avgSpentLabel": "Media gastada:",
+      "avgRemainingLabel": "Media disponible:",
+      "avgAmountPerDay": "{{amount}}/día",
       "avgSpent": "Media gastada: {{amount}}/día",
       "avgRemaining": "Media disponible: {{amount}}/día",
-      "cycleEnd": "Fin del ciclo"
+      "cycleEnd": "Fin del ciclo",
+      "daysUntilPayday": "Días hasta la nómina: {{remaining}} de {{total}}",
+      "paydayToday": "Hoy es día de cobro"
     },
     "recent": {
       "title": "Transacciones recientes",

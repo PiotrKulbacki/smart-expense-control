@@ -481,9 +481,14 @@
       "overLimit": "{{amount}} ponad limit"
     },
     "daily": {
+      "avgSpentLabel": "Średnio wydano:",
+      "avgRemainingLabel": "Średnio do wydania:",
+      "avgAmountPerDay": "{{amount}}/dzień",
       "avgSpent": "Średnio wydano: {{amount}}/dzień",
       "avgRemaining": "Średnio do wydania: {{amount}}/dzień",
-      "cycleEnd": "Koniec cyklu"
+      "cycleEnd": "Koniec cyklu",
+      "daysUntilPayday": "Dni do wypłaty: {{remaining}} z {{total}}",
+      "paydayToday": "Dziś wypłata"
     },
     "recent": {
       "title": "Ostatnie transakcje",

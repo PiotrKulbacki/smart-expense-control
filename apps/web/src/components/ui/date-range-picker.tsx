@@ -7,7 +7,8 @@ import type { DateRange } from 'react-day-picker';
 import { Button } from '@web/components/ui/button';
 import { Calendar } from '@web/components/ui/calendar';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '@web/components/ui/popover';
-import { useT } from '@web/features/i18n/LocaleProvider';
+import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
+import { getDayPickerLocale } from '@web/lib/date-locale';
 import { cn } from '@web/lib/utils';
 
 type DatePickerWithRangeProps = {
@@ -34,6 +35,8 @@ export function DatePickerWithRange({
   focusGuardRef,
 }: DatePickerWithRangeProps) {
   const t = useT();
+  const { locale } = useLocale();
+  const dayPickerLocale = getDayPickerLocale(locale);
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [draftRange, setDraftRange] = useState<DateRange | undefined>(dateRange);
   const open = controlledOpen ?? uncontrolledOpen;
@@ -52,18 +55,20 @@ export function DatePickerWithRange({
   }, [open, dateRange]);
 
   function handleApply() {
-    if (!draftRange?.from || !draftRange?.to) {
+    if (!draftRange?.from) {
       return;
     }
 
+    const rangeEnd = draftRange.to ?? draftRange.from;
+
     onDateRangeChange({
       from: startOfDay(draftRange.from),
-      to: endOfDay(draftRange.to),
+      to: endOfDay(rangeEnd),
     });
     setOpen(false);
   }
 
-  const canApply = Boolean(draftRange?.from && draftRange?.to);
+  const canApply = Boolean(draftRange?.from);
 
   return (
     <div className={cn(hideTrigger ? 'contents' : 'grid gap-2', className)}>
@@ -84,10 +89,11 @@ export function DatePickerWithRange({
               {dateRange?.from ? (
                 dateRange.to ? (
                   <>
-                    {format(dateRange.from, 'LLL dd, y')} – {format(dateRange.to, 'LLL dd, y')}
+                    {format(dateRange.from, 'LLL dd, y', { locale: dayPickerLocale })} –{' '}
+                    {format(dateRange.to, 'LLL dd, y', { locale: dayPickerLocale })}
                   </>
                 ) : (
-                  format(dateRange.from, 'LLL dd, y')
+                  format(dateRange.from, 'LLL dd, y', { locale: dayPickerLocale })
                 )
               ) : (
                 <span>{placeholder}</span>
@@ -108,6 +114,7 @@ export function DatePickerWithRange({
         >
           <Calendar
             mode="range"
+            locale={dayPickerLocale}
             defaultMonth={draftRange?.from ?? dateRange?.from ?? today}
             selected={draftRange}
             onSelect={setDraftRange}

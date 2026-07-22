@@ -43,6 +43,8 @@
 39. **Faza 12.6: Mobile nav — menu rozwijane (landing + app sidebar)** — [✅ Zrobione]
 40. **Faza 12.6.2: Settings mobile — limity, sheety, anti-zoom** — [✅ Zrobione]
 41. **Faza 12.6.3: Settings modale anti-scroll/autofocus + AI insights locale** — [✅ Zrobione]
+42. **Faza 12.6.4: Dashboard UX — średnie dzienne, kalendarz własnego zakresu** — [✅ Zrobione]
+43. **Faza 12.6.5: pasek „Dni do wypłaty” + polish średnich/donuta** — [✅ Zrobione]
 
 ## Żelazne zasady agentów (obowiązkowe)
 
@@ -95,6 +97,45 @@ Każda akcja użytkownika, która wywołuje **fetch API**, **nawigację** lub **
 **Reguła praktyczna:** jeśli dodajesz `onClick` → `fetch` lub `router.push`, dodaj też loader lub szkielet i `disabled` na czas operacji.
 
 ## Latest Handoff Log
+
+**2026-07-22 — Faza 12.6.5: pasek „Dni do wypłaty” + polish średnich/donuta.**
+
+### Panel „Suma wydatków”
+
+- **Payday progress:** pod średnimi dziennymi — etykieta `Dni do wypłaty: {{remaining}} z {{total}}` + segmentowany pasek (wypełnione = dni minione, puste ramki = pozostałe); w dniu startu cyklu: „Dziś wypłata”.
+- **Średnie dzienne:** ikona sklejona z tekstem; na mobile kolumna (`flex-col`), od `sm` rząd z prawą pozycją `ml-auto text-right`.
+
+### Wykres kategorii
+
+- Etykieta zakresu **zawsze** w środku donuta (okres / 7 dni / dziś / własny); większa czcionka (`text-sm`).
+
+### i18n / testy
+
+- Klucze `dashboard.daily.daysUntilPayday|paydayToday` (en/pl/de/es); `payday-cycle-metrics.test.ts`.
+- Lokalnie: format, lint, typecheck, test — zielone.
+
+---
+
+**2026-07-22 — Faza 12.6.4: Dashboard UX — średnie dzienne, kalendarz własnego zakresu.**
+
+### Panel „Suma wydatków”
+
+- **Wyrównanie średnich dziennych:** `DashboardDailyStats` — prawa kolumna (`Średnio do wydania`) z `flex-1` + `justify-end` / `text-right`, symetria z „Pozostało” na mobile.
+- **Etykieta zakresu:** przy `appliedFilter === 'custom'` data/zakres obok tytułu „Suma wydatków” (`formatDateRangeLabel`).
+
+### Wykres „Wydatki wg kategorii” + kalendarz
+
+- **Strzałki miesięcy:** aktywne chevrony w kolorze `--warm` (`fill-warm`); SVG DayPicker domyślnie miał czarny fill.
+- **Locale kalendarza:** `locale` z `react-day-picker/locale` (en/de/pl/es) — nazwy miesięcy i dni tygodnia w języku UI.
+- **Środek donuta:** po zastosowaniu własnego zakresu data/przedział w centrum wykresu.
+- **Bug podwójnego „Zastosuj”:** po Apply fetch nowego zakresu powodował pełny skeleton (`isLoading`) i remount → `useEffect` ponownie otwierał popover. Naprawa: `placeholderData` w query dashboardu + otwieranie pickera tylko przy wyborze „custom” (nie przy każdym mountcie).
+- **Pojedynczy dzień:** „Zastosuj” działa też gdy wybrany jest tylko `from` (`to = from`).
+
+### Testy / jakość
+
+- `format-date-range-label.test.ts`; lokalnie: format, lint, typecheck, test — zielone.
+
+---
 
 **2026-07-22 — Faza 12.6.3: Settings modale (anti-scroll, autofocus) + AI insights locale.**
 

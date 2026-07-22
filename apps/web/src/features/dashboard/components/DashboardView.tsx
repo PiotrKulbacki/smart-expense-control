@@ -31,7 +31,9 @@ import {
   getChartRangeStart,
   type ChartDateRange,
 } from '@web/features/transactions/lib/chart-date-filter';
+import { formatDateRangeLabel } from '@web/features/transactions/lib/format-date-range-label';
 import { computeDailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
+import { getPaydayCycleMetrics } from '@web/features/dashboard/lib/payday-cycle-metrics';
 import { countLogicalTransactions } from '@web/features/dashboard/lib/transaction-counts';
 import { CategoryLimitsProgressCard } from '@web/features/dashboard/components/CategoryLimitsProgressCard';
 import { TransactionsInsightsCard } from '@web/features/dashboard/components/TransactionsInsightsCard';
@@ -72,13 +74,13 @@ function toFormInitialValues(transaction: RecentTransaction): TransactionFormIni
 }
 
 function buildDashboardDateRange(customDateRange?: DateRange) {
-  if (!customDateRange?.from || !customDateRange?.to) {
+  if (!customDateRange?.from) {
     return undefined;
   }
 
   return {
     from: startOfDay(customDateRange.from),
-    to: endOfDay(customDateRange.to),
+    to: endOfDay(customDateRange.to ?? customDateRange.from),
   };
 }
 
@@ -110,6 +112,7 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
     queryKey: queryKeys.dashboard(user.id, dashboardDateRange),
     queryFn: () => fetchDashboard(dashboardDateRange),
     initialData: !dashboardDateRange ? initialDashboardData : undefined,
+    placeholderData: (previousData) => previousData,
   });
 
   const scanQuotaQuery = useQuery({
@@ -240,6 +243,44 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
     });
   }, [summary, appliedFilter, visibleTotalSpent, hiddenTotalSpent]);
 
+  const paydayMetrics = useMemo(() => {
+    if (!summary) {
+      return null;
+    }
+
+    return getPaydayCycleMetrics(summary.financialMonthStartDay);
+  }, [summary]);
+
+  const chartRangeLabel = useMemo(() => {
+    if (!summary) {
+      return null;
+    }
+
+    if (appliedFilter === 'custom') {
+      return formatDateRangeLabel(customDateRange, locale);
+    }
+
+    if (appliedFilter === 'today') {
+      const today = new Date();
+      return formatDateRangeLabel({ from: today, to: today }, locale);
+    }
+
+    if (appliedFilter === '7d') {
+      const to = new Date();
+      const from = new Date();
+      from.setDate(from.getDate() - 6);
+      return formatDateRangeLabel({ from, to }, locale);
+    }
+
+    return formatDateRangeLabel(
+      {
+        from: new Date(summary.periodStart),
+        to: summary.periodEnd ? new Date(summary.periodEnd) : new Date(summary.periodStart),
+      },
+      locale
+    );
+  }, [summary, appliedFilter, customDateRange, locale]);
+
   useEffect(() => {
     setHiddenCategories(new Set());
   }, [appliedFilter]);
@@ -344,6 +385,9 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
     return null;
   }
 
+  const customRangeLabel =
+    appliedFilter === 'custom' ? formatDateRangeLabel(customDateRange, locale) : null;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -376,6 +420,9 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
         <article className="panel relative z-10 h-full p-6">
           <p className="text-muted relative z-10 text-sm font-medium">
             {t('dashboard.summary.totalSpent')}
+            {customRangeLabel ? (
+              <span className="ml-2 font-normal normal-case">· {customRangeLabel}</span>
+            ) : null}
           </p>
           {isRefreshing ? (
             <div
@@ -387,10 +434,11 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
               {formatMoney(visibleTotalSpent, summary.primaryCurrency, locale)}
             </p>
           )}
-          {dailyStats && (
+          {dailyStats && paydayMetrics && (
             <BudgetProgress
               totalSpent={summary.billingPeriodTotalSpent}
               dailyStats={dailyStats}
+              paydayMetrics={paydayMetrics}
               currentMonthBudget={summary.currentMonthBudget}
               primaryCurrency={summary.primaryCurrency}
               locale={locale}
@@ -427,6 +475,7 @@ export function DashboardView({ initialDashboardData, initialScanQuota }: Dashbo
         categoryDisplayContext={categoryDisplayContext}
         customDateRange={customDateRange}
         onCustomRangeChange={handleCustomRangeApply}
+        chartRangeLabel={chartRangeLabel}
         isRefreshing={isRefreshing}
       />
 

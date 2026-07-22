@@ -479,9 +479,14 @@
       "overLimit": "{{amount}} über dem Limit"
     },
     "daily": {
+      "avgSpentLabel": "Ø ausgegeben:",
+      "avgRemainingLabel": "Ø verfügbar:",
+      "avgAmountPerDay": "{{amount}}/Tag",
       "avgSpent": "Ø ausgegeben: {{amount}}/Tag",
       "avgRemaining": "Ø verfügbar: {{amount}}/Tag",
-      "cycleEnd": "Ende des Zyklus"
+      "cycleEnd": "Ende des Zyklus",
+      "daysUntilPayday": "Tage bis Gehalt: {{remaining}} von {{total}}",
+      "paydayToday": "Heute ist Zahltag"
     },
     "recent": {
       "title": "Letzte Transaktionen",

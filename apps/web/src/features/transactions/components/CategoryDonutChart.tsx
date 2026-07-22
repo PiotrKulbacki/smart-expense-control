@@ -46,6 +46,7 @@ type CategoryDonutChartProps = {
   onToggleCategory: (category: string) => void;
   onCustomRangeChange?: (range: DateRange | undefined) => void;
   customDateRange?: DateRange;
+  chartRangeLabel?: string | null;
   categoryDisplayContext?: CategoryDisplayContext;
   isRefreshing?: boolean;
 };
@@ -83,6 +84,7 @@ export function CategoryDonutChart({
   onToggleCategory,
   onCustomRangeChange,
   customDateRange,
+  chartRangeLabel,
   categoryDisplayContext,
   isRefreshing = false,
 }: CategoryDonutChartProps) {
@@ -95,14 +97,7 @@ export function CategoryDonutChart({
   useEffect(() => {
     if (filterSelection !== 'custom') {
       setIsCustomPickerOpen(false);
-      return;
     }
-
-    const frameId = requestAnimationFrame(() => {
-      setIsCustomPickerOpen(true);
-    });
-
-    return () => cancelAnimationFrame(frameId);
   }, [filterSelection]);
 
   useEffect(() => {
@@ -128,6 +123,7 @@ export function CategoryDonutChart({
     onFilterSelectionChange(value);
 
     if (value === 'custom') {
+      setIsCustomPickerOpen(true);
       return;
     }
 
@@ -140,14 +136,19 @@ export function CategoryDonutChart({
   }
 
   function handleCustomRangeApply(range: DateRange | undefined) {
-    if (!range?.from || !range?.to) {
+    if (!range?.from) {
       return;
     }
 
+    const normalizedRange: DateRange = {
+      from: range.from,
+      to: range.to ?? range.from,
+    };
+
+    setIsCustomPickerOpen(false);
     onAppliedFilterChange('custom');
     onFilterSelectionChange('custom');
-    setIsCustomPickerOpen(false);
-    onCustomRangeChange?.(range);
+    onCustomRangeChange?.(normalizedRange);
   }
 
   return (
@@ -172,7 +173,14 @@ export function CategoryDonutChart({
               <SelectItem value="period">{t('dashboard.chartFilter.period')}</SelectItem>
               <SelectItem value="7d">{t('dashboard.chartFilter.last7Days')}</SelectItem>
               <SelectItem value="today">{t('dashboard.chartFilter.today')}</SelectItem>
-              <SelectItem value="custom">{t('dashboard.chartFilter.customRange')}</SelectItem>
+              <SelectItem
+                value="custom"
+                onPointerUp={() => {
+                  queueMicrotask(() => setIsCustomPickerOpen(true));
+                }}
+              >
+                {t('dashboard.chartFilter.customRange')}
+              </SelectItem>
             </SelectContent>
           </Select>
           {filterSelection === 'custom' && onCustomRangeChange && (
@@ -194,18 +202,27 @@ export function CategoryDonutChart({
         <p className="text-muted relative z-10 mt-6 text-sm">{t('dashboard.chartFilter.empty')}</p>
       ) : (
         <div className="relative z-10 mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center">
-          <div className="mx-auto h-64 w-full max-w-sm">
+          <div className="relative mx-auto h-64 w-full max-w-sm">
             {visibleCategoryTotals.length === 0 ? (
               <div className="bg-elevated/50 flex h-full items-center justify-center rounded-full border border-dashed border-[var(--border)] px-6 text-center">
                 <p className="text-muted text-sm">{t('dashboard.chartFilter.allHidden')}</p>
               </div>
             ) : (
-              <CategoryDonutChartPie
-                chartData={chartData}
-                primaryCurrency={primaryCurrency}
-                locale={locale}
-                formatMoney={formatMoney}
-              />
+              <>
+                <CategoryDonutChartPie
+                  chartData={chartData}
+                  primaryCurrency={primaryCurrency}
+                  locale={locale}
+                  formatMoney={formatMoney}
+                />
+                {chartRangeLabel && (
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <p className="text-muted max-w-[8.5rem] text-center text-sm font-medium leading-snug">
+                      {chartRangeLabel}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

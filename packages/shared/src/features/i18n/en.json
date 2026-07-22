@@ -479,9 +479,14 @@
       "overLimit": "{{amount}} over limit"
     },
     "daily": {
+      "avgSpentLabel": "Avg. spent:",
+      "avgRemainingLabel": "Avg. left to spend:",
+      "avgAmountPerDay": "{{amount}}/day",
       "avgSpent": "Avg. spent: {{amount}}/day",
       "avgRemaining": "Avg. left to spend: {{amount}}/day",
-      "cycleEnd": "End of cycle"
+      "cycleEnd": "End of cycle",
+      "daysUntilPayday": "Days until payday: {{remaining}} of {{total}}",
+      "paydayToday": "Payday today"
     },
     "recent": {
       "title": "Recent transactions",

@@ -9,12 +9,15 @@ import { Input } from '@web/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@web/components/ui/popover';
 import { Progress } from '@web/components/ui/progress';
 import { DashboardDailyStats } from '@web/features/dashboard/components/DashboardDailyStats';
+import { PaydayDaysProgress } from '@web/features/dashboard/components/PaydayDaysProgress';
 import type { DailyBudgetStats } from '@web/features/dashboard/lib/dashboard-daily-stats';
+import type { PaydayCycleMetrics } from '@web/features/dashboard/lib/payday-cycle-metrics';
 import { useLocale, useT } from '@web/features/i18n/LocaleProvider';
 
 type BudgetProgressProps = {
   totalSpent: number;
   dailyStats: DailyBudgetStats;
+  paydayMetrics: PaydayCycleMetrics;
   currentMonthBudget: number | null;
   primaryCurrency: string;
   locale: string;
@@ -33,6 +36,7 @@ function formatMoney(amount: number, currency: string, locale: string): string {
 export function BudgetProgress({
   totalSpent,
   dailyStats,
+  paydayMetrics,
   currentMonthBudget,
   primaryCurrency,
   locale,
@@ -45,18 +49,25 @@ export function BudgetProgress({
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const paydaySection = (
+    <div className="space-y-3">
+      <DashboardDailyStats
+        avgSpentPerDay={dailyStats.avgSpentPerDay}
+        avgRemainingPerDay={dailyStats.avgRemainingPerDay}
+        cycleEnded={dailyStats.cycleEnded}
+        primaryCurrency={primaryCurrency}
+        locale={locale}
+      />
+      <PaydayDaysProgress
+        daysUntilPayday={paydayMetrics.daysUntilPayday}
+        totalDays={paydayMetrics.totalDays}
+        daysFilled={paydayMetrics.daysFilled}
+      />
+    </div>
+  );
+
   if (currentMonthBudget == null || currentMonthBudget <= 0) {
-    return (
-      <div className="mt-4">
-        <DashboardDailyStats
-          avgSpentPerDay={dailyStats.avgSpentPerDay}
-          avgRemainingPerDay={dailyStats.avgRemainingPerDay}
-          cycleEnded={dailyStats.cycleEnded}
-          primaryCurrency={primaryCurrency}
-          locale={locale}
-        />
-      </div>
-    );
+    return <div className="mt-4">{paydaySection}</div>;
   }
 
   const budget = currentMonthBudget;
@@ -177,13 +188,7 @@ export function BudgetProgress({
           </div>
         </>
       )}
-      <DashboardDailyStats
-        avgSpentPerDay={dailyStats.avgSpentPerDay}
-        avgRemainingPerDay={dailyStats.avgRemainingPerDay}
-        cycleEnded={dailyStats.cycleEnded}
-        primaryCurrency={primaryCurrency}
-        locale={locale}
-      />
+      {paydaySection}
     </div>
   );
 }

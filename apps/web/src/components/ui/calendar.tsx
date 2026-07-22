@@ -7,7 +7,7 @@ import { cn } from '@web/lib/utils';
 export type CalendarProps = DayPickerProps;
 
 const navButtonClass = cn(
-  'absolute top-0 inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border)] bg-elevated/50 p-0 text-[var(--text)] opacity-80 transition hover:border-warm/30 hover:opacity-100',
+  'absolute top-0 inline-flex h-9 w-9 items-center justify-center rounded-md border border-[var(--border)] bg-elevated/50 p-0 text-warm opacity-90 transition hover:border-warm/40 hover:opacity-100',
   'disabled:pointer-events-none disabled:opacity-30',
   'aria-disabled:pointer-events-none aria-disabled:opacity-30'
 );
@@ -25,6 +25,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         caption_label: 'text-sm font-medium text-[var(--text)]',
         button_previous: cn(navButtonClass, 'left-0'),
         button_next: cn(navButtonClass, 'right-0'),
+        chevron: 'fill-warm',
         month_grid: 'mt-4 w-full border-collapse',
         weekdays: 'flex',
         weekday: 'w-9 text-center text-[0.8rem] font-normal text-muted',
